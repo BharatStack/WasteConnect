@@ -9,7 +9,210 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      pickup_requests: {
+        Row: {
+          collector_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          pickup_date: string | null
+          pickup_time: string | null
+          requester_id: string
+          status: Database["public"]["Enums"]["pickup_status"]
+          updated_at: string
+          waste_item_id: string
+        }
+        Insert: {
+          collector_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          requester_id: string
+          status?: Database["public"]["Enums"]["pickup_status"]
+          updated_at?: string
+          waste_item_id: string
+        }
+        Update: {
+          collector_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          requester_id?: string
+          status?: Database["public"]["Enums"]["pickup_status"]
+          updated_at?: string
+          waste_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pickup_requests_collector_id_fkey"
+            columns: ["collector_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pickup_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pickup_requests_waste_item_id_fkey"
+            columns: ["waste_item_id"]
+            isOneToOne: false
+            referencedRelation: "waste_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      processor_connections: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          price_per_unit: number | null
+          processing_capacity: number | null
+          processor_id: string
+          waste_generator_id: string
+          waste_type: Database["public"]["Enums"]["waste_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          price_per_unit?: number | null
+          processing_capacity?: number | null
+          processor_id: string
+          waste_generator_id: string
+          waste_type: Database["public"]["Enums"]["waste_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          price_per_unit?: number | null
+          processing_capacity?: number | null
+          processor_id?: string
+          waste_generator_id?: string
+          waste_type?: Database["public"]["Enums"]["waste_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processor_connections_processor_id_fkey"
+            columns: ["processor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processor_connections_waste_generator_id_fkey"
+            columns: ["waste_generator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          state: string | null
+          updated_at: string
+          user_type: Database["public"]["Enums"]["user_type"]
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      waste_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean
+          location: string | null
+          quantity: number
+          title: string
+          unit: string
+          updated_at: string
+          user_id: string
+          waste_type: Database["public"]["Enums"]["waste_type"]
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          location?: string | null
+          quantity: number
+          title: string
+          unit?: string
+          updated_at?: string
+          user_id: string
+          waste_type: Database["public"]["Enums"]["waste_type"]
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          location?: string | null
+          quantity?: number
+          title?: string
+          unit?: string
+          updated_at?: string
+          user_id?: string
+          waste_type?: Database["public"]["Enums"]["waste_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waste_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +221,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      pickup_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      user_type: "individual" | "business" | "processor" | "collector"
+      waste_type:
+        | "organic"
+        | "recyclable"
+        | "hazardous"
+        | "electronic"
+        | "general"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +343,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      pickup_status: ["scheduled", "in_progress", "completed", "cancelled"],
+      user_type: ["individual", "business", "processor", "collector"],
+      waste_type: [
+        "organic",
+        "recyclable",
+        "hazardous",
+        "electronic",
+        "general",
+      ],
+    },
   },
 } as const
