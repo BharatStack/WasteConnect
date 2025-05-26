@@ -1,8 +1,13 @@
+
 import React from 'react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { Plus, BarChart3, Users, Recycle } from 'lucide-react';
 
 const Dashboard = () => {
   return (
@@ -21,12 +26,37 @@ const Dashboard = () => {
               
               <DashboardStats />
               
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <div className="lg:col-span-2">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-eco-green-600">
+                      Quick Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Link to="/waste-entry">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Waste Data
+                      </Button>
+                    </Link>
+                    <Button variant="outline" className="w-full">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      View Reports
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      <Users className="h-4 w-4 mr-2" />
+                      Manage Team
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      <Recycle className="h-4 w-4 mr-2" />
+                      Recycling Hub
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <div className="lg:col-span-3">
                   <RecentActivity />
-                </div>
-                <div className="space-y-6">
-                  {/* Quick actions or additional widgets can go here */}
                 </div>
               </div>
             </div>
