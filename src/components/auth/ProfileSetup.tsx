@@ -24,7 +24,7 @@ const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
     city: '',
     state: '',
     zip_code: '',
-    user_type: 'individual'
+    user_type: 'individual' as 'individual' | 'business' | 'processor' | 'collector'
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +39,13 @@ const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
         .upsert({
           id: user.id,
           email: user.email || '',
-          ...profileData
+          full_name: profileData.full_name,
+          phone: profileData.phone,
+          address: profileData.address,
+          city: profileData.city,
+          state: profileData.state,
+          zip_code: profileData.zip_code,
+          user_type: profileData.user_type
         });
 
       if (error) throw error;
@@ -134,7 +140,7 @@ const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
 
               <div className="space-y-2">
                 <Label htmlFor="user_type">Account Type</Label>
-                <Select value={profileData.user_type} onValueChange={(value) => setProfileData(prev => ({ ...prev, user_type: value }))}>
+                <Select value={profileData.user_type} onValueChange={(value: 'individual' | 'business' | 'processor' | 'collector') => setProfileData(prev => ({ ...prev, user_type: value }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

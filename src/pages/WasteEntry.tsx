@@ -18,7 +18,7 @@ const WasteEntry = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
-    wasteType: '',
+    wasteType: '' as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general' | '',
     quantity: '',
     unit: 'kg',
     description: '',
@@ -117,7 +117,7 @@ const WasteEntry = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !formData.wasteType) return;
 
     setIsLoading(true);
 
@@ -127,7 +127,7 @@ const WasteEntry = () => {
         .insert({
           user_id: user.id,
           title: formData.title,
-          waste_type: formData.wasteType,
+          waste_type: formData.wasteType as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general',
           quantity: parseFloat(formData.quantity),
           unit: formData.unit,
           description: formData.description,
@@ -145,7 +145,7 @@ const WasteEntry = () => {
       // Reset form
       setFormData({
         title: '',
-        wasteType: '',
+        wasteType: '' as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general' | '',
         quantity: '',
         unit: 'kg',
         description: '',
@@ -168,7 +168,7 @@ const WasteEntry = () => {
   const clearForm = () => {
     setFormData({
       title: '',
-      wasteType: '',
+      wasteType: '' as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general' | '',
       quantity: '',
       unit: 'kg',
       description: '',
