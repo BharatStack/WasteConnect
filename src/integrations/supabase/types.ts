@@ -9,6 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      citizen_reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      municipality_responses: {
+        Row: {
+          after_image_url: string | null
+          created_at: string
+          id: string
+          message: string | null
+          report_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          after_image_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          report_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          after_image_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          report_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "municipality_responses_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pickup_requests: {
         Row: {
           collector_id: string | null
@@ -159,6 +236,38 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      report_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          report_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          report_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          report_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_messages_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_reports"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waste_items: {
         Row: {

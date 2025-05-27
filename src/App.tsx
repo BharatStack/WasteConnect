@@ -11,6 +11,9 @@ import Features from "./pages/Features";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
 import WasteEntry from "./pages/WasteEntry";
+import CitizenReports from "./pages/CitizenReports";
+import NewCitizenReport from "./pages/NewCitizenReport";
+import CitizenReportDetails from "./pages/CitizenReportDetails";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -36,6 +39,21 @@ const App = () => (
           <Route path="/waste-entry" element={
             <ProtectedRoute>
               <WasteEntry />
+            </ProtectedRoute>
+          } />
+          <Route path="/citizen-reports" element={
+            <ProtectedRoute>
+              <CitizenReports />
+            </ProtectedRoute>
+          } />
+          <Route path="/citizen-reports/new" element={
+            <ProtectedRoute>
+              <NewCitizenReport />
+            </ProtectedRoute>
+          } />
+          <Route path="/citizen-reports/:id" element={
+            <ProtectedRoute>
+              <CitizenReportDetails />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

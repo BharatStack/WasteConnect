@@ -1,69 +1,93 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trash2, FileText, MessageSquare } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import RecentActivity from '@/components/dashboard/RecentActivity';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
-import { Plus, BarChart3, Users, Recycle } from 'lucide-react';
 
 const Dashboard = () => {
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <DashboardHeader />
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                <p className="text-muted-foreground">
-                  Welcome to your waste management dashboard
-                </p>
-              </div>
-              
-              <DashboardStats />
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-eco-green-600">
-                      Quick Actions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Link to="/waste-entry">
-                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Waste Data
-                      </Button>
-                    </Link>
-                    <Button variant="outline" className="w-full">
-                      <BarChart3 className="h-4 w-4 mr-2" />
+    <div className="min-h-screen bg-gray-50">
+      <DashboardHeader />
+      
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            <p className="text-gray-600">Manage your waste data and environmental impact</p>
+          </div>
+
+          <DashboardStats />
+
+          <div className="mt-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Trash2 className="h-5 w-5 text-eco-green-600" />
+                    Waste Entry
+                  </CardTitle>
+                  <CardDescription>
+                    Record new waste data and calculate environmental impact
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link to="/waste-entry">
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Add Waste Data
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <MessageSquare className="h-5 w-5 text-eco-green-600" />
+                    Citizen Reports
+                  </CardTitle>
+                  <CardDescription>
+                    Report environmental issues and track municipality responses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link to="/citizen-reports">
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
                       View Reports
                     </Button>
-                    <Button variant="outline" className="w-full">
-                      <Users className="h-4 w-4 mr-2" />
-                      Manage Team
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      <Recycle className="h-4 w-4 mr-2" />
-                      Recycling Hub
-                    </Button>
-                  </CardContent>
-                </Card>
+                  </Link>
+                </CardContent>
+              </Card>
 
-                <div className="lg:col-span-3">
-                  <RecentActivity />
-                </div>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="h-5 w-5 text-eco-green-600" />
+                    Analytics
+                  </CardTitle>
+                  <CardDescription>
+                    View detailed reports and environmental impact metrics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full" disabled>
+                    Coming Soon
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </main>
-      </div>
-    </ProtectedRoute>
+
+          <div className="mt-8">
+            <RecentActivity />
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 
