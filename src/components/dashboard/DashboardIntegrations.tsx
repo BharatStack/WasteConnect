@@ -186,6 +186,9 @@ const DashboardIntegrations = () => {
     return <div className="text-center py-8">Loading dashboard integrations...</div>;
   }
 
+  const currentUserType = getCurrentUserType();
+  const UserIcon = currentUserType.icon;
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="overview" className="w-full">
@@ -208,16 +211,16 @@ const DashboardIntegrations = () => {
               {userProfile && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${getCurrentUserType().color}`}>
-                      <getCurrentUserType().icon className={`h-6 w-6 ${getCurrentUserType().iconColor}`} />
+                    <div className={`p-3 rounded-lg ${currentUserType.color}`}>
+                      <UserIcon className={`h-6 w-6 ${currentUserType.iconColor}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{getCurrentUserType().title}</h3>
+                      <h3 className="font-semibold">{currentUserType.title}</h3>
                       <p className="text-sm text-gray-600">{userProfile.full_name}</p>
                       <Badge variant="outline">{userProfile.user_type}</Badge>
                     </div>
                   </div>
-                  <p className="text-gray-600">{getCurrentUserType().description}</p>
+                  <p className="text-gray-600">{currentUserType.description}</p>
                 </div>
               )}
             </CardContent>
@@ -245,63 +248,69 @@ const DashboardIntegrations = () => {
 
         <TabsContent value="user-types" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            {userTypes.map((type) => (
-              <Card key={type.id} className={`${type.color} border-none shadow-md`}>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${type.color} border-2 border-eco-green-200`}>
-                      <type.icon className={`h-6 w-6 ${type.iconColor}`} />
-                    </div>
-                    <CardTitle className="text-lg">{type.title}</CardTitle>
-                    {userProfile?.user_type === type.id && (
-                      <Badge variant="default">Current</Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="mb-4">{type.description}</CardDescription>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Available Features:</h4>
-                    {type.features.map((feature, i) => (
-                      <div key={i} className="flex items-center">
-                        <div className="h-2 w-2 rounded-full bg-eco-green-500 mr-2"></div>
-                        <span className="text-sm">{feature}</span>
+            {userTypes.map((type) => {
+              const TypeIcon = type.icon;
+              return (
+                <Card key={type.id} className={`${type.color} border-none shadow-md`}>
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${type.color} border-2 border-eco-green-200`}>
+                        <TypeIcon className={`h-6 w-6 ${type.iconColor}`} />
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <CardTitle className="text-lg">{type.title}</CardTitle>
+                      {userProfile?.user_type === type.id && (
+                        <Badge variant="default">Current</Badge>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="mb-4">{type.description}</CardDescription>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Available Features:</h4>
+                      {type.features.map((feature, i) => (
+                        <div key={i} className="flex items-center">
+                          <div className="h-2 w-2 rounded-full bg-eco-green-500 mr-2"></div>
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </TabsContent>
 
         <TabsContent value="features" className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-eco-green-100 text-eco-green-600">
-                      <feature.icon className="h-5 w-5" />
+            {features.map((feature, index) => {
+              const FeatureIcon = feature.icon;
+              return (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-eco-green-100 text-eco-green-600">
+                        <FeatureIcon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base">{feature.title}</CardTitle>
+                        <Badge variant="outline" className="text-xs">
+                          {feature.category}
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-base">{feature.title}</CardTitle>
-                      <Badge variant="outline" className="text-xs">
-                        {feature.category}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="mb-4">{feature.description}</CardDescription>
-                  <Link to={feature.route}>
-                    <Button variant="outline" className="w-full">
-                      Access Feature
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="mb-4">{feature.description}</CardDescription>
+                    <Link to={feature.route}>
+                      <Button variant="outline" className="w-full">
+                        Access Feature
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </TabsContent>
 
