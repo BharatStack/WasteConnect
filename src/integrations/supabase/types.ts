@@ -51,6 +51,150 @@ export type Database = {
         }
         Relationships: []
       }
+      collection_schedules: {
+        Row: {
+          collection_type: string
+          collector_assigned: string | null
+          created_at: string
+          id: string
+          location: string
+          scheduled_date: string
+          scheduled_time: string | null
+          special_instructions: string | null
+          status: Database["public"]["Enums"]["collection_status"]
+          updated_at: string
+          user_id: string
+          waste_types: string[] | null
+        }
+        Insert: {
+          collection_type: string
+          collector_assigned?: string | null
+          created_at?: string
+          id?: string
+          location: string
+          scheduled_date: string
+          scheduled_time?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["collection_status"]
+          updated_at?: string
+          user_id: string
+          waste_types?: string[] | null
+        }
+        Update: {
+          collection_type?: string
+          collector_assigned?: string | null
+          created_at?: string
+          id?: string
+          location?: string
+          scheduled_date?: string
+          scheduled_time?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["collection_status"]
+          updated_at?: string
+          user_id?: string
+          waste_types?: string[] | null
+        }
+        Relationships: []
+      }
+      compliance_reports: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          compliance_data: Json
+          created_at: string
+          id: string
+          report_type: string
+          reporting_period_end: string
+          reporting_period_start: string
+          status: Database["public"]["Enums"]["compliance_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          compliance_data: Json
+          created_at?: string
+          id?: string
+          report_type: string
+          reporting_period_end: string
+          reporting_period_start: string
+          status?: Database["public"]["Enums"]["compliance_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          compliance_data?: Json
+          created_at?: string
+          id?: string
+          report_type?: string
+          reporting_period_end?: string
+          reporting_period_start?: string
+          status?: Database["public"]["Enums"]["compliance_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      marketplace_items: {
+        Row: {
+          buyer_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          item_name: string
+          location: string | null
+          material_type: Database["public"]["Enums"]["waste_type"]
+          price_per_unit: number | null
+          quantity: number
+          seller_id: string
+          status: Database["public"]["Enums"]["marketplace_item_status"]
+          total_price: number | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          item_name: string
+          location?: string | null
+          material_type: Database["public"]["Enums"]["waste_type"]
+          price_per_unit?: number | null
+          quantity: number
+          seller_id: string
+          status?: Database["public"]["Enums"]["marketplace_item_status"]
+          total_price?: number | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          item_name?: string
+          location?: string | null
+          material_type?: Database["public"]["Enums"]["waste_type"]
+          price_per_unit?: number | null
+          quantity?: number
+          seller_id?: string
+          status?: Database["public"]["Enums"]["marketplace_item_status"]
+          total_price?: number | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       municipality_responses: {
         Row: {
           after_image_url: string | null
@@ -269,6 +413,177 @@ export type Database = {
           },
         ]
       }
+      route_optimizations: {
+        Row: {
+          carbon_reduction: number | null
+          created_at: string
+          end_location: string
+          estimated_distance: number | null
+          estimated_time: number | null
+          fuel_saved: number | null
+          id: string
+          route_name: string
+          start_location: string
+          status: Database["public"]["Enums"]["route_status"]
+          updated_at: string
+          user_id: string
+          waypoints: Json | null
+        }
+        Insert: {
+          carbon_reduction?: number | null
+          created_at?: string
+          end_location: string
+          estimated_distance?: number | null
+          estimated_time?: number | null
+          fuel_saved?: number | null
+          id?: string
+          route_name: string
+          start_location: string
+          status?: Database["public"]["Enums"]["route_status"]
+          updated_at?: string
+          user_id: string
+          waypoints?: Json | null
+        }
+        Update: {
+          carbon_reduction?: number | null
+          created_at?: string
+          end_location?: string
+          estimated_distance?: number | null
+          estimated_time?: number | null
+          fuel_saved?: number | null
+          id?: string
+          route_name?: string
+          start_location?: string
+          status?: Database["public"]["Enums"]["route_status"]
+          updated_at?: string
+          user_id?: string
+          waypoints?: Json | null
+        }
+        Relationships: []
+      }
+      sustainable_practices: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          impact_metrics: Json | null
+          implementation_date: string | null
+          is_active: boolean
+          practice_name: string
+          practice_type: string
+          recommendations: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_metrics?: Json | null
+          implementation_date?: string | null
+          is_active?: boolean
+          practice_name: string
+          practice_type: string
+          recommendations?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_metrics?: Json | null
+          implementation_date?: string | null
+          is_active?: boolean
+          practice_name?: string
+          practice_type?: string
+          recommendations?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      waste_analytics: {
+        Row: {
+          analytics_data: Json | null
+          carbon_footprint: number | null
+          cost_savings: number | null
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          recycling_rate: number | null
+          total_waste_generated: number | null
+          user_id: string
+        }
+        Insert: {
+          analytics_data?: Json | null
+          carbon_footprint?: number | null
+          cost_savings?: number | null
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          recycling_rate?: number | null
+          total_waste_generated?: number | null
+          user_id: string
+        }
+        Update: {
+          analytics_data?: Json | null
+          carbon_footprint?: number | null
+          cost_savings?: number | null
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          recycling_rate?: number | null
+          total_waste_generated?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      waste_data_logs: {
+        Row: {
+          collection_date: string | null
+          created_at: string
+          environmental_impact: Json | null
+          id: string
+          location: string | null
+          notes: string | null
+          quantity: number
+          unit: string
+          updated_at: string
+          user_id: string
+          waste_type: Database["public"]["Enums"]["waste_type"]
+        }
+        Insert: {
+          collection_date?: string | null
+          created_at?: string
+          environmental_impact?: Json | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          quantity: number
+          unit?: string
+          updated_at?: string
+          user_id: string
+          waste_type: Database["public"]["Enums"]["waste_type"]
+        }
+        Update: {
+          collection_date?: string | null
+          created_at?: string
+          environmental_impact?: Json | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          updated_at?: string
+          user_id?: string
+          waste_type?: Database["public"]["Enums"]["waste_type"]
+        }
+        Relationships: []
+      }
       waste_items: {
         Row: {
           created_at: string
@@ -322,6 +637,56 @@ export type Database = {
           },
         ]
       }
+      waste_tracking: {
+        Row: {
+          actual_processing_date: string | null
+          created_at: string
+          current_location: string | null
+          current_status: Database["public"]["Enums"]["tracking_status"]
+          estimated_processing_date: string | null
+          id: string
+          tracking_history: Json | null
+          tracking_number: string
+          updated_at: string
+          user_id: string
+          waste_item_id: string | null
+        }
+        Insert: {
+          actual_processing_date?: string | null
+          created_at?: string
+          current_location?: string | null
+          current_status?: Database["public"]["Enums"]["tracking_status"]
+          estimated_processing_date?: string | null
+          id?: string
+          tracking_history?: Json | null
+          tracking_number: string
+          updated_at?: string
+          user_id: string
+          waste_item_id?: string | null
+        }
+        Update: {
+          actual_processing_date?: string | null
+          created_at?: string
+          current_location?: string | null
+          current_status?: Database["public"]["Enums"]["tracking_status"]
+          estimated_processing_date?: string | null
+          id?: string
+          tracking_history?: Json | null
+          tracking_number?: string
+          updated_at?: string
+          user_id?: string
+          waste_item_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waste_tracking_waste_item_id_fkey"
+            columns: ["waste_item_id"]
+            isOneToOne: false
+            referencedRelation: "waste_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -330,7 +695,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      collection_status: "scheduled" | "in_progress" | "completed" | "missed"
+      compliance_status: "compliant" | "non_compliant" | "pending_review"
+      marketplace_item_status: "available" | "reserved" | "sold" | "removed"
       pickup_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      route_status: "planned" | "in_progress" | "completed" | "cancelled"
+      tracking_status:
+        | "generated"
+        | "collected"
+        | "in_transit"
+        | "processing"
+        | "disposed"
       user_type: "individual" | "business" | "processor" | "collector"
       waste_type:
         | "organic"
@@ -453,7 +828,18 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      collection_status: ["scheduled", "in_progress", "completed", "missed"],
+      compliance_status: ["compliant", "non_compliant", "pending_review"],
+      marketplace_item_status: ["available", "reserved", "sold", "removed"],
       pickup_status: ["scheduled", "in_progress", "completed", "cancelled"],
+      route_status: ["planned", "in_progress", "completed", "cancelled"],
+      tracking_status: [
+        "generated",
+        "collected",
+        "in_transit",
+        "processing",
+        "disposed",
+      ],
       user_type: ["individual", "business", "processor", "collector"],
       waste_type: [
         "organic",

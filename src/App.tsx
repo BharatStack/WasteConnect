@@ -14,6 +14,9 @@ import WasteEntry from "./pages/WasteEntry";
 import CitizenReports from "./pages/CitizenReports";
 import NewCitizenReport from "./pages/NewCitizenReport";
 import CitizenReportDetails from "./pages/CitizenReportDetails";
+import RouteOptimization from "./pages/RouteOptimization";
+import Marketplace from "./pages/Marketplace";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -54,6 +57,21 @@ const App = () => (
           <Route path="/citizen-reports/:id" element={
             <ProtectedRoute>
               <CitizenReportDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="/route-optimization" element={
+            <ProtectedRoute>
+              <RouteOptimization />
+            </ProtectedRoute>
+          } />
+          <Route path="/marketplace" element={
+            <ProtectedRoute>
+              <Marketplace />
+            </ProtectedRoute>
+          } />
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <Analytics />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
