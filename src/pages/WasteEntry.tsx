@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Home } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const WasteEntry = () => {
@@ -120,12 +119,22 @@ const WasteEntry = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center gap-4">
+      {/* Navigation Buttons */}
+      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-2">
+        <div className="max-w-4xl mx-auto flex items-center gap-4">
+          <Link to="/" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
+            <Home className="h-4 w-4 mr-2" />
+            Home
+          </Link>
           <Link to="/dashboard" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Link>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-eco-green-700">Waste Data Entry</h1>
         </div>
 

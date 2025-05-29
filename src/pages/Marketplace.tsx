@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Filter, MapPin, DollarSign } from 'lucide-react';
+import { ShoppingCart, Filter, MapPin, DollarSign, ArrowLeft, Home } from 'lucide-react';
 import MarketplaceItemForm from '@/components/marketplace/MarketplaceItemForm';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { useToast } from '@/hooks/use-toast';
@@ -48,7 +49,25 @@ const Marketplace = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setItems(data || []);
+      
+      // Filter and map the data to match our interface
+      const filteredItems = (data || []).filter(item => 
+        ['available', 'sold', 'reserved'].includes(item.status)
+      ).map(item => ({
+        id: item.id,
+        seller_id: item.seller_id,
+        item_name: item.item_name,
+        material_type: item.material_type,
+        quantity: item.quantity,
+        price_per_unit: item.price_per_unit,
+        total_price: item.total_price,
+        description: item.description,
+        location: item.location,
+        status: item.status as 'available' | 'sold' | 'reserved',
+        created_at: item.created_at
+      }));
+
+      setItems(filteredItems);
     } catch (error: any) {
       console.error('Error fetching marketplace items:', error);
       toast({
@@ -116,6 +135,24 @@ const Marketplace = () => {
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader />
       
+      {/* Navigation Buttons */}
+      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-2">
+        <div className="max-w-7xl mx-auto flex items-center gap-4">
+          <Link to="/" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
+            <Home className="h-4 w-4 mr-2" />
+            Home
+          </Link>
+          <Button 
+            variant="ghost" 
+            onClick={() => window.history.back()}
+            className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        </div>
+      </div>
+      
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-8">
@@ -174,7 +211,6 @@ const Marketplace = () => {
             </CardContent>
           </Card>
 
-          {/* Marketplace Items */}
           {isLoading ? (
             <div className="text-center py-8">Loading marketplace items...</div>
           ) : filteredItems.length === 0 ? (

@@ -93,6 +93,10 @@ const Footer = () => {
                 <Mail size={18} className="text-eco-green-600 dark:text-eco-green-400 mt-1 flex-shrink-0" />
                 <span className="text-eco-green-600 dark:text-eco-green-400">info@wasteconnect.com</span>
               </li>
+              <li className="flex items-start space-x-3">
+                <Mail size={18} className="text-eco-green-600 dark:text-eco-green-400 mt-1 flex-shrink-0" />
+                <span className="text-eco-green-600 dark:text-eco-green-400">skandam063@gmail.com</span>
+              </li>
               <li className="text-eco-green-600 dark:text-eco-green-400">
                 123 Green Street<br />
                 Eco City, EC 12345<br />

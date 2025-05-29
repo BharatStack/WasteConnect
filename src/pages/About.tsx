@@ -1,8 +1,8 @@
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { CheckCircle2, ArrowRight, Mail } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Mail, ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -28,17 +28,17 @@ const About = () => {
 
   const teamMembers = [
     {
-      name: "Alex Johnson",
+      name: "SAI VIKAS P S",
       role: "Founder & CEO",
       bio: "Environmental engineer with 15+ years of experience in waste management systems."
     },
     {
-      name: "Sarah Chen",
+      name: "MANAS REDDY",
       role: "CTO",
       bio: "Technology leader specializing in sustainable tech solutions and data analytics."
     },
     {
-      name: "Michael Rodriguez",
+      name: "SKANDA MM",
       role: "Head of Operations",
       bio: "Operations expert with background in municipal waste management systems."
     },
@@ -67,6 +67,24 @@ const About = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
+      {/* Navigation Buttons */}
+      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-2">
+        <div className="max-w-7xl mx-auto flex items-center gap-4">
+          <Link to="/" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
+            <Home className="h-4 w-4 mr-2" />
+            Home
+          </Link>
+          <Button 
+            variant="ghost" 
+            onClick={() => window.history.back()}
+            className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        </div>
+      </div>
 
       <main className="flex-1">
         <div className="bg-eco-green-50 dark:bg-eco-green-900/20 py-16 md:py-24">
