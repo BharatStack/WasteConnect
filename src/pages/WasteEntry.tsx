@@ -48,14 +48,14 @@ const WasteEntry = () => {
     const factors = {
       organic: { co2_reduction: 0.5, methane_prevention: 0.8 },
       recyclable: { co2_reduction: 2.1, resource_saved: 1.5 },
-      hazardous: { toxicity_prevented: 10, soil_protection: 5 },
+      hazardous: { co2_reduction: 0.1, toxicity_prevented: 10, soil_protection: 5 },
       electronic: { rare_metals_recovered: 0.3, co2_reduction: 1.8 },
       general: { landfill_diverted: 1.0, co2_reduction: 0.2 }
     };
 
     const factor = factors[wasteType as keyof typeof factors] || factors.general;
     return {
-      co2_reduction_kg: quantity * (factor.co2_reduction || 0),
+      co2_reduction_kg: quantity * factor.co2_reduction,
       additional_impact: factor
     };
   };
@@ -78,7 +78,7 @@ const WasteEntry = () => {
         .from('waste_data_logs')
         .insert({
           user_id: user.id,
-          waste_type: formData.waste_type,
+          waste_type: formData.waste_type as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general',
           quantity: quantity,
           unit: formData.unit,
           location: formData.location || null,
