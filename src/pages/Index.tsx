@@ -6,6 +6,7 @@ import UserTypes from "@/components/UserTypes";
 import TestimonialSection from "@/components/TestimonialSection";
 import CallToAction from "@/components/CallToAction";
 import Footer from "@/components/Footer";
+import MainNavigation from "@/components/navigation/MainNavigation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,7 +16,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <MainNavigation />
       <Hero />
       
       {/* Auth CTA Section */}

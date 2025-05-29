@@ -1,11 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, Route, ShoppingCart, BarChart3, MessageSquare, TrendingUp, Leaf, Recycle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Trash2, Route, ShoppingCart, BarChart3, MessageSquare, TrendingUp, Leaf, Recycle, Layout } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import DashboardIntegrations from '@/components/dashboard/DashboardIntegrations';
 
 interface WasteStats {
   totalWaste: number;
@@ -87,153 +90,166 @@ const Dashboard = () => {
             <p className="text-gray-600">Manage your waste data and environmental impact</p>
           </div>
 
-          {/* Waste Statistics */}
-          <div className="grid gap-6 md:grid-cols-4 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Waste Logged</CardTitle>
-                <Trash2 className="h-4 w-4 text-eco-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{wasteStats.totalWaste.toFixed(1)} kg</div>
-                <p className="text-xs text-muted-foreground">All time total</p>
-              </CardContent>
-            </Card>
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="features">Features</TabsTrigger>
+              <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            </TabsList>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Recycling Rate</CardTitle>
-                <Recycle className="h-4 w-4 text-eco-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{wasteStats.recyclingRate.toFixed(1)}%</div>
-                <p className="text-xs text-muted-foreground">Of total waste recycled</p>
-              </CardContent>
-            </Card>
+            <TabsContent value="overview" className="space-y-6">
+              {/* Waste Statistics */}
+              <div className="grid gap-6 md:grid-cols-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Waste Logged</CardTitle>
+                    <Trash2 className="h-4 w-4 text-eco-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{wasteStats.totalWaste.toFixed(1)} kg</div>
+                    <p className="text-xs text-muted-foreground">All time total</p>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">CO₂ Reduction</CardTitle>
-                <Leaf className="h-4 w-4 text-eco-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{wasteStats.carbonReduction.toFixed(1)} kg</div>
-                <p className="text-xs text-muted-foreground">Carbon footprint reduced</p>
-              </CardContent>
-            </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Recycling Rate</CardTitle>
+                    <Recycle className="h-4 w-4 text-eco-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{wasteStats.recyclingRate.toFixed(1)}%</div>
+                    <p className="text-xs text-muted-foreground">Of total waste recycled</p>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Cost Savings</CardTitle>
-                <TrendingUp className="h-4 w-4 text-eco-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">${wasteStats.costSavings.toFixed(2)}</div>
-                <p className="text-xs text-muted-foreground">Estimated savings</p>
-              </CardContent>
-            </Card>
-          </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">CO₂ Reduction</CardTitle>
+                    <Leaf className="h-4 w-4 text-eco-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{wasteStats.carbonReduction.toFixed(1)} kg</div>
+                    <p className="text-xs text-muted-foreground">Carbon footprint reduced</p>
+                  </CardContent>
+                </Card>
 
-          {/* Feature Actions */}
-          <div className="mt-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Waste Management Features</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Trash2 className="h-5 w-5 text-eco-green-600" />
-                    Waste Data Entry
-                  </CardTitle>
-                  <CardDescription>
-                    Record waste data with automatic environmental impact calculations
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to="/waste-entry">
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      Log Waste Data
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Cost Savings</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-eco-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">${wasteStats.costSavings.toFixed(2)}</div>
+                    <p className="text-xs text-muted-foreground">Estimated savings</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Route className="h-5 w-5 text-eco-green-600" />
-                    Route Optimization
-                  </CardTitle>
-                  <CardDescription>
-                    Optimize collection routes to reduce fuel consumption and emissions
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to="/route-optimization">
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      Optimize Routes
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+            <TabsContent value="features" className="space-y-6">
+              {/* Feature Actions */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Trash2 className="h-5 w-5 text-eco-green-600" />
+                      Waste Data Entry
+                    </CardTitle>
+                    <CardDescription>
+                      Record waste data with automatic environmental impact calculations
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to="/waste-entry">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        Log Waste Data
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <BarChart3 className="h-5 w-5 text-eco-green-600" />
-                    Analytics & Reports
-                  </CardTitle>
-                  <CardDescription>
-                    View detailed analytics and generate environmental impact reports
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to="/analytics">
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      View Analytics
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Route className="h-5 w-5 text-eco-green-600" />
+                      Route Optimization
+                    </CardTitle>
+                    <CardDescription>
+                      Optimize collection routes to reduce fuel consumption and emissions
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to="/route-optimization">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        Optimize Routes
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <ShoppingCart className="h-5 w-5 text-eco-green-600" />
-                    Circular Economy
-                  </CardTitle>
-                  <CardDescription>
-                    Buy and sell recyclable materials in our marketplace
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to="/marketplace">
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      Browse Marketplace
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <BarChart3 className="h-5 w-5 text-eco-green-600" />
+                      Analytics & Reports
+                    </CardTitle>
+                    <CardDescription>
+                      View detailed analytics and generate environmental impact reports
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to="/analytics">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        View Analytics
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <MessageSquare className="h-5 w-5 text-eco-green-600" />
-                    Citizen Reports
-                  </CardTitle>
-                  <CardDescription>
-                    Report environmental issues and track municipality responses
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to="/citizen-reports">
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      View Reports
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ShoppingCart className="h-5 w-5 text-eco-green-600" />
+                      Circular Economy
+                    </CardTitle>
+                    <CardDescription>
+                      Buy and sell recyclable materials in our marketplace
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to="/marketplace">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        Browse Marketplace
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <MessageSquare className="h-5 w-5 text-eco-green-600" />
+                      Citizen Reports
+                    </CardTitle>
+                    <CardDescription>
+                      Report environmental issues and track municipality responses
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to="/citizen-reports">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        View Reports
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="integrations" className="space-y-6">
+              <DashboardIntegrations />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>
