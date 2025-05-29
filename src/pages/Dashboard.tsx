@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -52,8 +51,9 @@ const Dashboard = () => {
         if (item.waste_type === 'recyclable') {
           recyclableWaste += item.quantity;
         }
-        if (item.environmental_impact) {
-          totalCarbonReduction += item.environmental_impact.co2_reduction_kg || 0;
+        if (item.environmental_impact && typeof item.environmental_impact === 'object') {
+          const impact = item.environmental_impact as any;
+          totalCarbonReduction += impact.co2_reduction_kg || 0;
         }
         // Estimate cost savings
         const costPerKg = item.waste_type === 'recyclable' ? 0.5 : 

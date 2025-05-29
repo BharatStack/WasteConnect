@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,7 +19,7 @@ const MarketplaceItemForm = ({ onItemCreated }: MarketplaceItemFormProps) => {
 
   const [formData, setFormData] = useState({
     item_name: '',
-    material_type: '',
+    material_type: '' as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general' | '',
     quantity: '',
     price_per_unit: '',
     description: '',
@@ -41,7 +40,7 @@ const MarketplaceItemForm = ({ onItemCreated }: MarketplaceItemFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !formData.material_type) return;
 
     setIsLoading(true);
 
@@ -54,13 +53,13 @@ const MarketplaceItemForm = ({ onItemCreated }: MarketplaceItemFormProps) => {
         .insert({
           seller_id: user.id,
           item_name: formData.item_name,
-          material_type: formData.material_type as 'organic' | 'recyclable' | 'hazardous' | 'electronic' | 'general',
+          material_type: formData.material_type,
           quantity: quantity,
           price_per_unit: pricePerUnit,
           total_price: quantity * pricePerUnit,
           description: formData.description || null,
           location: formData.location || null,
-          status: 'available'
+          status: 'available' as const
         });
 
       if (error) throw error;
