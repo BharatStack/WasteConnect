@@ -66,32 +66,35 @@ const GovernmentDashboard = () => {
 
   const fetchGovernmentData = async () => {
     try {
-      // Fetch compliance reports with correct join
+      // Fetch compliance reports with manual join using producer_id
       const { data: compliance, error: complianceError } = await supabase
         .from('producer_compliance')
-        .select(`
-          *,
-          producer_profile:profiles!producer_compliance_producer_id_fkey(
-            full_name,
-            email,
-            user_type
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(20);
 
+      let complianceWithProfiles: ComplianceReport[] = [];
+
       if (complianceError) {
         console.error('Compliance query error:', complianceError);
-        // Fallback: fetch compliance reports without the join
-        const { data: fallbackCompliance } = await supabase
-          .from('producer_compliance')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(20);
-        
-        setComplianceReports(fallbackCompliance || []);
-      } else {
-        setComplianceReports(compliance || []);
+        setComplianceReports([]);
+      } else if (compliance) {
+        // Manually fetch producer profiles for each compliance report
+        const profilePromises = compliance.map(async (report) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email, user_type')
+            .eq('id', report.producer_id)
+            .single();
+
+          return {
+            ...report,
+            producer_profile: profile
+          };
+        });
+
+        complianceWithProfiles = await Promise.all(profilePromises);
+        setComplianceReports(complianceWithProfiles);
       }
 
       // Fetch audit logs
@@ -112,7 +115,7 @@ const GovernmentDashboard = () => {
 
       // Calculate stats
       const pendingVerifications = profiles?.filter(p => p.verification_status === 'pending').length || 0;
-      const totalReports = compliance?.length || 0;
+      const totalReports = complianceWithProfiles.length;
       const totalAuditEvents = audit?.length || 0;
 
       setStats({
