@@ -19,10 +19,10 @@ interface ComplianceReport {
   compliance_data: any;
   created_at: string;
   producer_profile?: {
-    full_name: string;
+    full_name: string | null;
     email: string;
     user_type: string;
-  };
+  } | null;
 }
 
 interface AuditLog {
@@ -66,8 +66,8 @@ const GovernmentDashboard = () => {
 
   const fetchGovernmentData = async () => {
     try {
-      // Fetch compliance reports
-      const { data: compliance } = await supabase
+      // Fetch compliance reports with correct join
+      const { data: compliance, error: complianceError } = await supabase
         .from('producer_compliance')
         .select(`
           *,
@@ -79,6 +79,20 @@ const GovernmentDashboard = () => {
         `)
         .order('created_at', { ascending: false })
         .limit(20);
+
+      if (complianceError) {
+        console.error('Compliance query error:', complianceError);
+        // Fallback: fetch compliance reports without the join
+        const { data: fallbackCompliance } = await supabase
+          .from('producer_compliance')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        setComplianceReports(fallbackCompliance || []);
+      } else {
+        setComplianceReports(compliance || []);
+      }
 
       // Fetch audit logs
       const { data: audit } = await supabase
@@ -93,7 +107,6 @@ const GovernmentDashboard = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      setComplianceReports(compliance || []);
       setAuditLogs(audit || []);
       setUserProfiles(profiles || []);
 
