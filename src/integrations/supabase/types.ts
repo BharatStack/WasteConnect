@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       citizen_reports: {
         Row: {
           created_at: string
@@ -141,6 +177,36 @@ export type Database = {
         }
         Relationships: []
       }
+      government_analytics: {
+        Row: {
+          analytics_type: string
+          created_at: string
+          data: Json
+          generated_by: string | null
+          id: string
+          period_end: string
+          period_start: string
+        }
+        Insert: {
+          analytics_type: string
+          created_at?: string
+          data: Json
+          generated_by?: string | null
+          id?: string
+          period_end: string
+          period_start: string
+        }
+        Update: {
+          analytics_type?: string
+          created_at?: string
+          data?: Json
+          generated_by?: string | null
+          id?: string
+          period_end?: string
+          period_start?: string
+        }
+        Relationships: []
+      }
       marketplace_items: {
         Row: {
           buyer_id: string | null
@@ -229,6 +295,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      password_reset_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      phone_verifications: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          phone_number: string
+          user_id: string
+          verification_code: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone_number: string
+          user_id: string
+          verification_code: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone_number?: string
+          user_id?: string
+          verification_code?: string
+          verified?: boolean
+        }
+        Relationships: []
       }
       pickup_requests: {
         Row: {
@@ -339,44 +462,98 @@ export type Database = {
           },
         ]
       }
+      producer_compliance: {
+        Row: {
+          compliance_data: Json
+          compliance_period_end: string
+          compliance_period_start: string
+          created_at: string
+          id: string
+          producer_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          compliance_data: Json
+          compliance_period_end: string
+          compliance_period_start: string
+          created_at?: string
+          id?: string
+          producer_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          compliance_data?: Json
+          compliance_period_end?: string
+          compliance_period_start?: string
+          created_at?: string
+          id?: string
+          producer_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          account_locked_until: string | null
           address: string | null
           city: string | null
           created_at: string
           email: string
+          failed_login_attempts: number | null
           full_name: string | null
           id: string
+          last_login_at: string | null
           phone: string | null
+          phone_verified: boolean | null
           state: string | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
+          verification_status: string | null
           zip_code: string | null
         }
         Insert: {
+          account_locked_until?: string | null
           address?: string | null
           city?: string | null
           created_at?: string
           email: string
+          failed_login_attempts?: number | null
           full_name?: string | null
           id: string
+          last_login_at?: string | null
           phone?: string | null
+          phone_verified?: boolean | null
           state?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          verification_status?: string | null
           zip_code?: string | null
         }
         Update: {
+          account_locked_until?: string | null
           address?: string | null
           city?: string | null
           created_at?: string
           email?: string
+          failed_login_attempts?: number | null
           full_name?: string | null
           id?: string
+          last_login_at?: string | null
           phone?: string | null
+          phone_verified?: boolean | null
           state?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          verification_status?: string | null
           zip_code?: string | null
         }
         Relationships: []
@@ -500,6 +677,39 @@ export type Database = {
           recommendations?: string[] | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_verification_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          document_url: string
+          id: string
+          user_id: string
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          document_url: string
+          id?: string
+          user_id: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          document_url?: string
+          id?: string
+          user_id?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -692,7 +902,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_audit_log: {
+        Args: {
+          p_action: string
+          p_resource_type: string
+          p_resource_id?: string
+          p_metadata?: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       collection_status: "scheduled" | "in_progress" | "completed" | "missed"
@@ -706,7 +924,12 @@ export type Database = {
         | "in_transit"
         | "processing"
         | "disposed"
-      user_type: "individual" | "business" | "processor" | "collector"
+      user_type:
+        | "individual"
+        | "business"
+        | "processor"
+        | "collector"
+        | "government"
       waste_type:
         | "organic"
         | "recyclable"
@@ -840,7 +1063,13 @@ export const Constants = {
         "processing",
         "disposed",
       ],
-      user_type: ["individual", "business", "processor", "collector"],
+      user_type: [
+        "individual",
+        "business",
+        "processor",
+        "collector",
+        "government",
+      ],
       waste_type: [
         "organic",
         "recyclable",

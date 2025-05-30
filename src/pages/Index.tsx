@@ -1,4 +1,7 @@
 
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
@@ -6,65 +9,91 @@ import UserTypes from "@/components/UserTypes";
 import TestimonialSection from "@/components/TestimonialSection";
 import CallToAction from "@/components/CallToAction";
 import Footer from "@/components/Footer";
-import MainNavigation from "@/components/navigation/MainNavigation";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { Shield, Users, BarChart3 } from "lucide-react";
 
 const Index = () => {
-  const { isAuthenticated } = useAuth();
-
   return (
-    <div className="min-h-screen">
-      <MainNavigation />
-      <Hero />
+    <div className="min-h-screen bg-gradient-to-b from-eco-green-50 to-white">
+      <Header />
       
-      {/* Auth CTA Section */}
-      <section className="py-12 bg-eco-green-50">
-        <div className="container mx-auto px-4 text-center">
-          {!isAuthenticated ? (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-eco-green-700">
-                Ready to Get Started?
+      <main>
+        <Hero />
+        
+        {/* Enhanced Authentication Section */}
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Secure Access for All Stakeholders
               </h2>
-              <p className="text-eco-green-600 max-w-2xl mx-auto">
-                Join thousands of organizations already using WasteConnect to optimize their waste management and contribute to a sustainable future.
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Our enhanced authentication system provides secure, role-based access with multi-factor authentication 
+                and government compliance features.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link to="/auth">
-                  <Button size="lg" className="bg-eco-green-600 hover:bg-eco-green-700">
-                    Sign Up Now
-                  </Button>
-                </Link>
-                <Link to="/auth">
-                  <Button variant="outline" size="lg">
-                    Login to Your Account
-                  </Button>
-                </Link>
-              </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-eco-green-700">
-                Welcome Back!
-              </h2>
-              <p className="text-eco-green-600">
-                Continue managing your waste data and environmental impact.
-              </p>
-              <Link to="/dashboard">
-                <Button size="lg" className="bg-eco-green-600 hover:bg-eco-green-700">
-                  Go to Dashboard
+
+            <div className="grid gap-8 md:grid-cols-3">
+              <Card className="text-center">
+                <CardHeader>
+                  <Shield className="h-12 w-12 text-eco-green-600 mx-auto mb-4" />
+                  <CardTitle>Enhanced Security</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Multi-factor authentication, phone verification, and secure audit logging 
+                    protect your data and ensure compliance.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center">
+                <CardHeader>
+                  <Users className="h-12 w-12 text-eco-green-600 mx-auto mb-4" />
+                  <CardTitle>Role-Based Access</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Different access levels for individuals, businesses, processors, collectors, 
+                    and government officials with appropriate permissions.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center">
+                <CardHeader>
+                  <BarChart3 className="h-12 w-12 text-eco-green-600 mx-auto mb-4" />
+                  <CardTitle>Government Oversight</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Comprehensive compliance monitoring, user verification, and audit trails 
+                    for regulatory oversight and transparency.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center mt-12">
+              <Link to="/enhanced-auth">
+                <Button size="lg" className="bg-eco-green-600 hover:bg-eco-green-700 mr-4">
+                  Access Enhanced Platform
+                </Button>
+              </Link>
+              <Link to="/auth">
+                <Button size="lg" variant="outline">
+                  Standard Login
                 </Button>
               </Link>
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <Features />
-      <UserTypes />
-      <TestimonialSection />
-      <CallToAction />
+        <Features />
+        <UserTypes />
+        <TestimonialSection />
+        <CallToAction />
+      </main>
+      
       <Footer />
     </div>
   );
