@@ -1,5 +1,4 @@
-
-import { HomeIcon, UserIcon, BarChart3Icon, RecycleIcon, TruckIcon, ShoppingCartIcon, MessageSquareIcon, InfoIcon, UsersIcon, FeaturesIcon, ShieldIcon } from "lucide-react";
+import { HomeIcon, UserIcon, BarChart3Icon, RecycleIcon, TruckIcon, ShoppingCartIcon, MessageSquareIcon, InfoIcon, UsersIcon, Settings, ShieldIcon } from "lucide-react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import EnhancedAuth from "./pages/EnhancedAuth";
@@ -109,7 +108,7 @@ export const navItems = [
   {
     title: "Features",
     to: "/features",
-    icon: <FeaturesIcon className="h-4 w-4" />,
+    icon: <Settings className="h-4 w-4" />,
     page: <Features />,
   },
   {
