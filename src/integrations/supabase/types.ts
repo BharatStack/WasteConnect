@@ -207,6 +207,44 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          listing_id: string
+          message: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          listing_id: string
+          message: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          listing_id?: string
+          message?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "waste_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_items: {
         Row: {
           buyer_id: string | null
@@ -295,6 +333,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      password_reset_requests: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
       }
       password_reset_tokens: {
         Row: {
@@ -680,6 +745,76 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "waste_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          rating: number
+          review_text: string | null
+          reviewed_user_id: string
+          reviewer_id: string
+          transaction_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          rating: number
+          review_text?: string | null
+          reviewed_user_id: string
+          reviewer_id: string
+          transaction_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          rating?: number
+          review_text?: string | null
+          reviewed_user_id?: string
+          reviewer_id?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "waste_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_verification_documents: {
         Row: {
           created_at: string
@@ -749,6 +884,27 @@ export type Database = {
           recycling_rate?: number | null
           total_waste_generated?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      waste_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -843,6 +999,86 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waste_listings: {
+        Row: {
+          availability_end: string | null
+          availability_start: string | null
+          created_at: string
+          delivery_available: boolean | null
+          delivery_radius: number | null
+          description: string | null
+          id: string
+          images: string[] | null
+          latitude: number | null
+          location: string
+          longitude: number | null
+          pickup_available: boolean | null
+          price_per_unit: number
+          quantity: number
+          seller_id: string
+          status: string
+          title: string
+          total_price: number
+          unit: string
+          updated_at: string
+          waste_category_id: string
+        }
+        Insert: {
+          availability_end?: string | null
+          availability_start?: string | null
+          created_at?: string
+          delivery_available?: boolean | null
+          delivery_radius?: number | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          pickup_available?: boolean | null
+          price_per_unit: number
+          quantity: number
+          seller_id: string
+          status?: string
+          title: string
+          total_price: number
+          unit?: string
+          updated_at?: string
+          waste_category_id: string
+        }
+        Update: {
+          availability_end?: string | null
+          availability_start?: string | null
+          created_at?: string
+          delivery_available?: boolean | null
+          delivery_radius?: number | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          pickup_available?: boolean | null
+          price_per_unit?: number
+          quantity?: number
+          seller_id?: string
+          status?: string
+          title?: string
+          total_price?: number
+          unit?: string
+          updated_at?: string
+          waste_category_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waste_listings_waste_category_id_fkey"
+            columns: ["waste_category_id"]
+            isOneToOne: false
+            referencedRelation: "waste_categories"
             referencedColumns: ["id"]
           },
         ]
