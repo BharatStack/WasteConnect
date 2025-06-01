@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft, Home } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import MarketplaceListings from '@/components/marketplace/MarketplaceListings';
 import CreateListingForm from '@/components/marketplace/CreateListingForm';
 import ContactDialog from '@/components/marketplace/ContactDialog';
@@ -18,6 +19,7 @@ const Marketplace = () => {
   const [contactListing, setContactListing] = useState<WasteListing | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const {
@@ -99,35 +101,73 @@ const Marketplace = () => {
 
   if (categoriesLoading || listingsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-eco-green-50 to-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading marketplace...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-eco-green-50 to-white">
       <div className="container mx-auto px-4 py-8">
+        {/* Navigation and Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Farming Waste Marketplace
-          </h1>
-          <p className="text-gray-600">
-            Buy and sell organic farming waste materials for sustainable agriculture
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(-1)}
+                className="flex items-center space-x-1"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back</span>
+              </Button>
+              <Link to="/">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center space-x-1"
+                >
+                  <Home className="h-4 w-4" />
+                  <span>Home</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-eco-green-600 to-eco-green-400 bg-clip-text text-transparent">
+              Farming Waste Marketplace
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Connect with farmers and businesses to buy and sell organic farming waste materials. 
+              Build a sustainable future together with eco-friendly solutions.
+            </p>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="flex justify-between items-center">
-            <TabsList>
-              <TabsTrigger value="browse">Browse Listings</TabsTrigger>
-              <TabsTrigger value="create">Create Listing</TabsTrigger>
+          <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="browse" className="flex items-center space-x-2">
+                <span>Browse Listings</span>
+              </TabsTrigger>
+              <TabsTrigger value="create" className="flex items-center space-x-2">
+                <span>Create Listing</span>
+              </TabsTrigger>
             </TabsList>
             
             {activeTab === 'browse' && (
-              <Button onClick={() => setActiveTab('create')}>
+              <Button 
+                onClick={() => setActiveTab('create')}
+                className="bg-eco-green-600 hover:bg-eco-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+              >
                 <Plus className="h-4 w-4 mr-2" />
-                Create Listing
+                Create New Listing
               </Button>
             )}
           </div>
