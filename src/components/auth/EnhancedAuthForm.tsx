@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     password: '',
     full_name: '',
     phone: '',
-    user_type: 'individual' as 'individual' | 'business' | 'processor' | 'collector' | 'government',
+    user_type: 'household' as 'individual' | 'business' | 'processor' | 'collector' | 'government' | 'household',
     address: '',
     city: '',
     state: '',
@@ -377,11 +376,12 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="household">Household User</SelectItem>
                         <SelectItem value="individual">Individual</SelectItem>
                         <SelectItem value="business">Business</SelectItem>
                         <SelectItem value="processor">Waste Processor</SelectItem>
                         <SelectItem value="collector">Waste Collector</SelectItem>
-                        <SelectItem value="government">Government Official</SelectItem>
+                        <SelectItem value="government">Government & Regulatory</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

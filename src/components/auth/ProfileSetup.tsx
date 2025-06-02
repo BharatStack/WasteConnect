@@ -24,7 +24,7 @@ const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
     city: '',
     state: '',
     zip_code: '',
-    user_type: 'individual' as 'individual' | 'business' | 'processor' | 'collector'
+    user_type: 'household' as 'individual' | 'business' | 'processor' | 'collector' | 'government' | 'household'
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,15 +140,17 @@ const ProfileSetup = ({ onComplete }: ProfileSetupProps) => {
 
               <div className="space-y-2">
                 <Label htmlFor="user_type">Account Type</Label>
-                <Select value={profileData.user_type} onValueChange={(value: 'individual' | 'business' | 'processor' | 'collector') => setProfileData(prev => ({ ...prev, user_type: value }))}>
+                <Select value={profileData.user_type} onValueChange={(value: 'individual' | 'business' | 'processor' | 'collector' | 'government' | 'household') => setProfileData(prev => ({ ...prev, user_type: value }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="household">Household User</SelectItem>
                     <SelectItem value="individual">Individual</SelectItem>
                     <SelectItem value="business">Business</SelectItem>
                     <SelectItem value="processor">Waste Processor</SelectItem>
                     <SelectItem value="collector">Waste Collector</SelectItem>
+                    <SelectItem value="government">Government & Regulatory</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

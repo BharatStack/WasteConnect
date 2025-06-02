@@ -1166,6 +1166,7 @@ export type Database = {
         | "processor"
         | "collector"
         | "government"
+        | "household"
       waste_type:
         | "organic"
         | "recyclable"
@@ -1305,6 +1306,7 @@ export const Constants = {
         "processor",
         "collector",
         "government",
+        "household",
       ],
       waste_type: [
         "organic",
