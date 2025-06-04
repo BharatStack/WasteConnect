@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Mock responses for testing when OpenAI is unavailable
+// Mock responses for testing when Gemini is unavailable
 const getMockResponse = (message: string, language: string) => {
   const responses = {
     en: {
@@ -65,10 +65,10 @@ serve(async (req) => {
 
   try {
     const { message, context, language = 'en' } = await req.json();
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
-    if (!openAIApiKey) {
-      console.log('OpenAI API key not configured, using mock response');
+    if (!geminiApiKey) {
+      console.log('Gemini API key not configured, using mock response');
       const mockResponse = getMockResponse(message, language);
       
       return new Response(JSON.stringify({ 
@@ -96,51 +96,72 @@ Please provide helpful, accurate information about waste management. Keep respon
 
 Respond in ${language === 'en' ? 'English' : language === 'hi' ? 'Hindi' : language === 'es' ? 'Spanish' : 'English'}.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
+        contents: [{
+          parts: [{
+            text: `${systemPrompt}\n\nUser: ${message}`
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 1000,
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
         ],
-        temperature: 0.7,
-        max_tokens: 1000,
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('OpenAI API error:', errorData);
+      console.error('Gemini API error:', errorData);
       
       // If it's a quota/billing error, fall back to mock response
       if (response.status === 429 || response.status === 402) {
-        console.log('OpenAI quota exceeded, using mock response');
+        console.log('Gemini quota exceeded, using mock response');
         const mockResponse = getMockResponse(message, language);
         
         return new Response(JSON.stringify({ 
-          message: `[DEMO MODE - OpenAI quota exceeded] ${mockResponse}`,
+          message: `[DEMO MODE - Gemini quota exceeded] ${mockResponse}`,
           usage: { mock: true, error: 'quota_exceeded' }
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const assistantMessage = data.choices[0].message.content;
+    const assistantMessage = data.candidates[0].content.parts[0].text;
 
     console.log('Assistant response generated successfully');
 
     return new Response(JSON.stringify({ 
       message: assistantMessage,
-      usage: data.usage 
+      usage: data.usageMetadata || {} 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
