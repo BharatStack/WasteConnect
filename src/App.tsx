@@ -25,6 +25,7 @@ import HouseholdUsers from "./pages/HouseholdUsers";
 import MunicipalityUsers from "./pages/MunicipalityUsers";
 import IndustryUsers from "./pages/IndustryUsers";
 import GovernmentUsers from "./pages/GovernmentUsers";
+import AIAssistant from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,11 @@ const App = () => (
             <Route path="/marketplace" element={
               <ProtectedRoute>
                 <Marketplace />
+              </ProtectedRoute>
+            } />
+            <Route path="/ai-assistant" element={
+              <ProtectedRoute>
+                <AIAssistant />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { ShoppingCart, User, LogOut, Home, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Home, ArrowLeft, Bot } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const MainNavigation = () => {
@@ -91,6 +90,18 @@ const MainNavigation = () => {
           <div className="hidden md:flex items-center space-x-8">
             {user && userProfile && (
               <>
+                <Link
+                  to="/ai-assistant"
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive('/ai-assistant') 
+                      ? 'text-eco-green-600 bg-eco-green-50' 
+                      : 'text-gray-600 hover:text-eco-green-600'
+                  }`}
+                >
+                  <Bot className="h-4 w-4" />
+                  <span>AI Assistant</span>
+                </Link>
+
                 <Link
                   to="/marketplace"
                   className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
