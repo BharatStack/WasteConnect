@@ -4,15 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Bot, User, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Message {
   id: string;
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  isDemo?: boolean;
 }
 
 interface ChatInterfaceProps {
@@ -24,6 +26,7 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -60,11 +63,15 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
         throw error;
       }
 
+      const isDemo = data.usage?.mock || data.message?.includes('[DEMO MODE');
+      setIsDemoMode(isDemo);
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.message,
         role: 'assistant',
         timestamp: new Date(),
+        isDemo,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -93,7 +100,20 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-eco-green-600" />
           WasteConnect Assistant
+          {isDemoMode && (
+            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+              Demo Mode
+            </span>
+          )}
         </CardTitle>
+        {isDemoMode && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              Running in demo mode with sample responses. OpenAI integration will be available once API quota is resolved.
+            </AlertDescription>
+          </Alert>
+        )}
       </CardHeader>
       <CardContent className="flex-1 flex flex-col gap-4 p-4">
         <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
@@ -113,14 +133,20 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
                 }`}
               >
                 {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-eco-green-100 flex items-center justify-center mt-1">
-                    <Bot className="h-4 w-4 text-eco-green-600" />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mt-1 ${
+                    message.isDemo ? 'bg-yellow-100' : 'bg-eco-green-100'
+                  }`}>
+                    <Bot className={`h-4 w-4 ${
+                      message.isDemo ? 'text-yellow-600' : 'text-eco-green-600'
+                    }`} />
                   </div>
                 )}
                 <div
                   className={`max-w-[80%] p-3 rounded-lg ${
                     message.role === 'user'
                       ? 'bg-eco-green-600 text-white'
+                      : message.isDemo
+                      ? 'bg-yellow-50 text-gray-900 border border-yellow-200'
                       : 'bg-gray-100 text-gray-900'
                   }`}
                 >
