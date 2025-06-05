@@ -1,24 +1,24 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Github, Linkedin, Mail } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Github, Linkedin, Mail, Sparkles } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-eco-green-50 dark:bg-eco-green-900/30 text-eco-green-800 dark:text-eco-green-100 pt-12 pb-8">
+    <footer className="bg-gradient-to-br from-eco-green-50 via-emerald-50 to-teal-50 dark:from-eco-green-900/30 dark:via-emerald-900/30 dark:to-teal-900/30 text-eco-green-800 dark:text-eco-green-100 pt-12 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-eco-green-500 to-eco-green-400 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">W</span>
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-eco-green-500 via-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+                <Sparkles className="text-white h-4 w-4" />
               </div>
-              <span className="text-xl font-bold text-eco-green-700 dark:text-white">WasteConnect</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-eco-green-700 via-emerald-700 to-teal-700 bg-clip-text text-transparent">WasteConnect</span>
             </Link>
             <p className="text-eco-green-600 dark:text-eco-green-300 mb-4">
               Connecting waste generators with processors for a sustainable future.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-4">
               <a href="#" className="text-eco-green-600 hover:text-eco-green-800 dark:text-eco-green-400 dark:hover:text-white transition-colors">
                 <Facebook size={20} />
               </a>
@@ -31,6 +31,9 @@ const Footer = () => {
               <a href="#" className="text-eco-green-600 hover:text-eco-green-800 dark:text-eco-green-400 dark:hover:text-white transition-colors">
                 <Linkedin size={20} />
               </a>
+            </div>
+            <div className="text-sm text-eco-green-600 dark:text-eco-green-400">
+              Powered by <span className="font-bold bg-gradient-to-r from-eco-green-600 to-emerald-600 bg-clip-text text-transparent">NOTIONX</span>
             </div>
           </div>
           
@@ -109,7 +112,7 @@ const Footer = () => {
         <div className="border-t border-eco-green-200 dark:border-eco-green-800/30 mt-8 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-eco-green-600 dark:text-eco-green-400 text-sm mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} WasteConnect. All rights reserved.
+              &copy; {new Date().getFullYear()} WasteConnect. All rights reserved. | Built with 💚 by <span className="font-bold text-eco-green-700">NOTIONX</span>
             </p>
             <div className="flex space-x-6">
               <Link to="/privacy" className="text-sm text-eco-green-600 hover:text-eco-green-800 dark:text-eco-green-400 dark:hover:text-white transition-colors">

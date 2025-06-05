@@ -96,25 +96,74 @@
 }
 
 .eco-gradient {
-  @apply bg-gradient-to-r from-eco-green-600 to-eco-green-400;
+  @apply bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600;
+}
+
+.eco-gradient-enhanced {
+  @apply bg-gradient-to-br from-eco-green-500 via-emerald-500 to-teal-500;
+}
+
+.eco-gradient-subtle {
+  @apply bg-gradient-to-r from-eco-green-50 via-emerald-50 to-teal-50;
 }
 
 .eco-card {
-  @apply bg-white dark:bg-eco-green-900/20 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300;
+  @apply bg-white dark:bg-eco-green-900/20 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-eco-green-100/50;
+}
+
+.eco-card-enhanced {
+  @apply bg-gradient-to-br from-white via-eco-green-50/30 to-emerald-50/30 dark:from-eco-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 backdrop-blur-lg border border-eco-green-200/50;
 }
 
 .page-header {
-  @apply text-3xl md:text-4xl font-bold mb-6 text-eco-green-700 dark:text-eco-green-400;
+  @apply text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-eco-green-700 via-emerald-700 to-teal-700 bg-clip-text text-transparent;
 }
 
 .section-header {
-  @apply text-xl md:text-2xl font-semibold mb-4 text-eco-green-600 dark:text-eco-green-500;
+  @apply text-xl md:text-2xl font-semibold mb-4 bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent;
 }
 
 .eco-button {
-  @apply bg-eco-green-600 hover:bg-eco-green-700 text-white font-medium rounded-md transition-colors duration-200;
+  @apply bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 hover:from-eco-green-700 hover:via-emerald-700 hover:to-teal-700 text-white font-medium rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
 }
 
 .eco-button-outline {
-  @apply border border-eco-green-600 text-eco-green-600 hover:bg-eco-green-50 font-medium rounded-md transition-colors duration-200;
+  @apply border-2 border-transparent bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-border text-eco-green-600 hover:text-white hover:bg-gradient-to-r hover:from-eco-green-50 hover:via-emerald-50 hover:to-teal-50 font-medium rounded-md transition-all duration-300 relative;
+}
+
+.glassmorphism {
+  @apply backdrop-blur-lg bg-white/10 border border-white/20 shadow-xl;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent;
+}
+
+.border-gradient {
+  border-image: linear-gradient(45deg, #16a34a, #10b981, #14b8a6) 1;
+}
+
+/* Enhanced animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Improved focus states */
+.eco-focus {
+  @apply focus:ring-4 focus:ring-eco-green-500/20 focus:border-eco-green-500 transition-all duration-200;
 }
