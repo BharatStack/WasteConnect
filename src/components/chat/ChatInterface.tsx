@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Bot, User, Loader2, AlertCircle, History } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAIConversations } from '@/hooks/useAIConversations';
 
 interface Message {
   id: string;
@@ -27,8 +28,14 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [sessionId] = useState(() => Math.random().toString(36).substr(2, 9));
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const {
+    findRelevantContext,
+    saveConversation,
+    knowledgeBase
+  } = useAIConversations();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -47,14 +54,21 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input.trim();
     setInput('');
     setIsLoading(true);
 
     try {
+      // Find relevant context from knowledge base
+      const knowledgeContext = findRelevantContext(currentInput);
+      const enhancedContext = context 
+        ? `${context}\n\nAdditional Knowledge:\n${knowledgeContext}`
+        : knowledgeContext;
+
       const { data, error } = await supabase.functions.invoke('chat-assistant', {
         body: {
           message: userMessage.content,
-          context,
+          context: enhancedContext,
           language,
         },
       });
@@ -75,6 +89,16 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Save conversation to database (fire and forget)
+      saveConversation(
+        sessionId,
+        userMessage.content,
+        data.message,
+        enhancedContext,
+        language
+      ).catch(err => console.log('Conversation save failed:', err));
+
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -105,6 +129,10 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
               Demo Mode
             </span>
           )}
+          <div className="ml-auto flex items-center gap-2 text-xs text-gray-500">
+            <History className="h-3 w-3" />
+            KB: {knowledgeBase.length} items
+          </div>
         </CardTitle>
         {isDemoMode && (
           <Alert>
@@ -121,8 +149,11 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
             {messages.length === 0 && (
               <div className="text-center text-gray-500 py-8">
                 <Bot className="h-12 w-12 mx-auto mb-4 text-eco-green-600" />
-                <p>Hello! I'm your WasteConnect assistant.</p>
+                <p>Hello! I'm your enhanced WasteConnect assistant.</p>
                 <p className="text-sm">Ask me about waste management, sustainability, or platform features.</p>
+                <p className="text-xs mt-2 text-gray-400">
+                  Your conversations are saved and I learn from our knowledge base.
+                </p>
               </div>
             )}
             {messages.map((message) => (
