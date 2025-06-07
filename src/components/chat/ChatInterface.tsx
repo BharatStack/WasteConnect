@@ -110,7 +110,7 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              Running in demo mode with sample responses. Gemini integration will be available once API quota is resolved.
+              Running in demo mode with sample responses. DeepSeek integration will be available once API quota is resolved.
             </AlertDescription>
           </Alert>
         )}
