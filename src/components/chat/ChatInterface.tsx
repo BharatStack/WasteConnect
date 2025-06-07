@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, Loader2, AlertCircle, History } from 'lucide-react';
+import { Send, Bot, User, Loader2, History } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAIConversations } from '@/hooks/useAIConversations';
 
 interface Message {
@@ -15,7 +14,6 @@ interface Message {
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
-  isDemo?: boolean;
 }
 
 interface ChatInterfaceProps {
@@ -27,7 +25,6 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [sessionId] = useState(() => Math.random().toString(36).substr(2, 9));
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -77,15 +74,15 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
         throw error;
       }
 
-      const isDemo = data.usage?.mock || data.message?.includes('[DEMO MODE');
-      setIsDemoMode(isDemo);
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.message,
         role: 'assistant',
         timestamp: new Date(),
-        isDemo,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -103,7 +100,7 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
       console.error('Error sending message:', error);
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -124,24 +121,11 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-eco-green-600" />
           WasteConnect Assistant
-          {isDemoMode && (
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-              Demo Mode
-            </span>
-          )}
           <div className="ml-auto flex items-center gap-2 text-xs text-gray-500">
             <History className="h-3 w-3" />
             KB: {knowledgeBase.length} items
           </div>
         </CardTitle>
-        {isDemoMode && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-sm">
-              Running in demo mode with sample responses. DeepSeek integration will be available once API quota is resolved.
-            </AlertDescription>
-          </Alert>
-        )}
       </CardHeader>
       <CardContent className="flex-1 flex flex-col gap-4 p-4">
         <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
@@ -149,7 +133,7 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
             {messages.length === 0 && (
               <div className="text-center text-gray-500 py-8">
                 <Bot className="h-12 w-12 mx-auto mb-4 text-eco-green-600" />
-                <p>Hello! I'm your enhanced WasteConnect assistant.</p>
+                <p>Hello! I'm your WasteConnect assistant powered by DeepSeek AI.</p>
                 <p className="text-sm">Ask me about waste management, sustainability, or platform features.</p>
                 <p className="text-xs mt-2 text-gray-400">
                   Your conversations are saved and I learn from our knowledge base.
@@ -164,20 +148,14 @@ const ChatInterface = ({ context, language = 'en' }: ChatInterfaceProps) => {
                 }`}
               >
                 {message.role === 'assistant' && (
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mt-1 ${
-                    message.isDemo ? 'bg-yellow-100' : 'bg-eco-green-100'
-                  }`}>
-                    <Bot className={`h-4 w-4 ${
-                      message.isDemo ? 'text-yellow-600' : 'text-eco-green-600'
-                    }`} />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center mt-1 bg-eco-green-100">
+                    <Bot className="h-4 w-4 text-eco-green-600" />
                   </div>
                 )}
                 <div
                   className={`max-w-[80%] p-3 rounded-lg ${
                     message.role === 'user'
                       ? 'bg-eco-green-600 text-white'
-                      : message.isDemo
-                      ? 'bg-yellow-50 text-gray-900 border border-yellow-200'
                       : 'bg-gray-100 text-gray-900'
                   }`}
                 >
