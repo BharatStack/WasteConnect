@@ -6,7 +6,25 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trash2, Route, ShoppingCart, BarChart3, MessageSquare, TrendingUp, Leaf, Recycle, Layout } from 'lucide-react';
+import { 
+  Trash2, 
+  Route, 
+  ShoppingCart, 
+  BarChart3, 
+  MessageSquare, 
+  TrendingUp, 
+  Leaf, 
+  Recycle, 
+  DollarSign,
+  Coins,
+  CreditCard,
+  PiggyBank,
+  Shield,
+  Building,
+  Users2,
+  FileText,
+  Globe
+} from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardIntegrations from '@/components/dashboard/DashboardIntegrations';
 
@@ -43,7 +61,6 @@ const Dashboard = () => {
 
       if (wasteError) throw wasteError;
 
-      // Calculate statistics
       let totalWaste = 0;
       let recyclableWaste = 0;
       let totalCarbonReduction = 0;
@@ -58,7 +75,6 @@ const Dashboard = () => {
           const impact = item.environmental_impact as any;
           totalCarbonReduction += impact.co2_reduction_kg || 0;
         }
-        // Estimate cost savings
         const costPerKg = item.waste_type === 'recyclable' ? 0.5 : 
                          item.waste_type === 'organic' ? 0.3 : 0.1;
         totalCostSavings += item.quantity * costPerKg;
@@ -87,13 +103,15 @@ const Dashboard = () => {
         <div className="px-4 py-6 sm:px-0">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-gray-600">Manage your waste data and environmental impact</p>
+            <p className="text-gray-600">Manage your waste data, environmental impact, and green finance opportunities</p>
           </div>
 
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="features">Features</TabsTrigger>
+              <TabsTrigger value="features">Core Features</TabsTrigger>
+              <TabsTrigger value="green-finance">Green Finance</TabsTrigger>
+              <TabsTrigger value="trading">Trading & Markets</TabsTrigger>
               <TabsTrigger value="integrations">Integrations</TabsTrigger>
             </TabsList>
 
@@ -241,6 +259,228 @@ const Dashboard = () => {
                         View Reports
                       </Button>
                     </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="green-finance" className="space-y-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Green Finance Solutions</h2>
+                <p className="text-gray-600">Access sustainable financing options and environmental investments</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Coins className="h-5 w-5 text-eco-green-600" />
+                      Green Bonds Platform
+                    </CardTitle>
+                    <CardDescription>
+                      Invest in green bonds for waste infrastructure projects with verified environmental impact
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Explore Green Bonds
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <PiggyBank className="h-5 w-5 text-eco-green-600" />
+                      Micro-Finance Solutions
+                    </CardTitle>
+                    <CardDescription>
+                      Access micro-loans and financial inclusion services for waste workers and small businesses
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Apply for Micro-Finance
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Building className="h-5 w-5 text-eco-green-600" />
+                      ESG Investment Tracking
+                    </CardTitle>
+                    <CardDescription>
+                      Track ESG performance and access impact investment opportunities
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      View ESG Dashboard
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Shield className="h-5 w-5 text-eco-green-600" />
+                      Green Insurance
+                    </CardTitle>
+                    <CardDescription>
+                      Parametric insurance for waste management operations and climate risk coverage
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Get Insurance Quote
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <CreditCard className="h-5 w-5 text-eco-green-600" />
+                      Equipment Financing
+                    </CardTitle>
+                    <CardDescription>
+                      Asset financing for waste collection vehicles, sorting equipment, and processing machinery
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Apply for Equipment Loan
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <FileText className="h-5 w-5 text-eco-green-600" />
+                      ESG Reporting & Compliance
+                    </CardTitle>
+                    <CardDescription>
+                      Automated ESG reporting platform with regulatory compliance tracking
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Access Reporting Tools
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="trading" className="space-y-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Environmental Asset Trading</h2>
+                <p className="text-gray-600">Trade carbon credits, plastic credits, and other environmental assets</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Leaf className="h-5 w-5 text-eco-green-600" />
+                      Carbon Credit Trading
+                    </CardTitle>
+                    <CardDescription>
+                      Generate, buy, and sell verified carbon credits from waste reduction activities
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Start Carbon Trading
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Recycle className="h-5 w-5 text-eco-green-600" />
+                      Plastic Credit Marketplace
+                    </CardTitle>
+                    <CardDescription>
+                      Trade plastic credits and achieve plastic neutrality through verified collection
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Trade Plastic Credits
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <DollarSign className="h-5 w-5 text-eco-green-600" />
+                      Green Cryptocurrency
+                    </CardTitle>
+                    <CardDescription>
+                      Earn and trade green crypto backed by verified environmental assets
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Access Green Crypto
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Globe className="h-5 w-5 text-eco-green-600" />
+                      Water Credit Trading
+                    </CardTitle>
+                    <CardDescription>
+                      Generate water credits from conservation through improved waste management
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Trade Water Credits
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Users2 className="h-5 w-5 text-eco-green-600" />
+                      Biodiversity Credits
+                    </CardTitle>
+                    <CardDescription>
+                      Earn credits for waste management activities that protect natural habitats
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Generate Bio Credits
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp className="h-5 w-5 text-eco-green-600" />
+                      Corporate Offset Programs
+                    </CardTitle>
+                    <CardDescription>
+                      B2B marketplace for corporate carbon offsetting and sustainability programs
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      Corporate Solutions
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
