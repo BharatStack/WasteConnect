@@ -117,6 +117,240 @@ export type Database = {
         }
         Relationships: []
       }
+      carbon_credit_orders: {
+        Row: {
+          created_at: string | null
+          credits_amount: number
+          expires_at: string | null
+          filled_amount: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          price_per_credit: number
+          status: Database["public"]["Enums"]["trade_status"] | null
+          total_amount: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          credits_amount: number
+          expires_at?: string | null
+          filled_amount?: number | null
+          id?: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          price_per_credit: number
+          status?: Database["public"]["Enums"]["trade_status"] | null
+          total_amount: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          credits_amount?: number
+          expires_at?: string | null
+          filled_amount?: number | null
+          id?: string
+          order_type?: Database["public"]["Enums"]["order_type"]
+          price_per_credit?: number
+          status?: Database["public"]["Enums"]["trade_status"] | null
+          total_amount?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carbon_credit_orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carbon_credit_profiles: {
+        Row: {
+          aadhaar_number: string | null
+          address_verified: boolean | null
+          bank_account_number: string | null
+          created_at: string | null
+          document_urls: Json | null
+          gps_coordinates: unknown | null
+          id: string
+          ifsc_code: string | null
+          kyc_status: Database["public"]["Enums"]["verification_status"] | null
+          onboarding_completed: boolean | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          terms_accepted_at: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aadhaar_number?: string | null
+          address_verified?: boolean | null
+          bank_account_number?: string | null
+          created_at?: string | null
+          document_urls?: Json | null
+          gps_coordinates?: unknown | null
+          id?: string
+          ifsc_code?: string | null
+          kyc_status?: Database["public"]["Enums"]["verification_status"] | null
+          onboarding_completed?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          terms_accepted_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aadhaar_number?: string | null
+          address_verified?: boolean | null
+          bank_account_number?: string | null
+          created_at?: string | null
+          document_urls?: Json | null
+          gps_coordinates?: unknown | null
+          id?: string
+          ifsc_code?: string | null
+          kyc_status?: Database["public"]["Enums"]["verification_status"] | null
+          onboarding_completed?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          terms_accepted_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carbon_credit_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carbon_credit_trades: {
+        Row: {
+          buy_order_id: string | null
+          buyer_id: string | null
+          created_at: string | null
+          credits_amount: number
+          id: string
+          price_per_credit: number
+          sell_order_id: string | null
+          seller_id: string | null
+          settlement_status: string | null
+          total_amount: number
+          trade_date: string | null
+        }
+        Insert: {
+          buy_order_id?: string | null
+          buyer_id?: string | null
+          created_at?: string | null
+          credits_amount: number
+          id?: string
+          price_per_credit: number
+          sell_order_id?: string | null
+          seller_id?: string | null
+          settlement_status?: string | null
+          total_amount: number
+          trade_date?: string | null
+        }
+        Update: {
+          buy_order_id?: string | null
+          buyer_id?: string | null
+          created_at?: string | null
+          credits_amount?: number
+          id?: string
+          price_per_credit?: number
+          sell_order_id?: string | null
+          seller_id?: string | null
+          settlement_status?: string | null
+          total_amount?: number
+          trade_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carbon_credit_trades_buy_order_id_fkey"
+            columns: ["buy_order_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_credit_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carbon_credit_trades_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carbon_credit_trades_sell_order_id_fkey"
+            columns: ["sell_order_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_credit_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carbon_credit_trades_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carbon_credits: {
+        Row: {
+          activity_id: string | null
+          created_at: string | null
+          credits_amount: number
+          credits_type: string | null
+          earned_date: string | null
+          expiry_date: string | null
+          id: string
+          status: string | null
+          transaction_hash: string | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_id?: string | null
+          created_at?: string | null
+          credits_amount: number
+          credits_type?: string | null
+          earned_date?: string | null
+          expiry_date?: string | null
+          id?: string
+          status?: string | null
+          transaction_hash?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_id?: string | null
+          created_at?: string | null
+          credits_amount?: number
+          credits_type?: string | null
+          earned_date?: string | null
+          expiry_date?: string | null
+          id?: string
+          status?: string | null
+          transaction_hash?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carbon_credits_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "waste_activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carbon_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       citizen_reports: {
         Row: {
           created_at: string
@@ -203,6 +437,50 @@ export type Database = {
           waste_types?: string[] | null
         }
         Relationships: []
+      }
+      community_leaderboards: {
+        Row: {
+          activities_count: number | null
+          created_at: string | null
+          credits_earned: number | null
+          id: string
+          leaderboard_type: string
+          period_end: string
+          period_start: string
+          rank_position: number | null
+          user_id: string | null
+        }
+        Insert: {
+          activities_count?: number | null
+          created_at?: string | null
+          credits_earned?: number | null
+          id?: string
+          leaderboard_type: string
+          period_end: string
+          period_start: string
+          rank_position?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          activities_count?: number | null
+          created_at?: string | null
+          credits_earned?: number | null
+          id?: string
+          leaderboard_type?: string
+          period_end?: string
+          period_start?: string
+          rank_position?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_leaderboards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       compliance_reports: {
         Row: {
@@ -371,6 +649,39 @@ export type Database = {
         }
         Relationships: []
       }
+      material_conversion_factors: {
+        Row: {
+          conversion_factor: number
+          created_at: string | null
+          effective_from: string | null
+          effective_to: string | null
+          id: string
+          material_type: Database["public"]["Enums"]["waste_material"]
+          region: string | null
+          regional_factor: number | null
+        }
+        Insert: {
+          conversion_factor: number
+          created_at?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          material_type: Database["public"]["Enums"]["waste_material"]
+          region?: string | null
+          regional_factor?: number | null
+        }
+        Update: {
+          conversion_factor?: number
+          created_at?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          material_type?: Database["public"]["Enums"]["waste_material"]
+          region?: string | null
+          regional_factor?: number | null
+        }
+        Relationships: []
+      }
       municipality_responses: {
         Row: {
           after_image_url: string | null
@@ -459,6 +770,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          credits_amount: number | null
+          gateway_response: Json | null
+          id: string
+          payment_gateway_id: string | null
+          payment_method: string | null
+          processed_at: string | null
+          status: string | null
+          transaction_type: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          credits_amount?: number | null
+          gateway_response?: Json | null
+          id?: string
+          payment_gateway_id?: string | null
+          payment_method?: string | null
+          processed_at?: string | null
+          status?: string | null
+          transaction_type: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          credits_amount?: number | null
+          gateway_response?: Json | null
+          id?: string
+          payment_gateway_id?: string | null
+          payment_method?: string | null
+          processed_at?: string | null
+          status?: string | null
+          transaction_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       phone_verifications: {
         Row: {
@@ -817,6 +1178,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_name: string
+          achievement_type: string
+          badge_url: string | null
+          created_at: string | null
+          description: string | null
+          earned_at: string | null
+          id: string
+          points_earned: number | null
+          user_id: string | null
+        }
+        Insert: {
+          achievement_name: string
+          achievement_type: string
+          badge_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          earned_at?: string | null
+          id?: string
+          points_earned?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          achievement_name?: string
+          achievement_type?: string
+          badge_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          earned_at?: string | null
+          id?: string
+          points_earned?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -887,6 +1292,68 @@ export type Database = {
           },
         ]
       }
+      user_stats: {
+        Row: {
+          co2_saved: number | null
+          created_at: string | null
+          current_level: number | null
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          level_points: number | null
+          longest_streak: number | null
+          total_activities: number | null
+          total_credits_earned: number | null
+          total_credits_traded: number | null
+          total_earnings: number | null
+          total_waste_processed: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          co2_saved?: number | null
+          created_at?: string | null
+          current_level?: number | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          level_points?: number | null
+          longest_streak?: number | null
+          total_activities?: number | null
+          total_credits_earned?: number | null
+          total_credits_traded?: number | null
+          total_earnings?: number | null
+          total_waste_processed?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          co2_saved?: number | null
+          created_at?: string | null
+          current_level?: number | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          level_points?: number | null
+          longest_streak?: number | null
+          total_activities?: number | null
+          total_credits_earned?: number | null
+          total_credits_traded?: number | null
+          total_earnings?: number | null
+          total_waste_processed?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_verification_documents: {
         Row: {
           created_at: string
@@ -919,6 +1386,140 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: []
+      }
+      verification_appeals: {
+        Row: {
+          activity_id: string | null
+          created_at: string | null
+          id: string
+          reason: string
+          resolved_at: string | null
+          reviewer_comments: string | null
+          reviewer_id: string | null
+          status: Database["public"]["Enums"]["verification_status"] | null
+          supporting_documents: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_id?: string | null
+          created_at?: string | null
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          reviewer_comments?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          supporting_documents?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_id?: string | null
+          created_at?: string | null
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          reviewer_comments?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          supporting_documents?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_appeals_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "waste_activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verification_appeals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waste_activities: {
+        Row: {
+          activity_date: string | null
+          activity_type: Database["public"]["Enums"]["waste_material"]
+          ai_classification_confidence: number | null
+          batch_id: string | null
+          carbon_credits_earned: number | null
+          created_at: string | null
+          id: string
+          location: unknown | null
+          location_name: string | null
+          notes: string | null
+          photo_urls: Json | null
+          quantity: number
+          status: Database["public"]["Enums"]["activity_status"] | null
+          unit: string | null
+          updated_at: string | null
+          user_id: string | null
+          verification_score: number | null
+          verification_tier:
+            | Database["public"]["Enums"]["verification_tier"]
+            | null
+          video_urls: Json | null
+        }
+        Insert: {
+          activity_date?: string | null
+          activity_type: Database["public"]["Enums"]["waste_material"]
+          ai_classification_confidence?: number | null
+          batch_id?: string | null
+          carbon_credits_earned?: number | null
+          created_at?: string | null
+          id?: string
+          location?: unknown | null
+          location_name?: string | null
+          notes?: string | null
+          photo_urls?: Json | null
+          quantity: number
+          status?: Database["public"]["Enums"]["activity_status"] | null
+          unit?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_score?: number | null
+          verification_tier?:
+            | Database["public"]["Enums"]["verification_tier"]
+            | null
+          video_urls?: Json | null
+        }
+        Update: {
+          activity_date?: string | null
+          activity_type?: Database["public"]["Enums"]["waste_material"]
+          ai_classification_confidence?: number | null
+          batch_id?: string | null
+          carbon_credits_earned?: number | null
+          created_at?: string | null
+          id?: string
+          location?: unknown | null
+          location_name?: string | null
+          notes?: string | null
+          photo_urls?: Json | null
+          quantity?: number
+          status?: Database["public"]["Enums"]["activity_status"] | null
+          unit?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_score?: number | null
+          verification_tier?:
+            | Database["public"]["Enums"]["verification_tier"]
+            | null
+          video_urls?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waste_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waste_analytics: {
         Row: {
@@ -1221,9 +1822,11 @@ export type Database = {
       }
     }
     Enums: {
+      activity_status: "pending" | "verified" | "rejected" | "expired"
       collection_status: "scheduled" | "in_progress" | "completed" | "missed"
       compliance_status: "compliant" | "non_compliant" | "pending_review"
       marketplace_item_status: "available" | "reserved" | "sold" | "removed"
+      order_type: "buy" | "sell"
       pickup_status: "scheduled" | "in_progress" | "completed" | "cancelled"
       route_status: "planned" | "in_progress" | "completed" | "cancelled"
       tracking_status:
@@ -1232,6 +1835,8 @@ export type Database = {
         | "in_transit"
         | "processing"
         | "disposed"
+      trade_status: "active" | "completed" | "cancelled" | "expired"
+      user_role: "individual" | "community" | "organization" | "municipal"
       user_type:
         | "individual"
         | "business"
@@ -1239,6 +1844,17 @@ export type Database = {
         | "collector"
         | "government"
         | "household"
+      verification_status: "pending" | "approved" | "rejected" | "under_review"
+      verification_tier: "tier1_ai" | "tier2_community" | "tier3_auditor"
+      waste_material:
+        | "organic"
+        | "recyclable"
+        | "hazardous"
+        | "ewaste"
+        | "plastic"
+        | "paper"
+        | "metal"
+        | "glass"
       waste_type:
         | "organic"
         | "recyclable"
@@ -1360,9 +1976,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_status: ["pending", "verified", "rejected", "expired"],
       collection_status: ["scheduled", "in_progress", "completed", "missed"],
       compliance_status: ["compliant", "non_compliant", "pending_review"],
       marketplace_item_status: ["available", "reserved", "sold", "removed"],
+      order_type: ["buy", "sell"],
       pickup_status: ["scheduled", "in_progress", "completed", "cancelled"],
       route_status: ["planned", "in_progress", "completed", "cancelled"],
       tracking_status: [
@@ -1372,6 +1990,8 @@ export const Constants = {
         "processing",
         "disposed",
       ],
+      trade_status: ["active", "completed", "cancelled", "expired"],
+      user_role: ["individual", "community", "organization", "municipal"],
       user_type: [
         "individual",
         "business",
@@ -1379,6 +1999,18 @@ export const Constants = {
         "collector",
         "government",
         "household",
+      ],
+      verification_status: ["pending", "approved", "rejected", "under_review"],
+      verification_tier: ["tier1_ai", "tier2_community", "tier3_auditor"],
+      waste_material: [
+        "organic",
+        "recyclable",
+        "hazardous",
+        "ewaste",
+        "plastic",
+        "paper",
+        "metal",
+        "glass",
       ],
       waste_type: [
         "organic",
