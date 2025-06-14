@@ -28,7 +28,7 @@ const CarbonCreditMarketplace = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [orderData, setOrderData] = useState({
-    order_type: 'buy',
+    order_type: 'buy' as 'buy' | 'sell',
     credits_amount: '',
     price_per_credit: ''
   });
@@ -112,7 +112,7 @@ const CarbonCreditMarketplace = () => {
           credits_amount: creditsAmount,
           price_per_credit: pricePerCredit,
           total_amount: creditsAmount * pricePerCredit,
-          status: 'active',
+          status: 'active' as const,
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
         });
 
@@ -240,7 +240,7 @@ const CarbonCreditMarketplace = () => {
                   <Label htmlFor="order_type">Order Type</Label>
                   <Select 
                     value={orderData.order_type} 
-                    onValueChange={(value) => setOrderData(prev => ({ ...prev, order_type: value }))}
+                    onValueChange={(value: 'buy' | 'sell') => setOrderData(prev => ({ ...prev, order_type: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue />

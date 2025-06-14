@@ -23,7 +23,7 @@ const CarbonCreditOnboarding = ({ onComplete }: OnboardingProps) => {
   
   const [formData, setFormData] = useState({
     aadhaar_number: '',
-    role: 'individual',
+    role: 'individual' as 'individual' | 'community' | 'organization' | 'municipal',
     bank_account_number: '',
     ifsc_code: '',
     address_verified: false,
@@ -73,7 +73,7 @@ const CarbonCreditOnboarding = ({ onComplete }: OnboardingProps) => {
           address_verified: formData.address_verified,
           onboarding_completed: true,
           terms_accepted_at: new Date().toISOString(),
-          kyc_status: 'pending'
+          kyc_status: 'pending' as const
         });
 
       if (profileError) throw profileError;
@@ -183,7 +183,7 @@ const CarbonCreditOnboarding = ({ onComplete }: OnboardingProps) => {
               </div>
               <div>
                 <Label htmlFor="role">Account Type</Label>
-                <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+                <Select value={formData.role} onValueChange={(value: 'individual' | 'community' | 'organization' | 'municipal') => handleInputChange('role', value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

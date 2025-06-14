@@ -15,6 +15,8 @@ interface ActivityTrackerProps {
   onActivityLogged: () => void;
 }
 
+type WasteType = 'organic' | 'recyclable' | 'plastic' | 'paper' | 'metal' | 'glass' | 'ewaste' | 'hazardous';
+
 const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -22,7 +24,7 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
   const [isLoading, setIsLoading] = useState(false);
   
   const [activityData, setActivityData] = useState({
-    activity_type: '',
+    activity_type: '' as WasteType | '',
     quantity: '',
     unit: 'kg',
     location_name: '',
@@ -32,14 +34,14 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
   const [photos, setPhotos] = useState<FileList | null>(null);
 
   const wasteTypes = [
-    { value: 'organic', label: 'Organic Waste', icon: '🌱', factor: 0.5 },
-    { value: 'recyclable', label: 'Recyclable Materials', icon: '♻️', factor: 0.8 },
-    { value: 'plastic', label: 'Plastic Waste', icon: '🥤', factor: 1.2 },
-    { value: 'paper', label: 'Paper & Cardboard', icon: '📄', factor: 0.6 },
-    { value: 'metal', label: 'Metal Scrap', icon: '🔩', factor: 1.5 },
-    { value: 'glass', label: 'Glass Waste', icon: '🍼', factor: 0.4 },
-    { value: 'ewaste', label: 'Electronic Waste', icon: '📱', factor: 2.0 },
-    { value: 'hazardous', label: 'Hazardous Waste', icon: '⚠️', factor: 1.8 }
+    { value: 'organic' as const, label: 'Organic Waste', icon: '🌱', factor: 0.5 },
+    { value: 'recyclable' as const, label: 'Recyclable Materials', icon: '♻️', factor: 0.8 },
+    { value: 'plastic' as const, label: 'Plastic Waste', icon: '🥤', factor: 1.2 },
+    { value: 'paper' as const, label: 'Paper & Cardboard', icon: '📄', factor: 0.6 },
+    { value: 'metal' as const, label: 'Metal Scrap', icon: '🔩', factor: 1.5 },
+    { value: 'glass' as const, label: 'Glass Waste', icon: '🍼', factor: 0.4 },
+    { value: 'ewaste' as const, label: 'Electronic Waste', icon: '📱', factor: 2.0 },
+    { value: 'hazardous' as const, label: 'Hazardous Waste', icon: '⚠️', factor: 1.8 }
   ];
 
   const handleInputChange = (field: string, value: any) => {
@@ -54,7 +56,7 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
 
   const calculateEstimatedCredits = () => {
     const selectedType = wasteTypes.find(type => type.value === activityData.activity_type);
-    if (!selectedType || !activityData.quantity) return 0;
+    if (!selectedType || !activityData.quantity) return '0';
     
     const quantity = parseFloat(activityData.quantity);
     return (quantity * selectedType.factor * 0.1).toFixed(2); // Base calculation
@@ -84,13 +86,13 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
         .from('waste_activities')
         .insert({
           user_id: user.id,
-          activity_type: activityData.activity_type,
+          activity_type: activityData.activity_type as WasteType,
           quantity: parseFloat(activityData.quantity),
           unit: activityData.unit,
           location_name: activityData.location_name,
           notes: activityData.notes,
-          status: 'pending',
-          verification_tier: 'tier1_ai',
+          status: 'pending' as const,
+          verification_tier: 'tier1_ai' as const,
           carbon_credits_earned: estimatedCredits,
           ai_classification_confidence: 0.85
         })
@@ -178,7 +180,7 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="activity_type">Waste Type *</Label>
-                <Select value={activityData.activity_type} onValueChange={(value) => handleInputChange('activity_type', value)}>
+                <Select value={activityData.activity_type} onValueChange={(value: WasteType) => handleInputChange('activity_type', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select waste type" />
                   </SelectTrigger>
@@ -259,8 +261,7 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label html
-              For="notes">Additional Notes</Label>
+              <Label htmlFor="notes">Additional Notes</Label>
               <Textarea
                 id="notes"
                 placeholder="Add any additional details about this activity..."
