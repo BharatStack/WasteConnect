@@ -1,111 +1,103 @@
 
-import { Home, BarChart3, Recycle, ShoppingCart, Users, Settings, Upload, Route, FileText, AlertTriangle } from "lucide-react";
+import { HomeIcon, Users, Building2, Recycle, BarChart3, MessageSquare, Route, Leaf, DollarSign, TrendingUp } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import UserTypes from "./pages/UserTypes.jsx";
+import HouseholdUsers from "./pages/HouseholdUsers.jsx";
+import IndustryUsers from "./pages/IndustryUsers.jsx";
+import MunicipalityUsers from "./pages/MunicipalityUsers.jsx";
+import GovernmentUsers from "./pages/GovernmentUsers.jsx";
 import WasteEntry from "./pages/WasteEntry.jsx";
 import Marketplace from "./pages/Marketplace.jsx";
-import UserTypes from "./pages/UserTypes.jsx";
-import Features from "./pages/Features.jsx";
-import About from "./pages/About.jsx";
 import Analytics from "./pages/Analytics.jsx";
+import AIAssistant from "./pages/AIAssistant.jsx";
 import RouteOptimization from "./pages/RouteOptimization.jsx";
-import Auth from "./pages/Auth.jsx";
-import EnhancedAuth from "./pages/EnhancedAuth.jsx";
-import CitizenReports from "./pages/CitizenReports.jsx";
-import NewCitizenReport from "./pages/NewCitizenReport.jsx";
-import CitizenReportDetails from "./pages/CitizenReportDetails.jsx";
+import CarbonCreditTrading from "./pages/CarbonCreditTrading.jsx";
+import GreenBonds from "./pages/GreenBonds.jsx";
 
 export const navItems = [
   {
     title: "Home",
     to: "/",
-    icon: <Home className="h-4 w-4" />,
+    icon: <HomeIcon className="h-4 w-4" />,
     page: <Index />,
-  },
-  {
-    title: "Marketplace",
-    to: "/marketplace",
-    icon: <ShoppingCart className="h-4 w-4" />,
-    page: <Marketplace />,
-    protected: true,
   },
   {
     title: "Dashboard",
     to: "/dashboard",
     icon: <BarChart3 className="h-4 w-4" />,
     page: <Dashboard />,
-    protected: true,
+  },
+  {
+    title: "User Types",
+    to: "/user-types", 
+    icon: <Users className="h-4 w-4" />,
+    page: <UserTypes />,
+  },
+  {
+    title: "Household Users",
+    to: "/household-users",
+    icon: <HomeIcon className="h-4 w-4" />,
+    page: <HouseholdUsers />,
+  },
+  {
+    title: "Industry Users", 
+    to: "/industry-users",
+    icon: <Building2 className="h-4 w-4" />,
+    page: <IndustryUsers />,
+  },
+  {
+    title: "Municipality Users",
+    to: "/municipality-users", 
+    icon: <Building2 className="h-4 w-4" />,
+    page: <MunicipalityUsers />,
+  },
+  {
+    title: "Government Users",
+    to: "/government-users",
+    icon: <Building2 className="h-4 w-4" />,
+    page: <GovernmentUsers />,
   },
   {
     title: "Waste Entry",
     to: "/waste-entry",
-    icon: <Upload className="h-4 w-4" />,
+    icon: <Recycle className="h-4 w-4" />,
     page: <WasteEntry />,
-    protected: true,
   },
   {
-    title: "Route Optimization",
-    to: "/route-optimization",
-    icon: <Route className="h-4 w-4" />,
-    page: <RouteOptimization />,
-    protected: true,
+    title: "Marketplace",
+    to: "/marketplace", 
+    icon: <DollarSign className="h-4 w-4" />,
+    page: <Marketplace />,
   },
   {
     title: "Analytics",
     to: "/analytics",
     icon: <BarChart3 className="h-4 w-4" />,
     page: <Analytics />,
-    protected: true,
   },
   {
-    title: "Citizen Reports",
-    to: "/citizen-reports",
-    icon: <AlertTriangle className="h-4 w-4" />,
-    page: <CitizenReports />,
-    protected: true,
+    title: "AI Assistant",
+    to: "/ai-assistant",
+    icon: <MessageSquare className="h-4 w-4" />,
+    page: <AIAssistant />,
   },
   {
-    title: "New Report",
-    to: "/new-citizen-report",
-    icon: <FileText className="h-4 w-4" />,
-    page: <NewCitizenReport />,
-    protected: true,
+    title: "Route Optimization",
+    to: "/route-optimization",
+    icon: <Route className="h-4 w-4" />,
+    page: <RouteOptimization />,
   },
   {
-    title: "Report Details",
-    to: "/citizen-report/:id",
-    icon: <FileText className="h-4 w-4" />,
-    page: <CitizenReportDetails />,
-    protected: true,
+    title: "Carbon Credits",
+    to: "/carbon-credit-trading",
+    icon: <Leaf className="h-4 w-4" />,
+    page: <CarbonCreditTrading />,
   },
   {
-    title: "User Types",
-    to: "/user-types",
-    icon: <Users className="h-4 w-4" />,
-    page: <UserTypes />,
-  },
-  {
-    title: "Features",
-    to: "/features",
-    icon: <Settings className="h-4 w-4" />,
-    page: <Features />,
-  },
-  {
-    title: "About",
-    to: "/about",
-    icon: <Settings className="h-4 w-4" />,
-    page: <About />,
-  },
-  {
-    title: "Auth",
-    to: "/auth",
-    icon: <Settings className="h-4 w-4" />,
-    page: <Auth />,
-  },
-  {
-    title: "Enhanced Auth",
-    to: "/enhanced-auth",
-    icon: <Settings className="h-4 w-4" />,
-    page: <EnhancedAuth />,
+    title: "Green Bonds",
+    to: "/green-bonds",
+    icon: <TrendingUp className="h-4 w-4" />,
+    page: <GreenBonds />,
   },
 ];

@@ -117,6 +117,357 @@ export type Database = {
         }
         Relationships: []
       }
+      biodiversity_activities: {
+        Row: {
+          activity_type: Database["public"]["Enums"]["biodiversity_activity_type"]
+          area_sqm: number | null
+          biodiversity_index: number | null
+          coordinates: unknown | null
+          created_at: string | null
+          credits_earned: number | null
+          habitat_type: string | null
+          id: string
+          location: string | null
+          photo_evidence: Json | null
+          species_involved: string[] | null
+          user_id: string
+          verification_status:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Insert: {
+          activity_type: Database["public"]["Enums"]["biodiversity_activity_type"]
+          area_sqm?: number | null
+          biodiversity_index?: number | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          credits_earned?: number | null
+          habitat_type?: string | null
+          id?: string
+          location?: string | null
+          photo_evidence?: Json | null
+          species_involved?: string[] | null
+          user_id: string
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Update: {
+          activity_type?: Database["public"]["Enums"]["biodiversity_activity_type"]
+          area_sqm?: number | null
+          biodiversity_index?: number | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          credits_earned?: number | null
+          habitat_type?: string | null
+          id?: string
+          location?: string | null
+          photo_evidence?: Json | null
+          species_involved?: string[] | null
+          user_id?: string
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Relationships: []
+      }
+      bond_impact_tracking: {
+        Row: {
+          bond_id: string | null
+          created_at: string | null
+          id: string
+          impact_data: Json
+          reporting_period_end: string
+          reporting_period_start: string
+          updated_at: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          bond_id?: string | null
+          created_at?: string | null
+          id?: string
+          impact_data?: Json
+          reporting_period_end: string
+          reporting_period_start: string
+          updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          bond_id?: string | null
+          created_at?: string | null
+          id?: string
+          impact_data?: Json
+          reporting_period_end?: string
+          reporting_period_start?: string
+          updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_impact_tracking_bond_id_fkey"
+            columns: ["bond_id"]
+            isOneToOne: false
+            referencedRelation: "green_bonds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bond_interest_payments: {
+        Row: {
+          bond_id: string | null
+          created_at: string | null
+          due_date: string
+          id: string
+          investment_id: string | null
+          investor_id: string | null
+          payment_amount: number
+          payment_date: string
+          payment_reference: string | null
+          processed_at: string | null
+          status: string | null
+        }
+        Insert: {
+          bond_id?: string | null
+          created_at?: string | null
+          due_date: string
+          id?: string
+          investment_id?: string | null
+          investor_id?: string | null
+          payment_amount: number
+          payment_date: string
+          payment_reference?: string | null
+          processed_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          bond_id?: string | null
+          created_at?: string | null
+          due_date?: string
+          id?: string
+          investment_id?: string | null
+          investor_id?: string | null
+          payment_amount?: number
+          payment_date?: string
+          payment_reference?: string | null
+          processed_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_interest_payments_bond_id_fkey"
+            columns: ["bond_id"]
+            isOneToOne: false
+            referencedRelation: "green_bonds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_interest_payments_investment_id_fkey"
+            columns: ["investment_id"]
+            isOneToOne: false
+            referencedRelation: "bond_investments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_interest_payments_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bond_investments: {
+        Row: {
+          bond_id: string | null
+          created_at: string | null
+          expected_return: number
+          id: string
+          investment_amount: number
+          investment_tier: Database["public"]["Enums"]["investment_tier"]
+          investor_id: string | null
+          maturity_date: string
+          purchase_date: string
+          purchase_price: number
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bond_id?: string | null
+          created_at?: string | null
+          expected_return: number
+          id?: string
+          investment_amount: number
+          investment_tier?: Database["public"]["Enums"]["investment_tier"]
+          investor_id?: string | null
+          maturity_date: string
+          purchase_date?: string
+          purchase_price?: number
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bond_id?: string | null
+          created_at?: string | null
+          expected_return?: number
+          id?: string
+          investment_amount?: number
+          investment_tier?: Database["public"]["Enums"]["investment_tier"]
+          investor_id?: string | null
+          maturity_date?: string
+          purchase_date?: string
+          purchase_price?: number
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_investments_bond_id_fkey"
+            columns: ["bond_id"]
+            isOneToOne: false
+            referencedRelation: "green_bonds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_investments_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bond_market_orders: {
+        Row: {
+          bond_id: string | null
+          buyer_id: string | null
+          created_at: string | null
+          expires_at: string | null
+          filled_at: string | null
+          id: string
+          order_type: string
+          price_per_unit: number
+          quantity: number
+          seller_id: string | null
+          status: string | null
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          bond_id?: string | null
+          buyer_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          filled_at?: string | null
+          id?: string
+          order_type: string
+          price_per_unit: number
+          quantity: number
+          seller_id?: string | null
+          status?: string | null
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          bond_id?: string | null
+          buyer_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          filled_at?: string | null
+          id?: string
+          order_type?: string
+          price_per_unit?: number
+          quantity?: number
+          seller_id?: string | null
+          status?: string | null
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_market_orders_bond_id_fkey"
+            columns: ["bond_id"]
+            isOneToOne: false
+            referencedRelation: "green_bonds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_market_orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_market_orders_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bond_portfolios: {
+        Row: {
+          active_investments: number | null
+          clean_energy_supported: number | null
+          communities_benefited: number | null
+          created_at: string | null
+          current_value: number | null
+          id: string
+          jobs_created: number | null
+          last_updated: string | null
+          overall_yield: number | null
+          total_co2_reduced: number | null
+          total_invested: number | null
+          total_returns: number | null
+          user_id: string | null
+        }
+        Insert: {
+          active_investments?: number | null
+          clean_energy_supported?: number | null
+          communities_benefited?: number | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          jobs_created?: number | null
+          last_updated?: string | null
+          overall_yield?: number | null
+          total_co2_reduced?: number | null
+          total_invested?: number | null
+          total_returns?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          active_investments?: number | null
+          clean_energy_supported?: number | null
+          communities_benefited?: number | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          jobs_created?: number | null
+          last_updated?: string | null
+          overall_yield?: number | null
+          total_co2_reduced?: number | null
+          total_invested?: number | null
+          total_returns?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_portfolios_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       carbon_credit_orders: {
         Row: {
           created_at: string | null
@@ -527,6 +878,272 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_accounts: {
+        Row: {
+          annual_emissions: number | null
+          api_key: string | null
+          company_name: string
+          contact_person_id: string | null
+          created_at: string | null
+          employee_count: number | null
+          headquarters_location: string | null
+          id: string
+          industry_sector: Database["public"]["Enums"]["industry_sector"]
+          offset_target_percentage: number | null
+          subscription_tier: string | null
+        }
+        Insert: {
+          annual_emissions?: number | null
+          api_key?: string | null
+          company_name: string
+          contact_person_id?: string | null
+          created_at?: string | null
+          employee_count?: number | null
+          headquarters_location?: string | null
+          id?: string
+          industry_sector: Database["public"]["Enums"]["industry_sector"]
+          offset_target_percentage?: number | null
+          subscription_tier?: string | null
+        }
+        Update: {
+          annual_emissions?: number | null
+          api_key?: string | null
+          company_name?: string
+          contact_person_id?: string | null
+          created_at?: string | null
+          employee_count?: number | null
+          headquarters_location?: string | null
+          id?: string
+          industry_sector?: Database["public"]["Enums"]["industry_sector"]
+          offset_target_percentage?: number | null
+          subscription_tier?: string | null
+        }
+        Relationships: []
+      }
+      corporate_offset_programs: {
+        Row: {
+          asset_types: Database["public"]["Enums"]["asset_type"][] | null
+          corporate_account_id: string
+          created_at: string | null
+          employee_participation: boolean | null
+          end_date: string | null
+          id: string
+          program_name: string
+          program_type: string | null
+          purchased_credits: number | null
+          start_date: string | null
+          status: string | null
+          target_credits: number | null
+        }
+        Insert: {
+          asset_types?: Database["public"]["Enums"]["asset_type"][] | null
+          corporate_account_id: string
+          created_at?: string | null
+          employee_participation?: boolean | null
+          end_date?: string | null
+          id?: string
+          program_name: string
+          program_type?: string | null
+          purchased_credits?: number | null
+          start_date?: string | null
+          status?: string | null
+          target_credits?: number | null
+        }
+        Update: {
+          asset_types?: Database["public"]["Enums"]["asset_type"][] | null
+          corporate_account_id?: string
+          created_at?: string | null
+          employee_participation?: boolean | null
+          end_date?: string | null
+          id?: string
+          program_name?: string
+          program_type?: string | null
+          purchased_credits?: number | null
+          start_date?: string | null
+          status?: string | null
+          target_credits?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_offset_programs_corporate_account_id_fkey"
+            columns: ["corporate_account_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_conversions: {
+        Row: {
+          conversion_rate: number
+          created_at: string | null
+          effective_date: string | null
+          expires_date: string | null
+          from_asset_type: Database["public"]["Enums"]["asset_type"]
+          id: string
+          region: string | null
+          to_asset_type: Database["public"]["Enums"]["asset_type"]
+        }
+        Insert: {
+          conversion_rate: number
+          created_at?: string | null
+          effective_date?: string | null
+          expires_date?: string | null
+          from_asset_type: Database["public"]["Enums"]["asset_type"]
+          id?: string
+          region?: string | null
+          to_asset_type: Database["public"]["Enums"]["asset_type"]
+        }
+        Update: {
+          conversion_rate?: number
+          created_at?: string | null
+          effective_date?: string | null
+          expires_date?: string | null
+          from_asset_type?: Database["public"]["Enums"]["asset_type"]
+          id?: string
+          region?: string | null
+          to_asset_type?: Database["public"]["Enums"]["asset_type"]
+        }
+        Relationships: []
+      }
+      environmental_assets: {
+        Row: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          metadata: Json | null
+          quantity: number
+          unit: string
+          updated_at: string | null
+          user_id: string
+          verification_date: string | null
+          verification_level:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+          verification_status:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Insert: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          metadata?: Json | null
+          quantity: number
+          unit?: string
+          updated_at?: string | null
+          user_id: string
+          verification_date?: string | null
+          verification_level?:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Update: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          metadata?: Json | null
+          quantity?: number
+          unit?: string
+          updated_at?: string | null
+          user_id?: string
+          verification_date?: string | null
+          verification_level?:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Relationships: []
+      }
+      environmental_credit_orders: {
+        Row: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at: string | null
+          credits_amount: number
+          expires_at: string | null
+          filled_amount: number | null
+          id: string
+          metadata: Json | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          price_per_credit: number
+          status: Database["public"]["Enums"]["trade_status"] | null
+          total_amount: number
+          user_id: string
+        }
+        Insert: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at?: string | null
+          credits_amount: number
+          expires_at?: string | null
+          filled_amount?: number | null
+          id?: string
+          metadata?: Json | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          price_per_credit: number
+          status?: Database["public"]["Enums"]["trade_status"] | null
+          total_amount: number
+          user_id: string
+        }
+        Update: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string | null
+          credits_amount?: number
+          expires_at?: string | null
+          filled_amount?: number | null
+          id?: string
+          metadata?: Json | null
+          order_type?: Database["public"]["Enums"]["order_type"]
+          price_per_credit?: number
+          status?: Database["public"]["Enums"]["trade_status"] | null
+          total_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      environmental_tokens: {
+        Row: {
+          backing_ratio: number | null
+          circulating_supply: number | null
+          contract_address: string | null
+          created_at: string | null
+          environmental_backing: Database["public"]["Enums"]["asset_type"]
+          id: string
+          token_name: string
+          token_symbol: string
+          total_supply: number | null
+        }
+        Insert: {
+          backing_ratio?: number | null
+          circulating_supply?: number | null
+          contract_address?: string | null
+          created_at?: string | null
+          environmental_backing: Database["public"]["Enums"]["asset_type"]
+          id?: string
+          token_name: string
+          token_symbol: string
+          total_supply?: number | null
+        }
+        Update: {
+          backing_ratio?: number | null
+          circulating_supply?: number | null
+          contract_address?: string | null
+          created_at?: string | null
+          environmental_backing?: Database["public"]["Enums"]["asset_type"]
+          id?: string
+          token_name?: string
+          token_symbol?: string
+          total_supply?: number | null
+        }
+        Relationships: []
+      }
       government_analytics: {
         Row: {
           analytics_type: string
@@ -556,6 +1173,154 @@ export type Database = {
           period_start?: string
         }
         Relationships: []
+      }
+      green_bonds: {
+        Row: {
+          available_amount: number
+          bond_name: string
+          bond_rating: Database["public"]["Enums"]["bond_rating"] | null
+          bond_symbol: string
+          category: Database["public"]["Enums"]["bond_category"]
+          created_at: string | null
+          description: string | null
+          documents: Json | null
+          environmental_impact: Json | null
+          id: string
+          interest_rate: number
+          issue_date: string
+          issuer_id: string | null
+          issuer_name: string
+          maturity_date: string
+          maximum_investment: number | null
+          minimum_investment: number
+          payment_frequency: Database["public"]["Enums"]["payment_frequency"]
+          project_details: Json | null
+          risk_factors: string[] | null
+          status: Database["public"]["Enums"]["bond_status"]
+          total_amount: number
+          updated_at: string | null
+          use_of_proceeds: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          available_amount: number
+          bond_name: string
+          bond_rating?: Database["public"]["Enums"]["bond_rating"] | null
+          bond_symbol: string
+          category: Database["public"]["Enums"]["bond_category"]
+          created_at?: string | null
+          description?: string | null
+          documents?: Json | null
+          environmental_impact?: Json | null
+          id?: string
+          interest_rate: number
+          issue_date: string
+          issuer_id?: string | null
+          issuer_name: string
+          maturity_date: string
+          maximum_investment?: number | null
+          minimum_investment?: number
+          payment_frequency?: Database["public"]["Enums"]["payment_frequency"]
+          project_details?: Json | null
+          risk_factors?: string[] | null
+          status?: Database["public"]["Enums"]["bond_status"]
+          total_amount: number
+          updated_at?: string | null
+          use_of_proceeds?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          available_amount?: number
+          bond_name?: string
+          bond_rating?: Database["public"]["Enums"]["bond_rating"] | null
+          bond_symbol?: string
+          category?: Database["public"]["Enums"]["bond_category"]
+          created_at?: string | null
+          description?: string | null
+          documents?: Json | null
+          environmental_impact?: Json | null
+          id?: string
+          interest_rate?: number
+          issue_date?: string
+          issuer_id?: string | null
+          issuer_name?: string
+          maturity_date?: string
+          maximum_investment?: number | null
+          minimum_investment?: number
+          payment_frequency?: Database["public"]["Enums"]["payment_frequency"]
+          project_details?: Json | null
+          risk_factors?: string[] | null
+          status?: Database["public"]["Enums"]["bond_status"]
+          total_amount?: number
+          updated_at?: string | null
+          use_of_proceeds?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "green_bonds_issuer_id_fkey"
+            columns: ["issuer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      green_crypto_transactions: {
+        Row: {
+          amount: number
+          blockchain_hash: string | null
+          created_at: string | null
+          environmental_backing_id: string | null
+          gas_fee: number | null
+          id: string
+          transaction_type: Database["public"]["Enums"]["crypto_activity_type"]
+          user_id: string
+          verification_status:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Insert: {
+          amount: number
+          blockchain_hash?: string | null
+          created_at?: string | null
+          environmental_backing_id?: string | null
+          gas_fee?: number | null
+          id?: string
+          transaction_type: Database["public"]["Enums"]["crypto_activity_type"]
+          user_id: string
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Update: {
+          amount?: number
+          blockchain_hash?: string | null
+          created_at?: string | null
+          environmental_backing_id?: string | null
+          gas_fee?: number | null
+          id?: string
+          transaction_type?: Database["public"]["Enums"]["crypto_activity_type"]
+          user_id?: string
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "green_crypto_transactions_environmental_backing_id_fkey"
+            columns: ["environmental_backing_id"]
+            isOneToOne: false
+            referencedRelation: "environmental_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listing_messages: {
         Row: {
@@ -912,6 +1677,96 @@ export type Database = {
           },
         ]
       }
+      plastic_activities: {
+        Row: {
+          collection_location: string | null
+          collection_method: string | null
+          created_at: string | null
+          credits_earned: number | null
+          id: string
+          photo_urls: Json | null
+          plastic_type: Database["public"]["Enums"]["plastic_type"]
+          processing_facility_id: string | null
+          user_id: string
+          verification_status:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+          weight_kg: number
+        }
+        Insert: {
+          collection_location?: string | null
+          collection_method?: string | null
+          created_at?: string | null
+          credits_earned?: number | null
+          id?: string
+          photo_urls?: Json | null
+          plastic_type: Database["public"]["Enums"]["plastic_type"]
+          processing_facility_id?: string | null
+          user_id: string
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+          weight_kg: number
+        }
+        Update: {
+          collection_location?: string | null
+          collection_method?: string | null
+          created_at?: string | null
+          credits_earned?: number | null
+          id?: string
+          photo_urls?: Json | null
+          plastic_type?: Database["public"]["Enums"]["plastic_type"]
+          processing_facility_id?: string | null
+          user_id?: string
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+          weight_kg?: number
+        }
+        Relationships: []
+      }
+      plastic_collection_points: {
+        Row: {
+          address: string | null
+          contact_info: Json | null
+          coordinates: unknown | null
+          created_at: string | null
+          id: string
+          name: string
+          operating_hours: Json | null
+          plastic_types_accepted:
+            | Database["public"]["Enums"]["plastic_type"][]
+            | null
+          verified: boolean | null
+        }
+        Insert: {
+          address?: string | null
+          contact_info?: Json | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          id?: string
+          name: string
+          operating_hours?: Json | null
+          plastic_types_accepted?:
+            | Database["public"]["Enums"]["plastic_type"][]
+            | null
+          verified?: boolean | null
+        }
+        Update: {
+          address?: string | null
+          contact_info?: Json | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          operating_hours?: Json | null
+          plastic_types_accepted?:
+            | Database["public"]["Enums"]["plastic_type"][]
+            | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       processor_connections: {
         Row: {
           created_at: string
@@ -1056,6 +1911,48 @@ export type Database = {
         }
         Relationships: []
       }
+      recycling_facilities: {
+        Row: {
+          certification_level: string | null
+          contact_info: Json | null
+          coordinates: unknown | null
+          created_at: string | null
+          id: string
+          location: string | null
+          name: string
+          plastic_types_processed:
+            | Database["public"]["Enums"]["plastic_type"][]
+            | null
+          processing_capacity: number | null
+        }
+        Insert: {
+          certification_level?: string | null
+          contact_info?: Json | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          plastic_types_processed?:
+            | Database["public"]["Enums"]["plastic_type"][]
+            | null
+          processing_capacity?: number | null
+        }
+        Update: {
+          certification_level?: string | null
+          contact_info?: Json | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          plastic_types_processed?:
+            | Database["public"]["Enums"]["plastic_type"][]
+            | null
+          processing_capacity?: number | null
+        }
+        Relationships: []
+      }
       report_messages: {
         Row: {
           created_at: string
@@ -1133,6 +2030,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           waypoints?: Json | null
+        }
+        Relationships: []
+      }
+      species_registry: {
+        Row: {
+          common_name: string
+          conservation_status: string | null
+          created_at: string | null
+          credit_multiplier: number | null
+          geographic_range: string[] | null
+          habitat_types: string[] | null
+          id: string
+          scientific_name: string | null
+        }
+        Insert: {
+          common_name: string
+          conservation_status?: string | null
+          created_at?: string | null
+          credit_multiplier?: number | null
+          geographic_range?: string[] | null
+          habitat_types?: string[] | null
+          id?: string
+          scientific_name?: string | null
+        }
+        Update: {
+          common_name?: string
+          conservation_status?: string | null
+          created_at?: string | null
+          credit_multiplier?: number | null
+          geographic_range?: string[] | null
+          habitat_types?: string[] | null
+          id?: string
+          scientific_name?: string | null
         }
         Relationships: []
       }
@@ -1250,6 +2180,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_portfolios: {
+        Row: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          available_credits: number | null
+          id: string
+          last_updated: string | null
+          locked_credits: number | null
+          total_credits: number | null
+          total_value: number | null
+          user_id: string
+        }
+        Insert: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          available_credits?: number | null
+          id?: string
+          last_updated?: string | null
+          locked_credits?: number | null
+          total_credits?: number | null
+          total_value?: number | null
+          user_id: string
+        }
+        Update: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          available_credits?: number | null
+          id?: string
+          last_updated?: string | null
+          locked_credits?: number | null
+          total_credits?: number | null
+          total_value?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_reviews: {
         Row: {
@@ -1806,6 +2769,90 @@ export type Database = {
           },
         ]
       }
+      water_activities: {
+        Row: {
+          activity_type: Database["public"]["Enums"]["water_activity_type"]
+          conservation_method: string | null
+          created_at: string | null
+          credits_earned: number | null
+          id: string
+          location: string | null
+          regional_scarcity_factor: number | null
+          user_id: string
+          verification_evidence: Json | null
+          verification_status:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+          water_saved_liters: number
+        }
+        Insert: {
+          activity_type: Database["public"]["Enums"]["water_activity_type"]
+          conservation_method?: string | null
+          created_at?: string | null
+          credits_earned?: number | null
+          id?: string
+          location?: string | null
+          regional_scarcity_factor?: number | null
+          user_id: string
+          verification_evidence?: Json | null
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+          water_saved_liters: number
+        }
+        Update: {
+          activity_type?: Database["public"]["Enums"]["water_activity_type"]
+          conservation_method?: string | null
+          created_at?: string | null
+          credits_earned?: number | null
+          id?: string
+          location?: string | null
+          regional_scarcity_factor?: number | null
+          user_id?: string
+          verification_evidence?: Json | null
+          verification_status?:
+            | Database["public"]["Enums"]["asset_status"]
+            | null
+          water_saved_liters?: number
+        }
+        Relationships: []
+      }
+      water_meters: {
+        Row: {
+          created_at: string | null
+          id: string
+          installation_date: string | null
+          is_smart_meter: boolean | null
+          last_reading: number | null
+          last_reading_date: string | null
+          location: string | null
+          meter_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          installation_date?: string | null
+          is_smart_meter?: boolean | null
+          last_reading?: number | null
+          last_reading_date?: string | null
+          location?: string | null
+          meter_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          installation_date?: string | null
+          is_smart_meter?: boolean | null
+          last_reading?: number | null
+          last_reading_date?: string | null
+          location?: string | null
+          meter_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1823,11 +2870,68 @@ export type Database = {
     }
     Enums: {
       activity_status: "pending" | "verified" | "rejected" | "expired"
+      asset_status: "pending" | "verified" | "retired" | "traded"
+      asset_type:
+        | "carbon"
+        | "plastic"
+        | "water"
+        | "biodiversity"
+        | "green_crypto"
+      biodiversity_activity_type:
+        | "habitat_protection"
+        | "species_conservation"
+        | "restoration"
+        | "planting"
+        | "monitoring"
+      bond_category:
+        | "renewable_energy"
+        | "energy_efficiency"
+        | "clean_transportation"
+        | "sustainable_water"
+        | "waste_management"
+        | "biodiversity"
+        | "climate_adaptation"
+      bond_rating:
+        | "AAA"
+        | "AA+"
+        | "AA"
+        | "AA-"
+        | "A+"
+        | "A"
+        | "A-"
+        | "BBB+"
+        | "BBB"
+        | "BBB-"
+        | "BB+"
+        | "BB"
+        | "BB-"
+        | "B+"
+        | "B"
+        | "B-"
+      bond_status: "draft" | "active" | "closed" | "matured" | "defaulted"
       collection_status: "scheduled" | "in_progress" | "completed" | "missed"
       compliance_status: "compliant" | "non_compliant" | "pending_review"
+      crypto_activity_type:
+        | "environmental_mining"
+        | "asset_tokenization"
+        | "staking"
+        | "trading"
+      industry_sector:
+        | "technology"
+        | "manufacturing"
+        | "finance"
+        | "healthcare"
+        | "retail"
+        | "energy"
+        | "transportation"
+        | "agriculture"
+        | "other"
+      investment_tier: "retail" | "accredited" | "institutional"
       marketplace_item_status: "available" | "reserved" | "sold" | "removed"
       order_type: "buy" | "sell"
+      payment_frequency: "monthly" | "quarterly" | "semi_annual" | "annual"
       pickup_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      plastic_type: "PET" | "HDPE" | "PVC" | "LDPE" | "PP" | "PS" | "Others"
       route_status: "planned" | "in_progress" | "completed" | "cancelled"
       tracking_status:
         | "generated"
@@ -1844,6 +2948,7 @@ export type Database = {
         | "collector"
         | "government"
         | "household"
+      verification_level: "tier1_ai" | "tier2_manual" | "tier3_expert"
       verification_status: "pending" | "approved" | "rejected" | "under_review"
       verification_tier: "tier1_ai" | "tier2_community" | "tier3_auditor"
       waste_material:
@@ -1861,6 +2966,12 @@ export type Database = {
         | "hazardous"
         | "electronic"
         | "general"
+      water_activity_type:
+        | "conservation"
+        | "harvesting"
+        | "recycling"
+        | "restoration"
+        | "efficiency"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1977,11 +3088,74 @@ export const Constants = {
   public: {
     Enums: {
       activity_status: ["pending", "verified", "rejected", "expired"],
+      asset_status: ["pending", "verified", "retired", "traded"],
+      asset_type: [
+        "carbon",
+        "plastic",
+        "water",
+        "biodiversity",
+        "green_crypto",
+      ],
+      biodiversity_activity_type: [
+        "habitat_protection",
+        "species_conservation",
+        "restoration",
+        "planting",
+        "monitoring",
+      ],
+      bond_category: [
+        "renewable_energy",
+        "energy_efficiency",
+        "clean_transportation",
+        "sustainable_water",
+        "waste_management",
+        "biodiversity",
+        "climate_adaptation",
+      ],
+      bond_rating: [
+        "AAA",
+        "AA+",
+        "AA",
+        "AA-",
+        "A+",
+        "A",
+        "A-",
+        "BBB+",
+        "BBB",
+        "BBB-",
+        "BB+",
+        "BB",
+        "BB-",
+        "B+",
+        "B",
+        "B-",
+      ],
+      bond_status: ["draft", "active", "closed", "matured", "defaulted"],
       collection_status: ["scheduled", "in_progress", "completed", "missed"],
       compliance_status: ["compliant", "non_compliant", "pending_review"],
+      crypto_activity_type: [
+        "environmental_mining",
+        "asset_tokenization",
+        "staking",
+        "trading",
+      ],
+      industry_sector: [
+        "technology",
+        "manufacturing",
+        "finance",
+        "healthcare",
+        "retail",
+        "energy",
+        "transportation",
+        "agriculture",
+        "other",
+      ],
+      investment_tier: ["retail", "accredited", "institutional"],
       marketplace_item_status: ["available", "reserved", "sold", "removed"],
       order_type: ["buy", "sell"],
+      payment_frequency: ["monthly", "quarterly", "semi_annual", "annual"],
       pickup_status: ["scheduled", "in_progress", "completed", "cancelled"],
+      plastic_type: ["PET", "HDPE", "PVC", "LDPE", "PP", "PS", "Others"],
       route_status: ["planned", "in_progress", "completed", "cancelled"],
       tracking_status: [
         "generated",
@@ -2000,6 +3174,7 @@ export const Constants = {
         "government",
         "household",
       ],
+      verification_level: ["tier1_ai", "tier2_manual", "tier3_expert"],
       verification_status: ["pending", "approved", "rejected", "under_review"],
       verification_tier: ["tier1_ai", "tier2_community", "tier3_auditor"],
       waste_material: [
@@ -2018,6 +3193,13 @@ export const Constants = {
         "hazardous",
         "electronic",
         "general",
+      ],
+      water_activity_type: [
+        "conservation",
+        "harvesting",
+        "recycling",
+        "restoration",
+        "efficiency",
       ],
     },
   },
