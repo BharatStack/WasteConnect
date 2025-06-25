@@ -14,30 +14,47 @@ import {
   PieChart,
   FileText,
   Target,
-  Award
+  Award,
+  AlertCircle,
+  DollarSign
 } from 'lucide-react';
 import BondMarketplace from '@/components/bonds/BondMarketplace';
 import BondPortfolio from '@/components/bonds/BondPortfolio';
 import BondAnalytics from '@/components/bonds/BondAnalytics';
 import ImpactDashboard from '@/components/bonds/ImpactDashboard';
+import ProjectCreationForm from '@/components/bonds/ProjectCreationForm';
+import InvestmentOpportunities from '@/components/bonds/InvestmentOpportunities';
+import InsuranceInterface from '@/components/bonds/InsuranceInterface';
+import AIAnalytics from '@/components/bonds/AIAnalytics';
 
 const GreenBonds = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [portfolio, setPortfolio] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('marketplace');
 
   useEffect(() => {
     if (user) {
-      fetchPortfolioData();
+      fetchUserData();
     }
   }, [user]);
 
-  const fetchPortfolioData = async () => {
+  const fetchUserData = async () => {
     if (!user) return;
 
     try {
+      // Fetch user profile to determine role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      setUserProfile(profile);
+
       // Fetch or create user's bond portfolio
       const { data: existingPortfolio, error: portfolioError } = await supabase
         .from('bond_portfolios')
@@ -48,7 +65,6 @@ const GreenBonds = () => {
       if (portfolioError) throw portfolioError;
 
       if (!existingPortfolio) {
-        // Create new portfolio for user
         const { data: newPortfolio, error: createError } = await supabase
           .from('bond_portfolios')
           .insert({ user_id: user.id })
@@ -61,10 +77,10 @@ const GreenBonds = () => {
         setPortfolio(existingPortfolio);
       }
     } catch (error: any) {
-      console.error('Error fetching portfolio data:', error);
+      console.error('Error fetching user data:', error);
       toast({
         title: "Error",
-        description: "Failed to load portfolio data. Please try again.",
+        description: "Failed to load user data. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -72,13 +88,48 @@ const GreenBonds = () => {
     }
   };
 
+  const getDashboardTabs = () => {
+    const userType = userProfile?.user_type;
+    
+    if (userType === 'government' || userType === 'municipality') {
+      // Waste Operator Dashboard
+      return [
+        { id: 'projects', label: 'My Projects', icon: FileText },
+        { id: 'create-project', label: 'Create Project', icon: Target },
+        { id: 'funding', label: 'Funding Status', icon: DollarSign },
+        { id: 'insurance', label: 'Insurance Coverage', icon: Award },
+        { id: 'reports', label: 'Environmental Reports', icon: BarChart3 }
+      ];
+    } else if (userType === 'business' || userType === 'individual') {
+      // Investor Dashboard
+      return [
+        { id: 'marketplace', label: 'Investment Opportunities', icon: ShoppingCart },
+        { id: 'portfolio', label: 'My Portfolio', icon: PieChart },
+        { id: 'analytics', label: 'Market Analytics', icon: BarChart3 },
+        { id: 'impact', label: 'Impact Dashboard', icon: Target },
+        { id: 'ai-insights', label: 'AI Insights', icon: TrendingUp }
+      ];
+    } else {
+      // Default investor view
+      return [
+        { id: 'marketplace', label: 'Marketplace', icon: ShoppingCart },
+        { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+        { id: 'impact', label: 'Impact', icon: Target }
+      ];
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     );
   }
+
+  const dashboardTabs = getDashboardTabs();
+  const userType = userProfile?.user_type;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -86,13 +137,25 @@ const GreenBonds = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Green Bond Investment Platform</h1>
-              <p className="text-green-100">Invest in sustainable projects and create positive environmental impact</p>
+              <h1 className="text-3xl font-bold mb-2">
+                {userType === 'government' || userType === 'municipality' 
+                  ? 'Waste Management Project Platform'
+                  : 'Green Bond Investment Platform'
+                }
+              </h1>
+              <p className="text-green-100">
+                {userType === 'government' || userType === 'municipality'
+                  ? 'Create and manage sustainable waste management projects'
+                  : 'Invest in sustainable projects and create positive environmental impact'
+                }
+              </p>
             </div>
             <div className="flex items-center gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold">₹{portfolio?.total_invested?.toLocaleString() || 0}</div>
-                <div className="text-sm text-green-200">Total Invested</div>
+                <div className="text-sm text-green-200">
+                  {userType === 'government' || userType === 'municipality' ? 'Total Funding' : 'Total Invested'}
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">₹{portfolio?.current_value?.toLocaleString() || 0}</div>
@@ -100,7 +163,9 @@ const GreenBonds = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{portfolio?.active_investments || 0}</div>
-                <div className="text-sm text-green-200">Active Bonds</div>
+                <div className="text-sm text-green-200">
+                  {userType === 'government' || userType === 'municipality' ? 'Active Projects' : 'Active Bonds'}
+                </div>
               </div>
             </div>
           </div>
@@ -109,40 +174,64 @@ const GreenBonds = () => {
 
       <div className="max-w-7xl mx-auto py-6 px-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="marketplace" className="flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Marketplace
-            </TabsTrigger>
-            <TabsTrigger value="portfolio" className="flex items-center gap-2">
-              <PieChart className="h-4 w-4" />
-              My Portfolio
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="impact" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Impact Dashboard
-            </TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-${dashboardTabs.length} mb-6`}>
+            {dashboardTabs.map(tab => (
+              <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
-          <TabsContent value="marketplace">
-            <BondMarketplace onInvestmentComplete={fetchPortfolioData} />
-          </TabsContent>
+          {/* Waste Operator Tabs */}
+          {(userType === 'government' || userType === 'municipality') && (
+            <>
+              <TabsContent value="projects">
+                <InvestmentOpportunities userType="waste_operator" />
+              </TabsContent>
 
-          <TabsContent value="portfolio">
-            <BondPortfolio portfolio={portfolio} onPortfolioUpdate={fetchPortfolioData} />
-          </TabsContent>
+              <TabsContent value="create-project">
+                <ProjectCreationForm onProjectCreated={fetchUserData} />
+              </TabsContent>
 
-          <TabsContent value="analytics">
-            <BondAnalytics />
-          </TabsContent>
+              <TabsContent value="funding">
+                <BondPortfolio portfolio={portfolio} onPortfolioUpdate={fetchUserData} />
+              </TabsContent>
 
-          <TabsContent value="impact">
-            <ImpactDashboard />
-          </TabsContent>
+              <TabsContent value="insurance">
+                <InsuranceInterface userType="waste_operator" />
+              </TabsContent>
+
+              <TabsContent value="reports">
+                <ImpactDashboard />
+              </TabsContent>
+            </>
+          )}
+
+          {/* Investor Tabs */}
+          {(userType === 'business' || userType === 'individual' || !userType) && (
+            <>
+              <TabsContent value="marketplace">
+                <BondMarketplace onInvestmentComplete={fetchUserData} />
+              </TabsContent>
+
+              <TabsContent value="portfolio">
+                <BondPortfolio portfolio={portfolio} onPortfolioUpdate={fetchUserData} />
+              </TabsContent>
+
+              <TabsContent value="analytics">
+                <BondAnalytics />
+              </TabsContent>
+
+              <TabsContent value="impact">
+                <ImpactDashboard />
+              </TabsContent>
+
+              <TabsContent value="ai-insights">
+                <AIAnalytics />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
     </div>
