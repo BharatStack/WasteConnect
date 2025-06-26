@@ -16,7 +16,7 @@ A web-based waste management system designed to streamline pickup scheduling, di
 
 🧩 Features
 
-* Pickup orders: Users can request waste pickup via forms (`order.php`, `order-summary.php`).
+* **Pickup orders**: Users can request waste pickup via forms (`order.php`, `order-summary.php`).
 * **User management**: Secure registration and login mechanisms (`signin.html`, `signin.php`, `login.php/login1.php`).
 * **Digital wallet**: Track and manage service credits and wallet balance (`wallet.php`).
 * **Payment handling**: Support for online payments through `sql.php` integrations.
