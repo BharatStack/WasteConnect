@@ -5,7 +5,6 @@
 **URL**: www.wasteconnect.live
 
 
-
 🌱 WasteConnect
 
 A web-based waste management system designed to streamline pickup scheduling, digital payments, user wallets, and more—aimed at improving waste-management workflows.
@@ -22,14 +21,6 @@ A web-based waste management system designed to streamline pickup scheduling, di
 * **Payment handling**: Support for online payments through `sql.php` integrations.
 * **Informational pages**: Static content-driven pages like `about.php`, `team.php`.
 * **Responsive UI**: Built using HTML, CSS, PHP, and JavaScript for modern browsers.
-
-
-
-🛡️ Security & Data Handling
-
-* The project centralizes SQL commands in `sql.php`; consider using **prepared statements** to reduce SQL injection risk.
-* Sessions and form handling occur across multiple PHP files—ensure **CSRF protection** and input sanitization wherever applicable.
-* Logging and validation are minimal; consider adding robust **error handling** and defensive coding patterns for production use.
 
  🧑‍💻 How to Contribute
 
