@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,7 @@ import IndustryUsers from "./pages/IndustryUsers";
 import GovernmentUsers from "./pages/GovernmentUsers";
 import AIAssistant from "./pages/AIAssistant";
 import CarbonCreditTrading from './pages/CarbonCreditTrading';
+import GreenBonds from './pages/GreenBonds';
 
 const queryClient = new QueryClient();
 
@@ -114,6 +116,11 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/carbon-trading" element={<CarbonCreditTrading />} />
+            <Route path="/green-bonds" element={
+              <ProtectedRoute>
+                <GreenBonds />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
