@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -183,11 +184,11 @@ const GreenBonds = () => {
 
       <div className="max-w-7xl mx-auto py-6 px-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full grid-cols-${dashboardTabs.length} mb-6`}>
+          <TabsList className="grid w-full mb-6" style={{gridTemplateColumns: `repeat(${dashboardTabs.length}, minmax(0, 1fr))`}}>
             {dashboardTabs.map(tab => (
-              <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+              <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-xs sm:text-sm px-2 py-2">
                 <tab.icon className="h-4 w-4" />
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
               </TabsTrigger>
             ))}
           </TabsList>

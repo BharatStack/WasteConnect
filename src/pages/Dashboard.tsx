@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -301,9 +300,11 @@ const Dashboard = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      Apply for Micro-Finance
-                    </Button>
+                    <Link to="/micro-finance">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        Apply for Micro-Finance
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
 
