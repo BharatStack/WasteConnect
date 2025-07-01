@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -281,9 +282,11 @@ const Dashboard = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      Explore Green Bonds
-                    </Button>
+                    <Link to="/green-bonds">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        Explore Green Bonds
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
 
