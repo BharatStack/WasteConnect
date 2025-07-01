@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +15,10 @@ import {
   Target,
   Award,
   AlertCircle,
-  DollarSign
+  DollarSign,
+  Brain,
+  Shield,
+  Zap
 } from 'lucide-react';
 import BondMarketplace from '@/components/bonds/BondMarketplace';
 import BondPortfolio from '@/components/bonds/BondPortfolio';
@@ -26,6 +28,9 @@ import ProjectCreationForm from '@/components/bonds/ProjectCreationForm';
 import InvestmentOpportunities from '@/components/bonds/InvestmentOpportunities';
 import InsuranceInterface from '@/components/bonds/InsuranceInterface';
 import AIAnalytics from '@/components/bonds/AIAnalytics';
+import SmartBondMatching from '@/components/bonds/SmartBondMatching';
+import GreenwashingDetector from '@/components/bonds/GreenwashingDetector';
+import DynamicPricingEngine from '@/components/bonds/DynamicPricingEngine';
 
 const GreenBonds = () => {
   const { user } = useAuth();
@@ -101,9 +106,12 @@ const GreenBonds = () => {
         { id: 'reports', label: 'Environmental Reports', icon: BarChart3 }
       ];
     } else if (userType === 'business' || userType === 'individual') {
-      // Investor Dashboard
+      // Enhanced Investor Dashboard with AI features
       return [
         { id: 'marketplace', label: 'Investment Opportunities', icon: ShoppingCart },
+        { id: 'smart-matching', label: 'AI Smart Matching', icon: Brain },
+        { id: 'dynamic-pricing', label: 'Dynamic Pricing', icon: Zap },
+        { id: 'greenwashing-detection', label: 'Fraud Detection', icon: Shield },
         { id: 'portfolio', label: 'My Portfolio', icon: PieChart },
         { id: 'analytics', label: 'Market Analytics', icon: BarChart3 },
         { id: 'impact', label: 'Impact Dashboard', icon: Target },
@@ -113,6 +121,7 @@ const GreenBonds = () => {
       // Default investor view
       return [
         { id: 'marketplace', label: 'Marketplace', icon: ShoppingCart },
+        { id: 'smart-matching', label: 'Smart Matching', icon: Brain },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
         { id: 'impact', label: 'Impact', icon: Target }
@@ -208,11 +217,23 @@ const GreenBonds = () => {
             </>
           )}
 
-          {/* Investor Tabs */}
+          {/* Enhanced Investor Tabs with AI Features */}
           {(userType === 'business' || userType === 'individual' || !userType) && (
             <>
               <TabsContent value="marketplace">
                 <BondMarketplace onInvestmentComplete={fetchUserData} />
+              </TabsContent>
+
+              <TabsContent value="smart-matching">
+                <SmartBondMatching />
+              </TabsContent>
+
+              <TabsContent value="dynamic-pricing">
+                <DynamicPricingEngine />
+              </TabsContent>
+
+              <TabsContent value="greenwashing-detection">
+                <GreenwashingDetector />
               </TabsContent>
 
               <TabsContent value="portfolio">
