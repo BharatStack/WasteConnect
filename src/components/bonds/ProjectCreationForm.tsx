@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,12 +24,38 @@ interface ProjectCreationFormProps {
   onProjectCreated: () => void;
 }
 
+interface EnvironmentalImpact {
+  co2Reduction: string;
+  wasteProcessed: string;
+  energyGenerated: string;
+  jobsCreated: string;
+}
+
+interface TechnicalSpecs {
+  technology: string;
+  processingMethod: string;
+  capacity: string;
+  efficiency: string;
+}
+
+interface FormData {
+  name: string;
+  description: string;
+  location: string;
+  projectType: string;
+  wasteCapacity: string;
+  projectTimeline: string;
+  fundingRequired: string;
+  environmentalImpact: EnvironmentalImpact;
+  technicalSpecs: TechnicalSpecs;
+}
+
 const ProjectCreationForm: React.FC<ProjectCreationFormProps> = ({ onProjectCreated }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
     location: '',
@@ -59,12 +84,12 @@ const ProjectCreationForm: React.FC<ProjectCreationFormProps> = ({ onProjectCrea
     { value: 'landfill_management', label: 'Landfill Management', icon: Droplets }
   ];
 
-  const handleInputChange = (field: string, value: string, section?: string) => {
+  const handleInputChange = (field: string, value: string, section?: 'environmentalImpact' | 'technicalSpecs') => {
     if (section) {
       setFormData(prev => ({
         ...prev,
         [section]: {
-          ...prev[section as keyof typeof prev],
+          ...prev[section],
           [field]: value
         }
       }));
