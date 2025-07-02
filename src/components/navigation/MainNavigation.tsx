@@ -90,7 +90,7 @@ const MainNavigation = () => {
       {navItems.map(item => {
       const Icon = item.icon;
       return <Link key={item.href} to={item.href} className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActivePath(item.href) ? 'bg-eco-green-100 text-eco-green-700' : 'text-gray-600 hover:text-eco-green-600 hover:bg-eco-green-50'}`} onClick={() => setIsOpen(false)}>
-            <Icon className="h-4 w-4" />
+            
             
           </Link>;
     })}
