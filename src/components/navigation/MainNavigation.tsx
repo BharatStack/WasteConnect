@@ -1,173 +1,180 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { ShoppingCart, User, LogOut, Home, ArrowLeft, Bot } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { 
+  Menu, 
+  Home, 
+  BarChart3, 
+  MessageSquare, 
+  ShoppingCart, 
+  Users, 
+  Info, 
+  LogOut, 
+  User,
+  Leaf,
+  DollarSign,
+  CreditCard,
+  TrendingUp,
+  Brain
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const MainNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const { isAuthenticated, user } = useAuth();
+  const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const isActive = (path: string) => location.pathname === path;
-  const showBackButton = location.pathname !== '/';
-
-  // Fetch user profile information
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        setUserProfile(data);
-      }
-    };
-
-    fetchUserProfile();
-  }, [user]);
-
-  const getUserTypeRoute = (userType: string) => {
-    switch (userType) {
-      case 'household':
-        return '/household-users';
-      case 'government':
-        return '/government-users';
-      case 'business':
-      case 'processor':
-      case 'collector':
-        return '/industry-users';
-      default:
-        return '/dashboard';
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Error signing out",
+        description: "There was a problem signing you out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  return (
-    <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo and Navigation */}
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-eco-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">WC</span>
-              </div>
-              <span className="font-bold text-xl text-gray-900">WasteConnect</span>
-            </Link>
+  const navItems = [
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/about', label: 'About', icon: Info },
+    { href: '/user-types', label: 'User Types', icon: Users },
+    ...(isAuthenticated ? [
+      { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+      { href: '/analytics', label: 'Analytics', icon: TrendingUp },
+      { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart },
+      { href: '/ai-assistant', label: 'AI Assistant', icon: MessageSquare },
+      { href: '/carbon-trading', label: 'Carbon Trading', icon: Leaf },
+      { href: '/green-bonds', label: 'Green Bonds', icon: CreditCard },
+      { href: '/micro-finance', label: 'Micro Finance', icon: DollarSign },
+      { href: '/enhanced-green-bonds', label: 'Enhanced Green Bonds', icon: Brain },
+      { href: '/enhanced-micro-finance', label: 'Enhanced Micro Finance', icon: Brain },
+    ] : []),
+  ];
 
-            {/* Back and Home buttons */}
-            <div className="flex items-center space-x-2">
-              {showBackButton && (
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const NavigationContent = () => (
+    <>
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              isActivePath(item.href)
+                ? 'bg-eco-green-100 text-eco-green-700'
+                : 'text-gray-600 hover:text-eco-green-600 hover:bg-eco-green-50'
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
+            <Icon className="h-4 w-4" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
+
+  return (
+    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center space-x-2">
+              <Leaf className="h-8 w-8 text-eco-green-600" />
+              <span className="text-xl font-bold text-gray-900">WasteConnect</span>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <NavigationContent />
+            
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">
+                    {user?.email?.split('@')[0] || 'User'}
+                  </span>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate(-1)}
-                  className="flex items-center space-x-1 text-gray-600 hover:text-eco-green-600"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
-                </Button>
-              )}
-              <Link
-                to="/"
-                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/') 
-                    ? 'text-eco-green-600 bg-eco-green-50' 
-                    : 'text-gray-600 hover:text-eco-green-600'
-                }`}
-              >
-                <Home className="h-4 w-4" />
-                <span>Home</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            {user && userProfile && (
-              <>
-                <Link
-                  to="/ai-assistant"
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive('/ai-assistant') 
-                      ? 'text-eco-green-600 bg-eco-green-50' 
-                      : 'text-gray-600 hover:text-eco-green-600'
-                  }`}
-                >
-                  <Bot className="h-4 w-4" />
-                  <span>AI Assistant</span>
-                </Link>
-
-                <Link
-                  to="/marketplace"
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive('/marketplace') 
-                      ? 'text-eco-green-600 bg-eco-green-50' 
-                      : 'text-gray-600 hover:text-eco-green-600'
-                  }`}
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  <span>Marketplace</span>
-                </Link>
-
-                <Link
-                  to={getUserTypeRoute(userProfile.user_type)}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive(getUserTypeRoute(userProfile.user_type)) 
-                      ? 'text-eco-green-600 bg-eco-green-50' 
-                      : 'text-gray-600 hover:text-eco-green-600'
-                  }`}
-                >
-                  <User className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </Link>
-
-                {/* Government users get access to Features */}
-                {userProfile.user_type === 'government' && (
-                  <Link
-                    to="/features"
-                    className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive('/features') 
-                        ? 'text-eco-green-600 bg-eco-green-50' 
-                        : 'text-gray-600 hover:text-eco-green-600'
-                    }`}
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Features</span>
-                  </Link>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Auth Section */}
-          <div className="flex items-center space-x-4">
-            {user && userProfile ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  Welcome, {userProfile.full_name || user.email}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={signOut}
-                  className="flex items-center space-x-1"
+                  onClick={handleSignOut}
+                  className="text-gray-600 hover:text-red-600"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
                 </Button>
               </div>
             ) : (
-              <Link to="/enhanced-auth">
-                <Button variant="default" size="sm">
-                  Sign In
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/enhanced-auth">Sign In</Link>
                 </Button>
-              </Link>
+              </div>
             )}
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64">
+                <div className="flex flex-col space-y-2 mt-8">
+                  <NavigationContent />
+                  
+                  <div className="pt-4 mt-4 border-t border-gray-200">
+                    {isAuthenticated ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2 px-3 py-2">
+                          <User className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm text-gray-600">
+                            {user?.email?.split('@')[0] || 'User'}
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleSignOut}
+                          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+                        <Link to="/enhanced-auth" onClick={() => setIsOpen(false)}>
+                          Sign In
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
