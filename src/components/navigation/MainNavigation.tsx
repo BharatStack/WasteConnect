@@ -1,28 +1,41 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Home, BarChart3, MessageSquare, ShoppingCart, Users, Info, LogOut, User, Leaf, DollarSign, CreditCard, TrendingUp, Brain } from 'lucide-react';
+import { 
+  Menu, 
+  Home, 
+  BarChart3, 
+  MessageSquare, 
+  ShoppingCart, 
+  Users, 
+  Info, 
+  LogOut, 
+  User,
+  Leaf,
+  DollarSign,
+  CreditCard,
+  TrendingUp,
+  Brain
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+
 const MainNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    isAuthenticated,
-    user
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { isAuthenticated, user } = useAuth();
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
       toast({
         title: "Signed out successfully",
-        description: "You have been logged out of your account."
+        description: "You have been logged out of your account.",
       });
       navigate('/');
     } catch (error) {
@@ -30,72 +43,57 @@ const MainNavigation = () => {
       toast({
         title: "Error signing out",
         description: "There was a problem signing you out. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
-  const navItems = [{
-    href: '/',
-    label: 'Home',
-    icon: Home
-  }, {
-    href: '/about',
-    label: 'About',
-    icon: Info
-  }, {
-    href: '/user-types',
-    label: 'User Types',
-    icon: Users
-  }, ...(isAuthenticated ? [{
-    href: '/dashboard',
-    label: 'Dashboard',
-    icon: BarChart3
-  }, {
-    href: '/analytics',
-    label: 'Analytics',
-    icon: TrendingUp
-  }, {
-    href: '/marketplace',
-    label: 'Marketplace',
-    icon: ShoppingCart
-  }, {
-    href: '/ai-assistant',
-    label: 'AI Assistant',
-    icon: MessageSquare
-  }, {
-    href: '/carbon-trading',
-    label: 'Carbon Trading',
-    icon: Leaf
-  }, {
-    href: '/green-bonds',
-    label: 'Green Bonds',
-    icon: CreditCard
-  }, {
-    href: '/micro-finance',
-    label: 'Micro Finance',
-    icon: DollarSign
-  }, {
-    href: '/enhanced-green-bonds',
-    label: 'Enhanced Green Bonds',
-    icon: Brain
-  }, {
-    href: '/enhanced-micro-finance',
-    label: 'Enhanced Micro Finance',
-    icon: Brain
-  }] : [])];
+
+  const navItems = [
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/about', label: 'About', icon: Info },
+    { href: '/user-types', label: 'User Types', icon: Users },
+    ...(isAuthenticated ? [
+      { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+      { href: '/analytics', label: 'Analytics', icon: TrendingUp },
+      { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart },
+      { href: '/ai-assistant', label: 'AI Assistant', icon: MessageSquare },
+      { href: '/carbon-trading', label: 'Carbon Trading', icon: Leaf },
+      { href: '/green-bonds', label: 'Green Bonds', icon: CreditCard },
+      { href: '/micro-finance', label: 'Micro Finance', icon: DollarSign },
+      { href: '/enhanced-green-bonds', label: 'Enhanced Green Bonds', icon: Brain },
+      { href: '/enhanced-micro-finance', label: 'Enhanced Micro Finance', icon: Brain },
+    ] : []),
+  ];
+
   const isActivePath = (path: string) => {
     return location.pathname === path;
   };
-  const NavigationContent = () => <>
-      {navItems.map(item => {
-      const Icon = item.icon;
-      return <Link key={item.href} to={item.href} className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActivePath(item.href) ? 'bg-eco-green-100 text-eco-green-700' : 'text-gray-600 hover:text-eco-green-600 hover:bg-eco-green-50'}`} onClick={() => setIsOpen(false)}>
-            
-            
-          </Link>;
-    })}
-    </>;
-  return <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+
+  const NavigationContent = () => (
+    <>
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              isActivePath(item.href)
+                ? 'bg-eco-green-100 text-eco-green-700'
+                : 'text-gray-600 hover:text-eco-green-600 hover:bg-eco-green-50'
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
+            <Icon className="h-4 w-4" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
+
+  return (
+    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -109,21 +107,30 @@ const MainNavigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             <NavigationContent />
             
-            {isAuthenticated ? <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4 text-gray-500" />
                   <span className="text-sm text-gray-600">
                     {user?.email?.split('@')[0] || 'User'}
                   </span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-gray-600 hover:text-red-600">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="text-gray-600 hover:text-red-600"
+                >
                   <LogOut className="h-4 w-4" />
                 </Button>
-              </div> : <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
                 <Button asChild variant="ghost" size="sm">
                   <Link to="/enhanced-auth">Sign In</Link>
                 </Button>
-              </div>}
+              </div>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -139,22 +146,31 @@ const MainNavigation = () => {
                   <NavigationContent />
                   
                   <div className="pt-4 mt-4 border-t border-gray-200">
-                    {isAuthenticated ? <div className="space-y-2">
+                    {isAuthenticated ? (
+                      <div className="space-y-2">
                         <div className="flex items-center space-x-2 px-3 py-2">
                           <User className="h-4 w-4 text-gray-500" />
                           <span className="text-sm text-gray-600">
                             {user?.email?.split('@')[0] || 'User'}
                           </span>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleSignOut}
+                          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
                           <LogOut className="h-4 w-4 mr-2" />
                           Sign Out
                         </Button>
-                      </div> : <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+                      </div>
+                    ) : (
+                      <Button asChild variant="ghost" size="sm" className="w-full justify-start">
                         <Link to="/enhanced-auth" onClick={() => setIsOpen(false)}>
                           Sign In
                         </Link>
-                      </Button>}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </SheetContent>
@@ -162,6 +178,8 @@ const MainNavigation = () => {
           </div>
         </div>
       </div>
-    </nav>;
+    </nav>
+  );
 };
+
 export default MainNavigation;
