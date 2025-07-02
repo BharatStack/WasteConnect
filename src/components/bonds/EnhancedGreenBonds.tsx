@@ -26,7 +26,7 @@ const EnhancedGreenBonds = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -45,64 +45,79 @@ const EnhancedGreenBonds = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: !!user?.id,
   });
 
-  // Fetch environmental impact data
+  // Fetch environmental impact data - using type assertion
   const { data: impactData = [] } = useQuery({
     queryKey: ['environmental-impact'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('environmental_impact_tracking')
-        .select(`
-          *,
-          green_bonds (bond_name, category)
-        `)
-        .eq('verification_status', 'verified')
-        .order('reporting_period_end', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('environmental_impact_tracking')
+          .select(`
+            *,
+            green_bonds (bond_name, category)
+          `)
+          .eq('verification_status', 'verified')
+          .order('reporting_period_end', { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching impact data:', error);
+        return [];
+      }
     },
   });
 
-  // Fetch greenwashing alerts
+  // Fetch greenwashing alerts - using type assertion
   const { data: greenwashingAlerts = [] } = useQuery({
     queryKey: ['greenwashing-alerts'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('greenwashing_alerts')
-        .select(`
-          *,
-          green_bonds (bond_name, issuer_name)
-        `)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('greenwashing_alerts')
+          .select(`
+            *,
+            green_bonds (bond_name, issuer_name)
+          `)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching greenwashing alerts:', error);
+        return [];
+      }
     },
   });
 
-  // Fetch bond pricing history
+  // Fetch bond pricing history - using type assertion
   const { data: pricingData = [] } = useQuery({
     queryKey: ['bond-pricing'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bond_pricing_history')
-        .select(`
-          *,
-          green_bonds (bond_name, bond_symbol)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('bond_pricing_history')
+          .select(`
+            *,
+            green_bonds (bond_name, bond_symbol)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching pricing data:', error);
+        return [];
+      }
     },
   });
 
@@ -155,7 +170,7 @@ const EnhancedGreenBonds = () => {
 
           <TabsContent value="marketplace" className="space-y-6">
             <div className="grid gap-6">
-              {bonds.map((bond) => (
+              {bonds.map((bond: any) => (
                 <Card key={bond.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -168,7 +183,7 @@ const EnhancedGreenBonds = () => {
                       </div>
                       <div className="text-right">
                         <Badge className={getCategoryColor(bond.category)}>
-                          {bond.category.replace('_', ' ')}
+                          {bond.category?.replace('_', ' ')}
                         </Badge>
                         {bond.bond_rating && (
                           <p className={`text-sm font-medium mt-1 ${getRatingColor(bond.bond_rating)}`}>
@@ -224,14 +239,14 @@ const EnhancedGreenBonds = () => {
           <TabsContent value="portfolio" className="space-y-6">
             <div className="grid gap-6">
               {investments.length > 0 ? (
-                investments.map((investment) => (
+                investments.map((investment: any) => (
                   <Card key={investment.id}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle>{investment.green_bonds.bond_name}</CardTitle>
+                        <CardTitle>{investment.green_bonds?.bond_name}</CardTitle>
                         <Badge variant="outline">{investment.status}</Badge>
                       </div>
-                      <CardDescription>{investment.green_bonds.issuer_name}</CardDescription>
+                      <CardDescription>{investment.green_bonds?.issuer_name}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -269,33 +284,33 @@ const EnhancedGreenBonds = () => {
 
           <TabsContent value="impact" className="space-y-6">
             <div className="grid gap-6">
-              {impactData.map((impact) => (
-                <Card key={impact.id}>
+              {impactData.map((impact: any) => (
+                <Card key={impact?.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Leaf className="h-5 w-5 text-green-600" />
-                      {impact.green_bonds.bond_name}
+                      {impact?.green_bonds?.bond_name}
                     </CardTitle>
                     <CardDescription>
-                      Impact Report: {new Date(impact.reporting_period_start).toLocaleDateString()} - {new Date(impact.reporting_period_end).toLocaleDateString()}
+                      Impact Report: {new Date(impact?.reporting_period_start).toLocaleDateString()} - {new Date(impact?.reporting_period_end).toLocaleDateString()}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center p-3 bg-green-50 rounded-lg">
-                        <p className="text-2xl font-bold text-green-600">{impact.carbon_reduction_tons || 0}</p>
+                        <p className="text-2xl font-bold text-green-600">{impact?.carbon_reduction_tons || 0}</p>
                         <p className="text-sm text-gray-600">CO₂ Reduced (tons)</p>
                       </div>
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
-                        <p className="text-2xl font-bold text-blue-600">{impact.renewable_energy_mwh || 0}</p>
+                        <p className="text-2xl font-bold text-blue-600">{impact?.renewable_energy_mwh || 0}</p>
                         <p className="text-sm text-gray-600">Clean Energy (MWh)</p>
                       </div>
                       <div className="text-center p-3 bg-purple-50 rounded-lg">
-                        <p className="text-2xl font-bold text-purple-600">{impact.jobs_created || 0}</p>
+                        <p className="text-2xl font-bold text-purple-600">{impact?.jobs_created || 0}</p>
                         <p className="text-sm text-gray-600">Jobs Created</p>
                       </div>
                       <div className="text-center p-3 bg-orange-50 rounded-lg">
-                        <p className="text-2xl font-bold text-orange-600">{impact.communities_benefited || 0}</p>
+                        <p className="text-2xl font-bold text-orange-600">{impact?.communities_benefited || 0}</p>
                         <p className="text-sm text-gray-600">Communities</p>
                       </div>
                     </div>
@@ -308,30 +323,30 @@ const EnhancedGreenBonds = () => {
           <TabsContent value="alerts" className="space-y-6">
             <div className="grid gap-6">
               {greenwashingAlerts.length > 0 ? (
-                greenwashingAlerts.map((alert) => (
-                  <Card key={alert.id} className="border-l-4 border-l-yellow-500">
+                greenwashingAlerts.map((alert: any) => (
+                  <Card key={alert?.id} className="border-l-4 border-l-yellow-500">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
                           <CardTitle className="flex items-center gap-2">
                             <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                            {alert.alert_type}
+                            {alert?.alert_type}
                           </CardTitle>
-                          <CardDescription>{alert.green_bonds.bond_name} - {alert.green_bonds.issuer_name}</CardDescription>
+                          <CardDescription>{alert?.green_bonds?.bond_name} - {alert?.green_bonds?.issuer_name}</CardDescription>
                         </div>
-                        <Badge className={getSeverityColor(alert.severity)}>
-                          {alert.severity}
+                        <Badge className={getSeverityColor(alert?.severity)}>
+                          {alert?.severity}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-gray-700 mb-2">{alert.description}</p>
+                      <p className="text-sm text-gray-700 mb-2">{alert?.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">
-                          AI Confidence: {(alert.ai_confidence_score * 100).toFixed(1)}%
+                          AI Confidence: {(alert?.ai_confidence_score * 100).toFixed(1)}%
                         </span>
                         <span className="text-xs text-gray-500">
-                          {new Date(alert.created_at).toLocaleDateString()}
+                          {new Date(alert?.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     </CardContent>
@@ -351,12 +366,12 @@ const EnhancedGreenBonds = () => {
 
           <TabsContent value="pricing" className="space-y-6">
             <div className="grid gap-6">
-              {pricingData.map((pricing) => (
-                <Card key={pricing.id}>
+              {pricingData.map((pricing: any) => (
+                <Card key={pricing?.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-blue-600" />
-                      {pricing.green_bonds.bond_name} ({pricing.green_bonds.bond_symbol})
+                      {pricing?.green_bonds?.bond_name} ({pricing?.green_bonds?.bond_symbol})
                     </CardTitle>
                     <CardDescription>AI Dynamic Pricing Update</CardDescription>
                   </CardHeader>
@@ -364,19 +379,19 @@ const EnhancedGreenBonds = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
                         <p className="text-sm text-gray-600">Current Price</p>
-                        <p className="text-xl font-bold">₹{pricing.price}</p>
+                        <p className="text-xl font-bold">₹{pricing?.price}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Environmental Score</p>
-                        <p className="font-medium">{pricing.environmental_performance_score || 'N/A'}/5.0</p>
+                        <p className="font-medium">{pricing?.environmental_performance_score || 'N/A'}/5.0</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Model Version</p>
-                        <p className="font-medium">{pricing.ai_pricing_model_version || 'v1.0'}</p>
+                        <p className="font-medium">{pricing?.ai_pricing_model_version || 'v1.0'}</p>
                       </div>
                     </div>
                     <div className="mt-4 text-xs text-gray-500">
-                      Last updated: {new Date(pricing.created_at).toLocaleString()}
+                      Last updated: {new Date(pricing?.created_at).toLocaleString()}
                     </div>
                   </CardContent>
                 </Card>

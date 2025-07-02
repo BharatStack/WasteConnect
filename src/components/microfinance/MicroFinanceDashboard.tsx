@@ -16,92 +16,117 @@ const MicroFinanceDashboard = () => {
   const { toast } = useToast();
   const [creditScore, setCreditScore] = useState<any>(null);
 
-  // Fetch user's credit score
+  // Fetch user's credit score - using type assertion
   const { data: aiCreditScore } = useQuery({
     queryKey: ['ai-credit-score', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('ai_credit_scores')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('last_calculated', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('ai_credit_scores')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('last_calculated', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') throw error;
+        return data;
+      } catch (error) {
+        console.log('Error fetching credit score:', error);
+        return null;
+      }
     },
     enabled: !!user?.id,
   });
 
-  // Fetch user's loans
+  // Fetch user's loans - using type assertion
   const { data: loans = [] } = useQuery({
     queryKey: ['microfinance-loans', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('microfinance_loans')
-        .select('*')
-        .eq('borrower_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('microfinance_loans')
+          .select('*')
+          .eq('borrower_id', user.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching loans:', error);
+        return [];
+      }
     },
     enabled: !!user?.id,
   });
 
-  // Fetch user's lending circles
+  // Fetch user's lending circles - using type assertion
   const { data: circles = [] } = useQuery({
     queryKey: ['lending-circles', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('circle_memberships')
-        .select(`
-          *,
-          lending_circles (*)
-        `)
-        .eq('member_id', user.id);
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('circle_memberships')
+          .select(`
+            *,
+            lending_circles (*)
+          `)
+          .eq('member_id', user.id);
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching circles:', error);
+        return [];
+      }
     },
     enabled: !!user?.id,
   });
 
-  // Fetch risk alerts
+  // Fetch risk alerts - using type assertion
   const { data: riskAlerts = [] } = useQuery({
     queryKey: ['risk-alerts', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('risk_monitoring_alerts')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('risk_monitoring_alerts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching risk alerts:', error);
+        return [];
+      }
     },
     enabled: !!user?.id,
   });
 
-  // Fetch education progress
+  // Fetch education progress - using type assertion
   const { data: educationProgress = [] } = useQuery({
     queryKey: ['education-progress', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('financial_education_progress')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await (supabase as any)
+          .from('financial_education_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.log('Error fetching education progress:', error);
+        return [];
+      }
     },
     enabled: !!user?.id,
   });
@@ -190,7 +215,7 @@ const MicroFinanceDashboard = () => {
             <CardContent>
               {riskAlerts.length > 0 ? (
                 <div className="space-y-3">
-                  {riskAlerts.slice(0, 3).map((alert) => (
+                  {riskAlerts.slice(0, 3).map((alert: any) => (
                     <div key={alert.id} className="p-3 bg-yellow-50 rounded-lg">
                       <p className="font-medium text-sm">{alert.alert_type}</p>
                       <p className="text-xs text-gray-600">{alert.description}</p>
@@ -218,7 +243,7 @@ const MicroFinanceDashboard = () => {
           <TabsContent value="loans" className="space-y-6">
             <div className="grid gap-6">
               {loans.length > 0 ? (
-                loans.map((loan) => (
+                loans.map((loan: any) => (
                   <Card key={loan.id}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -277,24 +302,24 @@ const MicroFinanceDashboard = () => {
           <TabsContent value="circles" className="space-y-6">
             <div className="grid gap-6">
               {circles.length > 0 ? (
-                circles.map((membership) => (
+                circles.map((membership: any) => (
                   <Card key={membership.id}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle>{membership.lending_circles.circle_name}</CardTitle>
+                        <CardTitle>{membership.lending_circles?.circle_name}</CardTitle>
                         <Badge variant="outline">{membership.role}</Badge>
                       </div>
-                      <CardDescription>{membership.lending_circles.circle_type}</CardDescription>
+                      <CardDescription>{membership.lending_circles?.circle_type}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-gray-600">Current Members</p>
-                          <p className="font-medium">{membership.lending_circles.current_members}/{membership.lending_circles.max_members}</p>
+                          <p className="font-medium">{membership.lending_circles?.current_members}/{membership.lending_circles?.max_members}</p>
                         </div>
                         <div>
                           <p className="text-gray-600">Success Rate</p>
-                          <p className="font-medium">{(membership.lending_circles.success_rate * 100).toFixed(1)}%</p>
+                          <p className="font-medium">{(membership.lending_circles?.success_rate * 100).toFixed(1)}%</p>
                         </div>
                         <div>
                           <p className="text-gray-600">Your Contribution</p>
@@ -323,7 +348,7 @@ const MicroFinanceDashboard = () => {
           <TabsContent value="education" className="space-y-6">
             <div className="grid gap-6">
               {educationProgress.length > 0 ? (
-                educationProgress.map((progress) => (
+                educationProgress.map((progress: any) => (
                   <Card key={progress.id}>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
@@ -345,7 +370,7 @@ const MicroFinanceDashboard = () => {
                         </div>
                         {progress.badges_earned && progress.badges_earned.length > 0 && (
                           <div className="flex gap-2 flex-wrap">
-                            {progress.badges_earned.map((badge, index) => (
+                            {progress.badges_earned.map((badge: string, index: number) => (
                               <Badge key={index} variant="secondary">{badge}</Badge>
                             ))}
                           </div>
