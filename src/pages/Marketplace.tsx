@@ -141,11 +141,11 @@ const Marketplace = () => {
           
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-eco-green-600 to-eco-green-400 bg-clip-text text-transparent">
-              Farming Waste Marketplace
+              Marketplace
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Connect with farmers and businesses to buy and sell organic farming waste materials. 
-              Build a sustainable future together with eco-friendly solutions.
+              Connect with buyers and sellers to trade reusable materials and products. 
+              Build a sustainable future together with eco-friendly marketplace solutions.
             </p>
           </div>
         </div>
