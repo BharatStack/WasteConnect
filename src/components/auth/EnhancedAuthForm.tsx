@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Shield, Phone } from 'lucide-react';
+import { Eye, EyeOff, Shield, Phone, ArrowLeft, Mail } from 'lucide-react';
 
 interface EnhancedAuthFormProps {
   onSuccess: () => void;
@@ -17,7 +17,9 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState<'auth' | 'phone' | 'verification'>('auth');
+  const [step, setStep] = useState<'auth' | 'phone' | 'verification' | 'forgot-password'>('auth');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   
   const [authData, setAuthData] = useState({
     email: '',
@@ -35,6 +37,8 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     code: '',
     isVerifying: false
   });
+
+  const [resetEmail, setResetEmail] = useState('');
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,6 +168,33 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      setResetEmailSent(true);
+      toast({
+        title: "Reset link sent!",
+        description: "Please check your email for the password reset link.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Reset Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handlePhoneVerification = async (e: React.FormEvent) => {
     e.preventDefault();
     setPhoneVerification(prev => ({ ...prev, isVerifying: true }));
@@ -253,6 +284,72 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     );
   }
 
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-eco-green-50 to-eco-green-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-eco-green-700">
+              <Shield className="h-6 w-6" />
+              Reset Password
+            </CardTitle>
+            <CardDescription>
+              {resetEmailSent ? "Check your email for reset instructions" : "Enter your email to receive a reset link"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!resetEmailSent ? (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset_email">Email Address</Label>
+                  <Input
+                    id="reset_email"
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-eco-green-600 hover:bg-eco-green-700" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending..." : "Send Reset Link"}
+                </Button>
+              </form>
+            ) : (
+              <div className="text-center space-y-4">
+                <div className="h-16 w-16 rounded-full bg-eco-green-100 flex items-center justify-center mx-auto">
+                  <Mail className="h-8 w-8 text-eco-green-600" />
+                </div>
+                <p className="text-gray-600">
+                  We've sent a password reset link to <strong>{resetEmail}</strong>
+                </p>
+              </div>
+            )}
+            <div className="mt-6">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setResetEmailSent(false);
+                  setResetEmail('');
+                }}
+                className="w-full text-eco-green-600 hover:text-eco-green-700 hover:bg-eco-green-50"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Sign In
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-eco-green-50 to-eco-green-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
@@ -304,6 +401,16 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
+                </div>
+                <div className="text-right">
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-eco-green-600 hover:text-eco-green-700 p-0 h-auto"
+                  >
+                    Forgot password?
+                  </Button>
                 </div>
                 <Button
                   type="submit"

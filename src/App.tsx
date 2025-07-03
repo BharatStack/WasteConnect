@@ -31,6 +31,7 @@ import GreenBonds from './pages/GreenBonds';
 import MicroFinance from './pages/MicroFinance';
 import EnhancedGreenBonds from './pages/EnhancedGreenBonds';
 import EnhancedMicroFinance from './pages/EnhancedMicroFinance';
+import ResetPassword from './pages/ResetPassword';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/enhanced-auth" element={<EnhancedAuth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/about" element={<About />} />
             <Route path="/features" element={
               <ProtectedRoute>
