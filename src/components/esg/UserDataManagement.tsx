@@ -26,7 +26,8 @@ import {
   TrendingUp,
   Award,
   Eye,
-  Download
+  Download,
+  MessageSquare
 } from 'lucide-react';
 
 const UserDataManagement = () => {
