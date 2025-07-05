@@ -19,7 +19,7 @@ const CallToAction = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Button 
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/dashboard')}
               className="bg-white hover:bg-gray-100 text-eco-green-600 text-lg px-8 py-6 rounded-md"
             >
               Get Started Now
@@ -27,7 +27,7 @@ const CallToAction = () => {
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/dashboard')}
               className="border-white text-white hover:bg-eco-green-700 text-lg px-8 py-6 rounded-md"
             >
               Request a Demo

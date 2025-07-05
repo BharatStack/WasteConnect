@@ -2,8 +2,11 @@
 import React from 'react';
 import { ArrowRight, Recycle, Award, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-eco-green-50 to-white dark:from-eco-green-900/20 dark:to-background pt-16 pb-20 md:pt-24 md:pb-28 lg:pb-32">
       {/* Decorative elements */}
@@ -26,7 +29,10 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-              <Button className="bg-eco-green-600 hover:bg-eco-green-700 text-white px-8 py-6 rounded-md text-lg w-full sm:w-auto">
+              <Button 
+                onClick={() => navigate('/dashboard')}
+                className="bg-eco-green-600 hover:bg-eco-green-700 text-white px-8 py-6 rounded-md text-lg w-full sm:w-auto"
+              >
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
