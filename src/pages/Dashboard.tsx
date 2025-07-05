@@ -273,6 +273,25 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
+                      <Building className="h-5 w-5 text-eco-green-600" />
+                      ESG Investment Tracking
+                    </CardTitle>
+                    <CardDescription>
+                      Track ESG performance and access impact investment opportunities with AI-powered insights
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to="/esg-investment-tracking">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        View ESG Dashboard
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
                       <Coins className="h-5 w-5 text-eco-green-600" />
                       Green Bonds Platform
                     </CardTitle>
@@ -305,23 +324,6 @@ const Dashboard = () => {
                         Apply for Micro-Finance
                       </Button>
                     </Link>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Building className="h-5 w-5 text-eco-green-600" />
-                      ESG Investment Tracking
-                    </CardTitle>
-                    <CardDescription>
-                      Track ESG performance and access impact investment opportunities
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
-                      View ESG Dashboard
-                    </Button>
                   </CardContent>
                 </Card>
 

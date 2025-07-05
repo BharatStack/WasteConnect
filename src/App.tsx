@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +31,7 @@ import MicroFinance from './pages/MicroFinance';
 import EnhancedGreenBonds from './pages/EnhancedGreenBonds';
 import EnhancedMicroFinance from './pages/EnhancedMicroFinance';
 import ResetPassword from './pages/ResetPassword';
+import ESGInvestmentTracking from './pages/ESGInvestmentTracking';
 
 const queryClient = new QueryClient();
 
@@ -139,6 +139,11 @@ const App = () => (
             <Route path="/enhanced-micro-finance" element={
               <ProtectedRoute>
                 <EnhancedMicroFinance />
+              </ProtectedRoute>
+            } />
+            <Route path="/esg-investment-tracking" element={
+              <ProtectedRoute>
+                <ESGInvestmentTracking />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
