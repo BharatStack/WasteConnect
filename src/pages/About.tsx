@@ -13,7 +13,7 @@ const About = () => {
       description: "We are committed to promoting sustainable waste management practices that minimize environmental impact and conserve natural resources."
     },
     {
-      title: "Innovation",
+      title: "Innovation", 
       description: "We continuously innovate to provide cutting-edge solutions that make waste management more efficient, cost-effective, and environmentally friendly."
     },
     {
@@ -39,13 +39,8 @@ const About = () => {
     },
     {
       name: "SKANDA MM",
-      role: "Head of Operations",
+      role: "Head of Operations", 
       bio: "Operations expert with background in municipal waste management systems."
-    },
-    {
-      name: "Priya Sharma",
-      role: "Sustainability Director",
-      bio: "Environmental scientist focused on circular economy and waste reduction strategies."
     }
   ];
 
@@ -192,7 +187,7 @@ const About = () => {
               Meet the passionate team behind WasteConnect, dedicated to creating sustainable waste management solutions.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {teamMembers.map((member, index) => (
                 <div key={index} className="bg-eco-green-50 dark:bg-eco-green-900/20 rounded-lg overflow-hidden shadow-md">
                   <div className="bg-eco-green-200 dark:bg-eco-green-800/30 h-40 flex items-center justify-center">
