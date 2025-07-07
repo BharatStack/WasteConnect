@@ -5,62 +5,44 @@ import Footer from '@/components/Footer';
 import { CheckCircle2, ArrowRight, Mail, ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
 const About = () => {
-  const missionValues = [
-    {
-      title: "Sustainability",
-      description: "We are committed to promoting sustainable waste management practices that minimize environmental impact and conserve natural resources."
-    },
-    {
-      title: "Innovation", 
-      description: "We continuously innovate to provide cutting-edge solutions that make waste management more efficient, cost-effective, and environmentally friendly."
-    },
-    {
-      title: "Collaboration",
-      description: "We believe in the power of collaboration between stakeholders to create effective waste management solutions and circular economy opportunities."
-    },
-    {
-      title: "Transparency",
-      description: "We promote transparency in waste management practices, ensuring that all stakeholders have access to accurate and timely information."
-    }
-  ];
-
-  const teamMembers = [
-    {
-      name: "SAI VIKAS P S",
-      role: "Founder & CEO",
-      bio: "Environmental engineer with 15+ years of experience in waste management systems."
-    },
-    {
-      name: "MANAS REDDY",
-      role: "CTO",
-      bio: "Technology leader specializing in sustainable tech solutions and data analytics."
-    },
-    {
-      name: "SKANDA MM",
-      role: "Head of Operations", 
-      bio: "Operations expert with background in municipal waste management systems."
-    }
-  ];
-
-  const partnerships = [
-    {
-      name: "Global Environmental Alliance",
-      description: "Working together to promote sustainable waste management practices worldwide."
-    },
-    {
-      name: "City Waste Management Agencies",
-      description: "Partnering with municipalities to implement smart waste collection systems."
-    },
-    {
-      name: "Recycling Industry Association",
-      description: "Collaborating to create more efficient material recovery and recycling processes."
-    }
-  ];
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  const missionValues = [{
+    title: "Sustainability",
+    description: "We are committed to promoting sustainable waste management practices that minimize environmental impact and conserve natural resources."
+  }, {
+    title: "Innovation",
+    description: "We continuously innovate to provide cutting-edge solutions that make waste management more efficient, cost-effective, and environmentally friendly."
+  }, {
+    title: "Collaboration",
+    description: "We believe in the power of collaboration between stakeholders to create effective waste management solutions and circular economy opportunities."
+  }, {
+    title: "Transparency",
+    description: "We promote transparency in waste management practices, ensuring that all stakeholders have access to accurate and timely information."
+  }];
+  const teamMembers = [{
+    name: "SAI VIKAS P S",
+    role: "Founder & CEO",
+    bio: "Environmental engineer with 15+ years of experience in waste management systems."
+  }, {
+    name: "MANAS REDDY",
+    role: "CTO",
+    bio: "Technology leader specializing in sustainable tech solutions and data analytics."
+  }, {
+    name: "SKANDA MM",
+    role: "Head of Operations",
+    bio: "Operations expert with background in municipal waste management systems."
+  }];
+  const partnerships = [{
+    name: "Global Environmental Alliance",
+    description: "Working together to promote sustainable waste management practices worldwide."
+  }, {
+    name: "City Waste Management Agencies",
+    description: "Partnering with municipalities to implement smart waste collection systems."
+  }, {
+    name: "Recycling Industry Association",
+    description: "Collaborating to create more efficient material recovery and recycling processes."
+  }];
+  return <div className="min-h-screen flex flex-col">
       <Header />
 
       {/* Navigation Buttons */}
@@ -70,11 +52,7 @@ const About = () => {
             <Home className="h-4 w-4 mr-2" />
             Home
           </Link>
-          <Button 
-            variant="ghost" 
-            onClick={() => window.history.back()}
-            className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700"
-          >
+          <Button variant="ghost" onClick={() => window.history.back()} className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -102,9 +80,7 @@ const About = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-eco-green-700 dark:text-eco-green-400 mb-6">
                   Our Story
                 </h2>
-                <p className="text-eco-green-600 dark:text-eco-green-300 mb-6">
-                  WasteConnect was founded in 2022 with a vision to transform waste management into an efficient, transparent, and sustainable process. We recognized the challenges faced by various stakeholders in the waste management ecosystem - from households struggling with recycling to municipalities optimizing collection routes to regulators ensuring compliance.
-                </p>
+                <p className="text-eco-green-600 dark:text-eco-green-300 mb-6">WasteConnect was founded in 2025 with a vision to transform waste management into an efficient, transparent, and sustainable process. We recognized the challenges faced by various stakeholders in the waste management ecosystem - from households struggling with recycling to municipalities optimizing collection routes to regulators ensuring compliance.</p>
                 <p className="text-eco-green-600 dark:text-eco-green-300 mb-6">
                   Our platform was built to bridge these gaps by connecting waste generators with processors, providing tools for efficient waste management, and promoting circular economy principles. Today, WasteConnect serves thousands of users across different sectors, helping them reduce environmental impact while creating economic opportunities from waste.
                 </p>
@@ -159,8 +135,7 @@ const About = () => {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {missionValues.map((value, index) => (
-                <Card key={index} className="bg-white dark:bg-eco-green-900/20 border-0 shadow-md">
+              {missionValues.map((value, index) => <Card key={index} className="bg-white dark:bg-eco-green-900/20 border-0 shadow-md">
                   <CardContent className="pt-6">
                     <div className="flex items-start">
                       <div className="mr-4 flex-shrink-0">
@@ -172,8 +147,7 @@ const About = () => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </div>
         </section>
@@ -188,8 +162,7 @@ const About = () => {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="bg-eco-green-50 dark:bg-eco-green-900/20 rounded-lg overflow-hidden shadow-md">
+              {teamMembers.map((member, index) => <div key={index} className="bg-eco-green-50 dark:bg-eco-green-900/20 rounded-lg overflow-hidden shadow-md">
                   <div className="bg-eco-green-200 dark:bg-eco-green-800/30 h-40 flex items-center justify-center">
                     <span className="text-5xl font-bold text-eco-green-600/30 dark:text-eco-green-500/30">
                       {member.name.charAt(0)}
@@ -200,8 +173,7 @@ const About = () => {
                     <p className="text-eco-green-600 dark:text-eco-green-400 mb-3">{member.role}</p>
                     <p className="text-eco-green-600 dark:text-eco-green-300 text-sm">{member.bio}</p>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </section>
@@ -216,15 +188,13 @@ const About = () => {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {partnerships.map((partner, index) => (
-                <div key={index} className="bg-white dark:bg-eco-green-900/20 p-6 rounded-lg shadow-md">
+              {partnerships.map((partner, index) => <div key={index} className="bg-white dark:bg-eco-green-900/20 p-6 rounded-lg shadow-md">
                   <div className="bg-eco-green-100 dark:bg-eco-green-800/30 h-24 mb-4 rounded flex items-center justify-center">
                     <span className="font-bold text-xl text-eco-green-600 dark:text-eco-green-400">{partner.name.charAt(0)}</span>
                   </div>
                   <h3 className="font-bold text-lg text-eco-green-700 dark:text-eco-green-200 mb-2">{partner.name}</h3>
                   <p className="text-eco-green-600 dark:text-eco-green-300">{partner.description}</p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </section>
@@ -248,8 +218,6 @@ const About = () => {
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default About;
