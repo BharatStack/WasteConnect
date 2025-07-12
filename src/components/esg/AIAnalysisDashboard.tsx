@@ -1,10 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Brain, 
   TrendingUp, 
@@ -18,45 +20,45 @@ import {
   Activity,
   Lightbulb,
   Shield,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ScatterChart, Scatter } from 'recharts';
 
-const AIAnalysisDashboard = () => {
+interface AIInsight {
+  id: string;
+  type: 'trend' | 'risk' | 'opportunity';
+  title: string;
+  description: string;
+  confidence: number;
+  impact: 'High' | 'Medium' | 'Low';
+  actionable: boolean;
+  created_at: string;
+}
+
+interface ChatMessage {
+  id: string;
+  type: 'user' | 'ai';
+  message: string;
+  timestamp: string;
+}
+
+const AIAnalysisDashboard = ({ onBack }: { onBack?: () => void }) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [chatMessage, setChatMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([
-    { type: 'ai', message: 'Hello! I\'m your ESG AI assistant. How can I help you with your sustainable investments today?' },
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
+    { 
+      id: '1',
+      type: 'ai', 
+      message: "Hello! I'm your ESG AI assistant. How can I help you with your sustainable investments today?",
+      timestamp: new Date().toISOString()
+    },
   ]);
   const [riskTolerance, setRiskTolerance] = useState('moderate');
   const [investmentGoals, setInvestmentGoals] = useState('');
-
-  // Mock AI insights data
-  const aiInsights = [
-    {
-      type: 'trend',
-      title: 'Renewable Energy Surge',
-      description: 'AI predicts 25% growth in renewable energy investments over next 6 months',
-      confidence: 87,
-      impact: 'High',
-      actionable: true
-    },
-    {
-      type: 'risk',
-      title: 'ESG Regulatory Changes',
-      description: 'New environmental regulations may impact 3 of your current holdings',
-      confidence: 92,
-      impact: 'Medium',
-      actionable: true
-    },
-    {
-      type: 'opportunity',
-      title: 'Water Technology Undervalued',
-      description: 'ML models identify water treatment stocks as 30% undervalued',
-      confidence: 78,
-      impact: 'High',
-      actionable: true
-    }
-  ];
+  const [loading, setLoading] = useState(false);
+  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
 
   const predictiveData = [
     { month: 'Jul', predicted: 89, actual: 87, confidence: 0.85 },
@@ -74,15 +76,9 @@ const AIAnalysisDashboard = () => {
     { sector: 'Social Impact', environmental: 25, social: 10, governance: 30 },
   ];
 
-  const sentimentData = [
-    { source: 'News Articles', positive: 65, neutral: 25, negative: 10 },
-    { source: 'Social Media', positive: 58, neutral: 32, negative: 10 },
-    { source: 'Analyst Reports', positive: 78, neutral: 18, negative: 4 },
-    { source: 'Regulatory Filings', positive: 45, neutral: 50, negative: 5 },
-  ];
-
   const aiRecommendations = [
     {
+      id: '1',
       title: 'Increase Clean Energy Allocation',
       description: 'Based on your risk profile and market trends, consider increasing clean energy exposure by 15%',
       confidence: 89,
@@ -90,6 +86,7 @@ const AIAnalysisDashboard = () => {
       reasoning: 'Government subsidies and falling costs make clean energy attractive'
     },
     {
+      id: '2',
       title: 'Diversify Social Impact Investments',
       description: 'Add education technology and healthcare access investments to your portfolio',
       confidence: 76,
@@ -97,6 +94,7 @@ const AIAnalysisDashboard = () => {
       reasoning: 'Social impact investing showing strong performance correlation with ESG scores'
     },
     {
+      id: '3',
       title: 'Monitor Water Scarcity Plays',
       description: 'Water treatment and conservation technologies are positioned for significant growth',
       confidence: 82,
@@ -105,21 +103,102 @@ const AIAnalysisDashboard = () => {
     }
   ];
 
-  const handleSendMessage = () => {
-    if (!chatMessage.trim()) return;
-    
-    setChatHistory(prev => [...prev, { type: 'user', message: chatMessage }]);
-    
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(chatMessage);
-      setChatHistory(prev => [...prev, { type: 'ai', message: aiResponse }]);
-    }, 1000);
-    
-    setChatMessage('');
+  useEffect(() => {
+    if (user) {
+      fetchAIInsights();
+    }
+  }, [user]);
+
+  const fetchAIInsights = async () => {
+    try {
+      setLoading(true);
+      // Simulate API call - replace with actual backend integration
+      const mockInsights: AIInsight[] = [
+        {
+          id: '1',
+          type: 'trend',
+          title: 'Renewable Energy Surge',
+          description: 'AI predicts 25% growth in renewable energy investments over next 6 months',
+          confidence: 87,
+          impact: 'High',
+          actionable: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          type: 'risk',
+          title: 'ESG Regulatory Changes',
+          description: 'New environmental regulations may impact 3 of your current holdings',
+          confidence: 92,
+          impact: 'Medium',
+          actionable: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '3',
+          type: 'opportunity',
+          title: 'Water Technology Undervalued',
+          description: 'ML models identify water treatment stocks as 30% undervalued',
+          confidence: 78,
+          impact: 'High',
+          actionable: true,
+          created_at: new Date().toISOString()
+        }
+      ];
+      
+      setAiInsights(mockInsights);
+    } catch (error) {
+      console.error('Error fetching AI insights:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load AI insights",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const generateAIResponse = (message) => {
+  const handleSendMessage = async () => {
+    if (!chatMessage.trim()) return;
+    
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      message: chatMessage,
+      timestamp: new Date().toISOString()
+    };
+    
+    setChatHistory(prev => [...prev, userMessage]);
+    setChatMessage('');
+    setLoading(true);
+    
+    try {
+      // Here you would integrate with your AI service (OpenAI, etc.)
+      // For now, simulate AI response
+      setTimeout(() => {
+        const aiResponse: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          type: 'ai',
+          message: generateAIResponse(userMessage.message),
+          timestamp: new Date().toISOString()
+        };
+        setChatHistory(prev => [...prev, aiResponse]);
+        setLoading(false);
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get AI response",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  };
+
+  const generateAIResponse = (message: string) => {
     const responses = [
       "Based on your portfolio, I recommend focusing on renewable energy investments with strong ESG ratings above 85.",
       "The current market conditions favor sustainable agriculture investments. Would you like me to analyze specific opportunities?",
@@ -130,7 +209,24 @@ const AIAnalysisDashboard = () => {
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
-  const getInsightIcon = (type) => {
+  const updatePersonalization = async () => {
+    try {
+      // Here you would save user preferences to backend
+      toast({
+        title: "Preferences Updated",
+        description: "Your AI personalization settings have been saved",
+      });
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update preferences",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getInsightIcon = (type: string) => {
     switch (type) {
       case 'trend': return TrendingUp;
       case 'risk': return AlertTriangle;
@@ -139,7 +235,7 @@ const AIAnalysisDashboard = () => {
     }
   };
 
-  const getInsightColor = (type) => {
+  const getInsightColor = (type: string) => {
     switch (type) {
       case 'trend': return 'text-blue-600';
       case 'risk': return 'text-red-600';
@@ -150,6 +246,18 @@ const AIAnalysisDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      {onBack && (
+        <Button 
+          onClick={onBack}
+          variant="outline" 
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
+      )}
+
       {/* AI Insights Panel */}
       <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
         <CardHeader>
@@ -161,10 +269,10 @@ const AIAnalysisDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {aiInsights.map((insight, index) => {
+            {aiInsights.map((insight) => {
               const IconComponent = getInsightIcon(insight.type);
               return (
-                <Card key={index} className="p-4 bg-white/70 backdrop-blur-md hover:shadow-md transition-shadow">
+                <Card key={insight.id} className="p-4 bg-white/70 backdrop-blur-md hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <IconComponent className={`h-6 w-6 ${getInsightColor(insight.type)} mt-1`} />
                     <div className="flex-1">
@@ -203,8 +311,8 @@ const AIAnalysisDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="h-64 overflow-y-auto mb-4 p-4 bg-white rounded-lg border">
-              {chatHistory.map((chat, index) => (
-                <div key={index} className={`mb-3 flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {chatHistory.map((chat) => (
+                <div key={chat.id} className={`mb-3 flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     chat.type === 'user' 
                       ? 'bg-purple-600 text-white' 
@@ -214,6 +322,17 @@ const AIAnalysisDashboard = () => {
                   </div>
                 </div>
               ))}
+              {loading && (
+                <div className="flex justify-start mb-3">
+                  <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <Input
@@ -222,8 +341,13 @@ const AIAnalysisDashboard = () => {
                 onChange={(e) => setChatMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 className="flex-1"
+                disabled={loading}
               />
-              <Button onClick={handleSendMessage} className="bg-purple-600 hover:bg-purple-700">
+              <Button 
+                onClick={handleSendMessage} 
+                className="bg-purple-600 hover:bg-purple-700"
+                disabled={loading}
+              >
                 <MessageSquare className="h-4 w-4" />
               </Button>
             </div>
@@ -261,7 +385,10 @@ const AIAnalysisDashboard = () => {
                 rows={3}
               />
             </div>
-            <Button className="w-full bg-green-600 hover:bg-green-700">
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700"
+              onClick={updatePersonalization}
+            >
               Update AI Preferences
             </Button>
           </CardContent>
@@ -361,8 +488,8 @@ const AIAnalysisDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {aiRecommendations.map((rec, index) => (
-              <Card key={index} className="p-4 bg-white/70 backdrop-blur-md border-l-4 border-l-indigo-500">
+            {aiRecommendations.map((rec) => (
+              <Card key={rec.id} className="p-4 bg-white/70 backdrop-blur-md border-l-4 border-l-indigo-500">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-semibold text-gray-900">{rec.title}</h4>
                   <div className="flex items-center gap-2">

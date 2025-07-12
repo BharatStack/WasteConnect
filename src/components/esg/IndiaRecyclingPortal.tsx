@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Map, 
   TrendingUp, 
@@ -22,112 +24,57 @@ import {
   MapPin,
   Calendar,
   Award,
-  Zap
+  Zap,
+  ArrowLeft
 } from 'lucide-react';
 
-const IndiaRecyclingPortal = () => {
+interface RecyclingCompany {
+  id: string;
+  name: string;
+  symbol: string;
+  state: string;
+  city: string;
+  esg_score: number;
+  rating: string;
+  stock_price: number;
+  change: number;
+  change_percent: number;
+  market_cap: string;
+  waste_processed: string;
+  recycling_efficiency: string;
+  revenue_growth: string;
+  employees: number;
+  established_year: number;
+  category: string;
+  listed: boolean;
+}
+
+interface Startup {
+  id: string;
+  name: string;
+  stage: string;
+  funding: string;
+  location: string;
+  focus: string;
+  team_size: number;
+  impact_metrics: {
+    waste_processed: string;
+    co2_saved: string;
+    partners_connected: number;
+  };
+  founders: string[];
+  established_year: number;
+}
+
+const IndiaRecyclingPortal = ({ onBack }: { onBack?: () => void }) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedState, setSelectedState] = useState('all');
   const [darkMode, setDarkMode] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState(null);
-
-  // Mock data for Indian recycling companies
-  const recyclingCompanies = [
-    {
-      id: 1,
-      name: 'Green India Recycling Ltd',
-      symbol: 'GRECYC',
-      state: 'Maharashtra',
-      city: 'Mumbai',
-      esgScore: 89,
-      rating: 'A+',
-      stockPrice: 245.50,
-      change: 12.30,
-      changePercent: 5.26,
-      marketCap: '₹1,250 Cr',
-      wasteProcessed: '5,000 tons/month',
-      recyclingEfficiency: '92%',
-      revenueGrowth: '28%',
-      employees: 850,
-      establishedYear: 2008,
-      category: 'E-Waste & Plastic',
-      listed: true
-    },
-    {
-      id: 2,
-      name: 'EcoWaste Solutions',
-      symbol: 'ECOWAS',
-      state: 'Karnataka',
-      city: 'Bangalore',
-      esgScore: 85,
-      rating: 'A',
-      stockPrice: 189.75,
-      change: -8.25,
-      changePercent: -4.17,
-      marketCap: '₹890 Cr',
-      wasteProcessed: '3,500 tons/month',
-      recyclingEfficiency: '88%',
-      revenueGrowth: '22%',
-      employees: 620,
-      establishedYear: 2012,
-      category: 'Organic & Food Waste',
-      listed: true
-    },
-    {
-      id: 3,
-      name: 'Bharti Recycling Corp',
-      symbol: 'BHAREC',
-      state: 'Gujarat',
-      city: 'Ahmedabad',
-      esgScore: 92,
-      rating: 'A+',
-      stockPrice: 312.40,
-      change: 18.90,
-      changePercent: 6.44,
-      marketCap: '₹1,850 Cr',
-      wasteProcessed: '7,200 tons/month',
-      recyclingEfficiency: '95%',
-      revenueGrowth: '35%',
-      employees: 1200,
-      establishedYear: 2005,
-      category: 'Metal & Construction',
-      listed: true
-    }
-  ];
-
-  const startupShowcase = [
-    {
-      id: 1,
-      name: 'WasteWise Technologies',
-      stage: 'Series A',
-      funding: '₹25 Cr',
-      location: 'Delhi',
-      focus: 'AI-powered waste sorting',
-      teamSize: 45,
-      impactMetrics: {
-        wasteProcessed: '500 tons/month',
-        co2Saved: '200 tons/month',
-        partnersConnected: 150
-      },
-      founders: ['Priya Sharma', 'Ravi Kumar'],
-      establishedYear: 2019
-    },
-    {
-      id: 2,
-      name: 'Circular Economy Hub',
-      stage: 'Seed',
-      funding: '₹8 Cr',
-      location: 'Pune',
-      focus: 'Marketplace for recycled materials',
-      teamSize: 28,
-      impactMetrics: {
-        wasteProcessed: '300 tons/month',
-        co2Saved: '120 tons/month',
-        partnersConnected: 80
-      },
-      founders: ['Amit Patel', 'Sneha Gupta'],
-      establishedYear: 2020
-    }
-  ];
+  const [selectedCompany, setSelectedCompany] = useState<RecyclingCompany | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [recyclingCompanies, setRecyclingCompanies] = useState<RecyclingCompany[]>([]);
+  const [startupShowcase, setStartupShowcase] = useState<Startup[]>([]);
 
   const indianStates = [
     'Maharashtra', 'Karnataka', 'Gujarat', 'Tamil Nadu', 'Delhi', 'Uttar Pradesh',
@@ -141,6 +88,156 @@ const IndiaRecyclingPortal = () => {
     marketSize: '₹18,500 Cr',
     growthRate: '32%',
     co2Reduction: '2.5M tons/year'
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchRecyclingData();
+    }
+  }, [user]);
+
+  const fetchRecyclingData = async () => {
+    try {
+      setLoading(true);
+      // Simulate API calls - replace with actual backend integration
+      const mockCompanies: RecyclingCompany[] = [
+        {
+          id: '1',
+          name: 'Green India Recycling Ltd',
+          symbol: 'GRECYC',
+          state: 'Maharashtra',
+          city: 'Mumbai',
+          esg_score: 89,
+          rating: 'A+',
+          stock_price: 245.50,
+          change: 12.30,
+          change_percent: 5.26,
+          market_cap: '₹1,250 Cr',
+          waste_processed: '5,000 tons/month',
+          recycling_efficiency: '92%',
+          revenue_growth: '28%',
+          employees: 850,
+          established_year: 2008,
+          category: 'E-Waste & Plastic',
+          listed: true
+        },
+        {
+          id: '2',
+          name: 'EcoWaste Solutions',
+          symbol: 'ECOWAS',
+          state: 'Karnataka',
+          city: 'Bangalore',
+          esg_score: 85,
+          rating: 'A',
+          stock_price: 189.75,
+          change: -8.25,
+          change_percent: -4.17,
+          market_cap: '₹890 Cr',
+          waste_processed: '3,500 tons/month',
+          recycling_efficiency: '88%',
+          revenue_growth: '22%',
+          employees: 620,
+          established_year: 2012,
+          category: 'Organic & Food Waste',
+          listed: true
+        },
+        {
+          id: '3',
+          name: 'Bharti Recycling Corp',
+          symbol: 'BHAREC',
+          state: 'Gujarat',
+          city: 'Ahmedabad',
+          esg_score: 92,
+          rating: 'A+',
+          stock_price: 312.40,
+          change: 18.90,
+          change_percent: 6.44,
+          market_cap: '₹1,850 Cr',
+          waste_processed: '7,200 tons/month',
+          recycling_efficiency: '95%',
+          revenue_growth: '35%',
+          employees: 1200,
+          established_year: 2005,
+          category: 'Metal & Construction',
+          listed: true
+        }
+      ];
+
+      const mockStartups: Startup[] = [
+        {
+          id: '1',
+          name: 'WasteWise Technologies',
+          stage: 'Series A',
+          funding: '₹25 Cr',
+          location: 'Delhi',
+          focus: 'AI-powered waste sorting',
+          team_size: 45,
+          impact_metrics: {
+            waste_processed: '500 tons/month',
+            co2_saved: '200 tons/month',
+            partners_connected: 150
+          },
+          founders: ['Priya Sharma', 'Ravi Kumar'],
+          established_year: 2019
+        },
+        {
+          id: '2',
+          name: 'Circular Economy Hub',
+          stage: 'Seed',
+          funding: '₹8 Cr',
+          location: 'Pune',
+          focus: 'Marketplace for recycled materials',
+          team_size: 28,
+          impact_metrics: {
+            waste_processed: '300 tons/month',
+            co2_saved: '120 tons/month',
+            partners_connected: 80
+          },
+          founders: ['Amit Patel', 'Sneha Gupta'],
+          established_year: 2020
+        }
+      ];
+
+      setRecyclingCompanies(mockCompanies);
+      setStartupShowcase(mockStartups);
+    } catch (error) {
+      console.error('Error fetching recycling data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load recycling data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInvestment = async (companyId: string) => {
+    try {
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to make an investment",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Investment Initiated",
+        description: "Redirecting to investment portal...",
+      });
+      
+      // Here you would integrate with your investment platform
+      
+    } catch (error) {
+      console.error('Error processing investment:', error);
+      toast({
+        title: "Investment Failed",
+        description: "There was an error processing your investment",
+        variant: "destructive",
+      });
+    }
   };
 
   const getColorScheme = () => {
@@ -162,16 +259,40 @@ const IndiaRecyclingPortal = () => {
 
   const colors = getColorScheme();
 
+  const filteredCompanies = recyclingCompanies.filter(company => 
+    selectedState === 'all' || company.state === selectedState
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className={`space-y-6 ${colors.bg} min-h-screen p-4`}>
-      {/* Header with Dark Mode Toggle */}
+      {/* Header with Back Button and Dark Mode Toggle */}
       <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className={`text-2xl font-bold ${colors.text} flex items-center gap-2`}>
-            <Map className="h-6 w-6 text-orange-600" />
-            India Recycling Companies Portal
-          </h2>
-          <p className="text-gray-600">Investment opportunities in India's growing recycling sector</p>
+        <div className="flex items-center gap-4">
+          {onBack && (
+            <Button 
+              onClick={onBack}
+              variant="outline" 
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          )}
+          <div>
+            <h2 className={`text-2xl font-bold ${colors.text} flex items-center gap-2`}>
+              <Map className="h-6 w-6 text-orange-600" />
+              India Recycling Companies Portal
+            </h2>
+            <p className="text-gray-600">Investment opportunities in India's growing recycling sector</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-sm ${colors.text}`}>Indian Flag Theme</span>
@@ -274,9 +395,7 @@ const IndiaRecyclingPortal = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recyclingCompanies.filter(company => 
-              selectedState === 'all' || company.state === selectedState
-            ).map(company => (
+            {filteredCompanies.map(company => (
               <Card key={company.id} className="p-4 hover:shadow-lg transition-shadow border-l-4 border-l-orange-500">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                   <div className="flex-1">
@@ -294,26 +413,26 @@ const IndiaRecyclingPortal = () => {
                       <div>
                         <p className="text-sm text-gray-500">Current Price</p>
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold">₹{company.stockPrice}</span>
+                          <span className="text-lg font-bold">₹{company.stock_price}</span>
                           <span className={`text-sm flex items-center gap-1 ${
                             company.change > 0 ? 'text-green-600' : 'text-red-600'
                           }`}>
                             {company.change > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                            {company.changePercent}%
+                            {company.change_percent}%
                           </span>
                         </div>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Market Cap</p>
-                        <p className="text-lg font-semibold">{company.marketCap}</p>
+                        <p className="text-lg font-semibold">{company.market_cap}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Waste Processed</p>
-                        <p className="text-lg font-semibold text-green-600">{company.wasteProcessed}</p>
+                        <p className="text-lg font-semibold text-green-600">{company.waste_processed}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Efficiency</p>
-                        <p className="text-lg font-semibold text-blue-600">{company.recyclingEfficiency}</p>
+                        <p className="text-lg font-semibold text-blue-600">{company.recycling_efficiency}</p>
                       </div>
                     </div>
 
@@ -332,13 +451,16 @@ const IndiaRecyclingPortal = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4 text-gray-400" />
-                        <span>Est. {company.establishedYear}</span>
+                        <span>Est. {company.established_year}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    <Button className="bg-green-600 hover:bg-green-700">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => handleInvestment(company.id)}
+                    >
                       <DollarSign className="h-4 w-4 mr-1" />
                       Invest Now
                     </Button>
@@ -382,7 +504,7 @@ const IndiaRecyclingPortal = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Team Size</p>
-                    <p className="text-lg font-bold">{startup.teamSize}</p>
+                    <p className="text-lg font-bold">{startup.team_size}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Location</p>
@@ -390,7 +512,7 @@ const IndiaRecyclingPortal = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Founded</p>
-                    <p className="font-medium">{startup.establishedYear}</p>
+                    <p className="font-medium">{startup.established_year}</p>
                   </div>
                 </div>
 
@@ -398,15 +520,15 @@ const IndiaRecyclingPortal = () => {
                   <h4 className="font-medium text-gray-900 mb-2">Impact Metrics</h4>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div className="text-center p-2 bg-white rounded">
-                      <div className="font-bold text-green-600">{startup.impactMetrics.wasteProcessed}</div>
+                      <div className="font-bold text-green-600">{startup.impact_metrics.waste_processed}</div>
                       <div className="text-gray-500">Waste Processed</div>
                     </div>
                     <div className="text-center p-2 bg-white rounded">
-                      <div className="font-bold text-blue-600">{startup.impactMetrics.co2Saved}</div>
+                      <div className="font-bold text-blue-600">{startup.impact_metrics.co2_saved}</div>
                       <div className="text-gray-500">CO₂ Saved</div>
                     </div>
                     <div className="text-center p-2 bg-white rounded">
-                      <div className="font-bold text-purple-600">{startup.impactMetrics.partnersConnected}</div>
+                      <div className="font-bold text-purple-600">{startup.impact_metrics.partners_connected}</div>
                       <div className="text-gray-500">Partners</div>
                     </div>
                   </div>
@@ -424,7 +546,11 @@ const IndiaRecyclingPortal = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                  <Button 
+                    size="sm" 
+                    className="bg-purple-600 hover:bg-purple-700"
+                    onClick={() => handleInvestment(startup.id)}
+                  >
                     <DollarSign className="h-4 w-4 mr-1" />
                     Invest
                   </Button>
@@ -472,12 +598,12 @@ const IndiaRecyclingPortal = () => {
                       </div>
                     </td>
                     <td className="p-2">
-                      <Badge className="bg-green-100 text-green-800">{company.esgScore}</Badge>
+                      <Badge className="bg-green-100 text-green-800">{company.esg_score}</Badge>
                     </td>
-                    <td className="p-2">₹{company.stockPrice}</td>
-                    <td className="p-2">{company.marketCap}</td>
-                    <td className="p-2">{company.recyclingEfficiency}</td>
-                    <td className="p-2 text-green-600 font-medium">{company.revenueGrowth}</td>
+                    <td className="p-2">₹{company.stock_price}</td>
+                    <td className="p-2">{company.market_cap}</td>
+                    <td className="p-2">{company.recycling_efficiency}</td>
+                    <td className="p-2 text-green-600 font-medium">{company.revenue_growth}</td>
                     <td className="p-2">
                       <Button size="sm" variant="outline">Compare</Button>
                     </td>
