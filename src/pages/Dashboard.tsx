@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,6 +30,7 @@ import {
 } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardIntegrations from '@/components/dashboard/DashboardIntegrations';
+import NetworkDashboard from '@/components/network/NetworkDashboard';
 
 interface WasteStats {
   totalWaste: number;
@@ -48,6 +48,7 @@ const Dashboard = () => {
     costSavings: 0
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [showNetworkDashboard, setShowNetworkDashboard] = useState(false);
 
   useEffect(() => {
     fetchWasteStats();
@@ -98,6 +99,28 @@ const Dashboard = () => {
       setIsLoading(false);
     }
   };
+
+  if (showNetworkDashboard) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader />
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            <div className="mb-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowNetworkDashboard(false)}
+                className="mb-4"
+              >
+                ← Back to Dashboard
+              </Button>
+            </div>
+            <NetworkDashboard />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -278,15 +301,26 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                      <Button 
+                        className="w-full bg-eco-green-600 hover:bg-eco-green-700"
+                        onClick={() => setShowNetworkDashboard(true)}
+                      >
                         <Users className="h-4 w-4 mr-2" />
                         Connect with Communities
                       </Button>
-                      <Button variant="outline" className="w-full">
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => setShowNetworkDashboard(true)}
+                      >
                         <MapPin className="h-4 w-4 mr-2" />
                         Find Local Partners
                       </Button>
-                      <Button variant="outline" className="w-full">
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => setShowNetworkDashboard(true)}
+                      >
                         <Handshake className="h-4 w-4 mr-2" />
                         Join Networks
                       </Button>
