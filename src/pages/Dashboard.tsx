@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,7 +23,11 @@ import {
   Building,
   Users2,
   FileText,
-  Globe
+  Globe,
+  Network,
+  Users,
+  MapPin,
+  Handshake
 } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardIntegrations from '@/components/dashboard/DashboardIntegrations';
@@ -258,6 +263,34 @@ const Dashboard = () => {
                         View Reports
                       </Button>
                     </Link>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Network className="h-5 w-5 text-eco-green-600" />
+                      Network
+                    </CardTitle>
+                    <CardDescription>
+                      Connect with bharat - Build connections across India's waste management ecosystem
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700">
+                        <Users className="h-4 w-4 mr-2" />
+                        Connect with Communities
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        Find Local Partners
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        <Handshake className="h-4 w-4 mr-2" />
+                        Join Networks
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
