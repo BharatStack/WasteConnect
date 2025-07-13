@@ -5,42 +5,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Trash2, 
-  Route, 
-  ShoppingCart, 
-  BarChart3, 
-  MessageSquare, 
-  TrendingUp, 
-  Leaf, 
-  Recycle, 
-  DollarSign,
-  Coins,
-  CreditCard,
-  PiggyBank,
-  Shield,
-  Building,
-  Users2,
-  FileText,
-  Globe,
-  Network,
-  Users,
-  MapPin,
-  Handshake
-} from 'lucide-react';
+import { Trash2, Route, ShoppingCart, BarChart3, MessageSquare, TrendingUp, Leaf, Recycle, DollarSign, Coins, CreditCard, PiggyBank, Shield, Building, Users2, FileText, Globe, Network, Users, MapPin, Handshake } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardIntegrations from '@/components/dashboard/DashboardIntegrations';
 import NetworkDashboard from '@/components/network/NetworkDashboard';
-
 interface WasteStats {
   totalWaste: number;
   recyclingRate: number;
   carbonReduction: number;
   costSavings: number;
 }
-
 const Dashboard = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [wasteStats, setWasteStats] = useState<WasteStats>({
     totalWaste: 0,
     recyclingRate: 0,
@@ -49,28 +27,22 @@ const Dashboard = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [showNetworkDashboard, setShowNetworkDashboard] = useState(false);
-
   useEffect(() => {
     fetchWasteStats();
   }, [user]);
-
   const fetchWasteStats = async () => {
     if (!user) return;
-
     try {
       // Fetch waste data logs
-      const { data: wasteData, error: wasteError } = await supabase
-        .from('waste_data_logs')
-        .select('quantity, waste_type, environmental_impact')
-        .eq('user_id', user.id);
-
+      const {
+        data: wasteData,
+        error: wasteError
+      } = await supabase.from('waste_data_logs').select('quantity, waste_type, environmental_impact').eq('user_id', user.id);
       if (wasteError) throw wasteError;
-
       let totalWaste = 0;
       let recyclableWaste = 0;
       let totalCarbonReduction = 0;
       let totalCostSavings = 0;
-
       wasteData?.forEach(item => {
         totalWaste += item.quantity;
         if (item.waste_type === 'recyclable') {
@@ -80,13 +52,10 @@ const Dashboard = () => {
           const impact = item.environmental_impact as any;
           totalCarbonReduction += impact.co2_reduction_kg || 0;
         }
-        const costPerKg = item.waste_type === 'recyclable' ? 0.5 : 
-                         item.waste_type === 'organic' ? 0.3 : 0.1;
+        const costPerKg = item.waste_type === 'recyclable' ? 0.5 : item.waste_type === 'organic' ? 0.3 : 0.1;
         totalCostSavings += item.quantity * costPerKg;
       });
-
-      const recyclingRate = totalWaste > 0 ? (recyclableWaste / totalWaste) * 100 : 0;
-
+      const recyclingRate = totalWaste > 0 ? recyclableWaste / totalWaste * 100 : 0;
       setWasteStats({
         totalWaste,
         recyclingRate,
@@ -99,31 +68,22 @@ const Dashboard = () => {
       setIsLoading(false);
     }
   };
-
   if (showNetworkDashboard) {
-    return (
-      <div className="min-h-screen bg-gray-50">
+    return <div className="min-h-screen bg-gray-50">
         <DashboardHeader />
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="mb-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowNetworkDashboard(false)}
-                className="mb-4"
-              >
+              <Button variant="outline" onClick={() => setShowNetworkDashboard(false)} className="mb-4">
                 ← Back to Dashboard
               </Button>
             </div>
             <NetworkDashboard />
           </div>
         </main>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50">
       <DashboardHeader />
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -301,29 +261,12 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <Button 
-                        className="w-full bg-eco-green-600 hover:bg-eco-green-700"
-                        onClick={() => setShowNetworkDashboard(true)}
-                      >
+                      <Button className="w-full bg-eco-green-600 hover:bg-eco-green-700" onClick={() => setShowNetworkDashboard(true)}>
                         <Users className="h-4 w-4 mr-2" />
                         Connect with Communities
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => setShowNetworkDashboard(true)}
-                      >
-                        <MapPin className="h-4 w-4 mr-2" />
-                        Find Local Partners
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => setShowNetworkDashboard(true)}
-                      >
-                        <Handshake className="h-4 w-4 mr-2" />
-                        Join Networks
-                      </Button>
+                      
+                      
                     </div>
                   </CardContent>
                 </Card>
@@ -566,8 +509,6 @@ const Dashboard = () => {
           </Tabs>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
