@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, BarChart3, TrendingUp, Leaf, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface WasteData {
   id: string;
@@ -181,90 +181,127 @@ const Analytics = () => {
   const currentAnalytics = analytics[0];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center gap-4">
-          <Link to="/dashboard" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+    <div className="min-h-screen bg-gradient-to-br from-eco-green-50 via-emerald-50 to-teal-50 dark:from-eco-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Enhanced Header */}
+        <div className="mb-8 flex items-center gap-4">
+          <Link to="/dashboard" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700 transition-all duration-200 group">
+            <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span className="font-medium">Back to Dashboard</span>
           </Link>
-          <h1 className="text-2xl font-bold text-eco-green-700">Waste Analytics</h1>
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              Waste Analytics
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Comprehensive insights into your environmental impact
+            </p>
+          </div>
         </div>
 
-        <div className="mb-6 flex items-center justify-between">
+        {/* Enhanced Controls */}
+        <div className="mb-8 flex items-center justify-between p-6 bg-white/80 dark:bg-eco-green-900/30 backdrop-blur-sm rounded-xl border border-eco-green-200/50 shadow-lg">
           <div className="flex items-center gap-4">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="90">Last 90 days</SelectItem>
-                <SelectItem value="365">Last year</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Time Period
+              </label>
+              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                <SelectTrigger className="w-56 bg-white/70 border-eco-green-200 focus:border-eco-green-400 focus:ring-eco-green-400/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">Last 7 days</SelectItem>
+                  <SelectItem value="30">Last 30 days</SelectItem>
+                  <SelectItem value="90">Last 90 days</SelectItem>
+                  <SelectItem value="365">Last year</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           <Button 
             onClick={generateAnalytics}
-            className="bg-eco-green-600 hover:bg-eco-green-700"
+            className="bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 hover:from-eco-green-700 hover:via-emerald-700 hover:to-teal-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl px-8 py-3"
             disabled={isLoading || wasteData.length === 0}
           >
-            {isLoading ? "Generating..." : "Generate Analytics"}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Generating...
+              </div>
+            ) : (
+              "Generate Analytics"
+            )}
           </Button>
         </div>
 
-        {/* Key Metrics */}
+        {/* Enhanced Key Metrics */}
         {currentAnalytics && (
           <div className="grid gap-6 md:grid-cols-4 mb-8">
-            <Card>
+            <Card className="eco-card-enhanced group hover:scale-105 transition-all duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Waste</CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Waste</CardTitle>
+                <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10">
+                  <BarChart3 className="h-5 w-5 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{currentAnalytics.total_waste_generated?.toFixed(1) || '0'} kg</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                  {currentAnalytics.total_waste_generated?.toFixed(1) || '0'} kg
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
                   {selectedPeriod} day period
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="eco-card-enhanced group hover:scale-105 transition-all duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Recycling Rate</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Recycling Rate</CardTitle>
+                <div className="p-2 rounded-lg bg-gradient-to-r from-emerald-500/10 to-emerald-600/10">
+                  <TrendingUp className="h-5 w-5 text-emerald-600 group-hover:scale-110 transition-transform duration-200" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{currentAnalytics.recycling_rate?.toFixed(1) || '0'}%</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+                  {currentAnalytics.recycling_rate?.toFixed(1) || '0'}%
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
                   Of total waste recycled
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="eco-card-enhanced group hover:scale-105 transition-all duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">CO₂ Reduction</CardTitle>
-                <Leaf className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">CO₂ Reduction</CardTitle>
+                <div className="p-2 rounded-lg bg-gradient-to-r from-green-500/10 to-green-600/10">
+                  <Leaf className="h-5 w-5 text-green-600 group-hover:scale-110 transition-transform duration-200" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{currentAnalytics.carbon_footprint?.toFixed(1) || '0'} kg</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                  {currentAnalytics.carbon_footprint?.toFixed(1) || '0'} kg
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
                   Carbon footprint reduced
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="eco-card-enhanced group hover:scale-105 transition-all duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Cost Savings</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Cost Savings</CardTitle>
+                <div className="p-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-amber-600/10">
+                  <DollarSign className="h-5 w-5 text-amber-600 group-hover:scale-110 transition-transform duration-200" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${currentAnalytics.cost_savings?.toFixed(2) || '0'}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-amber-700 bg-clip-text text-transparent">
+                  ${currentAnalytics.cost_savings?.toFixed(2) || '0'}
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
                   Estimated savings
                 </p>
               </CardContent>
@@ -272,87 +309,155 @@ const Analytics = () => {
           </div>
         )}
 
-        {/* Charts */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Waste by Type</CardTitle>
-              <CardDescription>Distribution of waste types in your data</CardDescription>
+        {/* Enhanced Charts */}
+        <div className="grid gap-8 md:grid-cols-2">
+          <Card className="eco-card-enhanced">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-semibold bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Waste by Type
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                Distribution of waste types in your data
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {wasteByType.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={wasteByType}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ type, percent }) => `${type} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="quantity"
-                    >
-                      {wasteByType.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => [`${value} kg`, 'Quantity']} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={wasteByType}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ type, percent }) => `${type} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="quantity"
+                      >
+                        {wasteByType.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => [`${value} kg`, 'Quantity']} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="flex items-center justify-center h-[300px] text-gray-500">
-                  No waste data available for the selected period
+                <div className="flex items-center justify-center h-80 text-gray-500 dark:text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                  <div className="text-center">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <p className="font-medium">No waste data available</p>
+                    <p className="text-sm mt-1">for the selected period</p>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Monthly Waste Trend</CardTitle>
-              <CardDescription>Waste generation over time</CardDescription>
+          <Card className="eco-card-enhanced">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-semibold bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Monthly Waste Trend
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                Waste generation over time
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {monthlyData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value: number) => [`${value} kg`, 'Quantity']} />
-                    <Line type="monotone" dataKey="quantity" stroke="#10b981" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" opacity={0.3} />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke="#6b7280"
+                        fontSize={12}
+                        fontWeight={500}
+                      />
+                      <YAxis 
+                        stroke="#6b7280"
+                        fontSize={12}
+                        fontWeight={500}
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => [`${value} kg`, 'Quantity']}
+                        contentStyle={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                      />
+                      <Bar 
+                        dataKey="quantity" 
+                        fill="url(#barGradient)"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" />
+                          <stop offset="50%" stopColor="#059669" />
+                          <stop offset="100%" stopColor="#047857" />
+                        </linearGradient>
+                      </defs>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="flex items-center justify-center h-[300px] text-gray-500">
-                  No trend data available for the selected period
+                <div className="flex items-center justify-center h-80 text-gray-500 dark:text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                  <div className="text-center">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <p className="font-medium">No trend data available</p>
+                    <p className="text-sm mt-1">for the selected period</p>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Historical Analytics */}
+        {/* Enhanced Historical Analytics */}
         {analytics.length > 0 && (
-          <Card className="mt-6">
+          <Card className="mt-8 eco-card-enhanced">
             <CardHeader>
-              <CardTitle>Historical Analytics</CardTitle>
-              <CardDescription>Your past analytics reports</CardDescription>
+              <CardTitle className="text-xl font-semibold bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Historical Analytics
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                Your past analytics reports
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {analytics.map((report) => (
-                  <div key={report.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">
-                        {new Date(report.period_start).toLocaleDateString()} - {new Date(report.period_end).toLocaleDateString()}
+                {analytics.map((report, index) => (
+                  <div key={report.id} className="flex items-center justify-between p-6 border border-eco-green-200/50 rounded-xl bg-gradient-to-r from-white/50 to-eco-green-50/30 dark:from-eco-green-900/20 dark:to-emerald-900/20 hover:shadow-lg transition-all duration-300 group">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-eco-green-600 transition-colors duration-200">
+                        Report #{analytics.length - index}
                       </h4>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                        <span>{report.total_waste_generated?.toFixed(1) || '0'} kg waste</span>
-                        <span>{report.recycling_rate?.toFixed(1) || '0'}% recycled</span>
-                        <span>{report.carbon_footprint?.toFixed(1) || '0'} kg CO₂ reduced</span>
-                        <span>${report.cost_savings?.toFixed(2) || '0'} saved</span>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {new Date(report.period_start).toLocaleDateString()} - {new Date(report.period_end).toLocaleDateString()}
+                      </p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="flex flex-col">
+                          <span className="text-gray-500 dark:text-gray-400 text-xs font-medium">Total Waste</span>
+                          <span className="font-semibold text-blue-600">{report.total_waste_generated?.toFixed(1) || '0'} kg</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-gray-500 dark:text-gray-400 text-xs font-medium">Recycled</span>
+                          <span className="font-semibold text-emerald-600">{report.recycling_rate?.toFixed(1) || '0'}%</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-gray-500 dark:text-gray-400 text-xs font-medium">CO₂ Reduced</span>
+                          <span className="font-semibold text-green-600">{report.carbon_footprint?.toFixed(1) || '0'} kg</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-gray-500 dark:text-gray-400 text-xs font-medium">Savings</span>
+                          <span className="font-semibold text-amber-600">${report.cost_savings?.toFixed(2) || '0'}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
