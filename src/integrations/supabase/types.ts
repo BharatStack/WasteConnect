@@ -86,6 +86,50 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_metrics: {
+        Row: {
+          additional_data: Json | null
+          calculation_date: string | null
+          created_at: string | null
+          id: string
+          metric_type: string | null
+          metric_value: number | null
+          municipality_id: string | null
+          period_end: string | null
+          period_start: string | null
+        }
+        Insert: {
+          additional_data?: Json | null
+          calculation_date?: string | null
+          created_at?: string | null
+          id?: string
+          metric_type?: string | null
+          metric_value?: number | null
+          municipality_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+        }
+        Update: {
+          additional_data?: Json | null
+          calculation_date?: string | null
+          created_at?: string | null
+          id?: string
+          metric_type?: string | null
+          metric_value?: number | null
+          municipality_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_metrics_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -709,6 +753,8 @@ export type Database = {
       }
       citizen_reports: {
         Row: {
+          assigned_to: string | null
+          auto_assigned: boolean | null
           created_at: string
           description: string | null
           id: string
@@ -716,12 +762,17 @@ export type Database = {
           latitude: number | null
           location: string | null
           longitude: number | null
+          municipality_id: string | null
+          priority: string | null
+          resolution_date: string | null
           status: string | null
           title: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          assigned_to?: string | null
+          auto_assigned?: boolean | null
           created_at?: string
           description?: string | null
           id?: string
@@ -729,12 +780,17 @@ export type Database = {
           latitude?: number | null
           location?: string | null
           longitude?: number | null
+          municipality_id?: string | null
+          priority?: string | null
+          resolution_date?: string | null
           status?: string | null
           title: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          assigned_to?: string | null
+          auto_assigned?: boolean | null
           created_at?: string
           description?: string | null
           id?: string
@@ -742,12 +798,23 @@ export type Database = {
           latitude?: number | null
           location?: string | null
           longitude?: number | null
+          municipality_id?: string | null
+          priority?: string | null
+          resolution_date?: string | null
           status?: string | null
           title?: string
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_municipality"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipalities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       collection_schedules: {
         Row: {
@@ -1452,6 +1519,95 @@ export type Database = {
         }
         Relationships: []
       }
+      municipal_staff: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          department: string | null
+          hire_date: string | null
+          id: string
+          municipality_id: string
+          permissions: Json | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          department?: string | null
+          hire_date?: string | null
+          id?: string
+          municipality_id: string
+          permissions?: Json | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          department?: string | null
+          hire_date?: string | null
+          id?: string
+          municipality_id?: string
+          permissions?: Json | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "municipal_staff_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      municipalities: {
+        Row: {
+          area_boundaries: Json | null
+          avg_resolution_time_hours: number | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          head_officer: string | null
+          id: string
+          name: string
+          performance_score: number | null
+          resolved_reports: number | null
+          total_reports: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          area_boundaries?: Json | null
+          avg_resolution_time_hours?: number | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          head_officer?: string | null
+          id?: string
+          name: string
+          performance_score?: number | null
+          resolved_reports?: number | null
+          total_reports?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          area_boundaries?: Json | null
+          avg_resolution_time_hours?: number | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          head_officer?: string | null
+          id?: string
+          name?: string
+          performance_score?: number | null
+          resolved_reports?: number | null
+          total_reports?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       municipality_responses: {
         Row: {
           after_image_url: string | null
@@ -1990,6 +2146,71 @@ export type Database = {
           },
         ]
       }
+      resolutions: {
+        Row: {
+          after_photo_url: string | null
+          before_photo_url: string | null
+          citizen_feedback_score: number | null
+          citizen_feedback_text: string | null
+          cost_estimate: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          report_id: string
+          resolution_date: string
+          resolution_method: string | null
+          resolved_by: string
+          resources_used: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          after_photo_url?: string | null
+          before_photo_url?: string | null
+          citizen_feedback_score?: number | null
+          citizen_feedback_text?: string | null
+          cost_estimate?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          report_id: string
+          resolution_date: string
+          resolution_method?: string | null
+          resolved_by: string
+          resources_used?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          after_photo_url?: string | null
+          before_photo_url?: string | null
+          citizen_feedback_score?: number | null
+          citizen_feedback_text?: string | null
+          cost_estimate?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          report_id?: string
+          resolution_date?: string
+          resolution_method?: string | null
+          resolved_by?: string
+          resources_used?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resolutions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       route_optimizations: {
         Row: {
           carbon_reduction: number | null
@@ -2405,6 +2626,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_logs: {
+        Row: {
+          checklist_items: Json | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          resolution_id: string
+          status: string | null
+          verification_date: string
+          verifier_id: string
+        }
+        Insert: {
+          checklist_items?: Json | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          resolution_id: string
+          status?: string | null
+          verification_date: string
+          verifier_id: string
+        }
+        Update: {
+          checklist_items?: Json | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          resolution_id?: string
+          status?: string | null
+          verification_date?: string
+          verifier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_logs_resolution_id_fkey"
+            columns: ["resolution_id"]
+            isOneToOne: false
+            referencedRelation: "resolutions"
             referencedColumns: ["id"]
           },
         ]
