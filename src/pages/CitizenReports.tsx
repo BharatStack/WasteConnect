@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -69,30 +68,48 @@ const CitizenReports = () => {
 
   const fetchReports = async () => {
     try {
-      // Fetch reports with voting data
-      const { data, error } = await supabase
+      console.log('Fetching reports...');
+      
+      // First, fetch all reports
+      const { data: reportsData, error: reportsError } = await supabase
         .from('citizen_reports')
-        .select(`
-          *,
-          report_votes!left (
-            vote_type,
-            user_id
-          ),
-          report_comments!left (
-            id
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      
+      if (reportsError) {
+        console.error('Error fetching reports:', reportsError);
+        throw reportsError;
+      }
+
+      console.log('Reports fetched:', reportsData?.length || 0);
+
+      // Then fetch votes for all reports
+      const { data: votesData, error: votesError } = await supabase
+        .from('report_votes')
+        .select('*');
+
+      if (votesError) {
+        console.error('Error fetching votes:', votesError);
+        // Don't throw error, just log it and continue without vote data
+      }
+
+      // Fetch comments count for all reports
+      const { data: commentsData, error: commentsError } = await supabase
+        .from('report_comments')
+        .select('report_id');
+
+      if (commentsError) {
+        console.error('Error fetching comments:', commentsError);
+        // Don't throw error, just log it and continue without comments data
+      }
+
       // Process the data to include vote counts and user votes
-      const processedReports = (data || []).map(report => {
-        const votes = report.report_votes || [];
-        const upVotes = votes.filter((v: any) => v.vote_type === 'up').length;
-        const downVotes = votes.filter((v: any) => v.vote_type === 'down').length;
-        const userVote = user ? votes.find((v: any) => v.user_id === user.id)?.vote_type || null : null;
-        const commentsCount = report.report_comments?.length || 0;
+      const processedReports = (reportsData || []).map(report => {
+        const reportVotes = votesData?.filter(vote => vote.report_id === report.id) || [];
+        const upVotes = reportVotes.filter(vote => vote.vote_type === 'up').length;
+        const downVotes = reportVotes.filter(vote => vote.vote_type === 'down').length;
+        const userVote = user ? reportVotes.find(vote => vote.user_id === user.id)?.vote_type as 'up' | 'down' | null || null : null;
+        const commentsCount = commentsData?.filter(comment => comment.report_id === report.id).length || 0;
         
         // Calculate trending score based on votes, comments, and recency
         const hoursOld = Math.max(1, (Date.now() - new Date(report.created_at).getTime()) / (1000 * 60 * 60));
@@ -108,10 +125,11 @@ const CitizenReports = () => {
         };
       });
       
+      console.log('Processed reports:', processedReports.length);
       setReports(processedReports);
       calculateStats(processedReports);
     } catch (error: any) {
-      console.error('Error fetching reports:', error);
+      console.error('Error in fetchReports:', error);
       toast({
         title: "Error",
         description: "Failed to load reports. Please try again.",
@@ -257,6 +275,8 @@ const CitizenReports = () => {
     }
 
     try {
+      console.log('Voting on report:', reportId, 'with vote type:', voteType);
+      
       const { error } = await supabase
         .from('report_votes')
         .upsert({
@@ -267,17 +287,30 @@ const CitizenReports = () => {
           onConflict: 'report_id,user_id'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error voting:', error);
+        throw error;
+      }
 
+      console.log('Vote successful, refreshing reports...');
       // Refresh reports to update vote counts
       await fetchReports();
+      
+      toast({
+        title: "Vote recorded",
+        description: `Your ${voteType === 'up' ? 'upvote' : 'downvote'} has been recorded.`,
+      });
     } catch (error: any) {
-      console.error('Error voting:', error);
-      throw error;
+      console.error('Error in handleVote:', error);
+      toast({
+        title: "Error",
+        description: "Failed to record your vote. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  const hasActiveFilters = searchTerm || statusFilter !== 'all' || priorityFilter !== 'all';
+  const hasActiveFilters = searchTerm !== '' || statusFilter !== 'all' || priorityFilter !== 'all';
 
   if (isLoading) {
     return (

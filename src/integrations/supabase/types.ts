@@ -2114,6 +2114,41 @@ export type Database = {
         }
         Relationships: []
       }
+      report_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          report_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          report_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          report_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_comments_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_messages: {
         Row: {
           created_at: string
@@ -2139,6 +2174,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "report_messages_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_votes: {
+        Row: {
+          created_at: string
+          id: string
+          report_id: string
+          updated_at: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          report_id: string
+          updated_at?: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          report_id?: string
+          updated_at?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_votes_report_id_fkey"
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "citizen_reports"
