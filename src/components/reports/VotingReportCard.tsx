@@ -1,12 +1,17 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MapPin, Calendar, ThumbsUp, ThumbsDown, MessageSquare, Eye, TrendingUp } from 'lucide-react';
+import { MapPin, Calendar, ThumbsUp, ThumbsDown, MessageSquare, Eye, Share2, Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import TrendingBadge from './TrendingBadge';
+import PriorityBadge from './PriorityBadge';
+import CommunityImpactScore from './CommunityImpactScore';
+import AnimatedStatusPill from './AnimatedStatusPill';
 
 interface VotingReportCardProps {
   report: {
@@ -32,36 +37,7 @@ interface VotingReportCardProps {
 const VotingReportCard = ({ report, showVoting = true, onVote }: VotingReportCardProps) => {
   const { toast } = useToast();
   const [isVoting, setIsVoting] = useState(false);
-
-  const getStatusColor = (status: string | null) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'in_progress':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'resolved':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'invalid':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getPriorityColor = (priority: string | null) => {
-    switch (priority) {
-      case 'low':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'medium':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-      case 'high':
-        return 'bg-orange-50 text-orange-700 border-orange-200';
-      case 'critical':
-        return 'bg-red-50 text-red-700 border-red-200';
-      default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-    }
-  };
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -88,12 +64,19 @@ const VotingReportCard = ({ report, showVoting = true, onVote }: VotingReportCar
     if (!onVote) return;
     
     setIsVoting(true);
+    setShowConfetti(true);
+    
     try {
       await onVote(report.id, voteType);
-      toast({
-        title: "Vote recorded",
-        description: `Your ${voteType === 'up' ? 'upvote' : 'downvote'} has been recorded.`,
-      });
+      
+      // Show success animation
+      setTimeout(() => {
+        toast({
+          title: "Vote recorded! 🎉",
+          description: `Your ${voteType === 'up' ? 'upvote' : 'downvote'} helps the community prioritize issues.`,
+        });
+      }, 300);
+      
     } catch (error) {
       toast({
         title: "Error",
@@ -102,125 +85,260 @@ const VotingReportCard = ({ report, showVoting = true, onVote }: VotingReportCar
       });
     } finally {
       setIsVoting(false);
+      setTimeout(() => setShowConfetti(false), 2000);
     }
   };
 
   const voteScore = (report.votes_up || 0) - (report.votes_down || 0);
+  const totalVotes = (report.votes_up || 0) + (report.votes_down || 0);
+  const communityImpactScore = Math.min(100, Math.max(0, 
+    (report.votes_up || 0) * 2 + (report.comments_count || 0) * 3 + (report.trending_score || 0) * 5
+  ));
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-eco-green-300">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg line-clamp-2 mb-2">{report.title}</CardTitle>
-            <div className="flex flex-wrap gap-2 mb-2">
-              <Badge className={`text-xs font-medium border ${getStatusColor(report.status)}`}>
-                {report.status || 'pending'}
-              </Badge>
-              {report.priority && (
-                <Badge variant="outline" className={`text-xs ${getPriorityColor(report.priority)}`}>
-                  {report.priority}
-                </Badge>
-              )}
-              {report.trending_score && report.trending_score > 0 && (
-                <Badge className="text-xs bg-orange-100 text-orange-800 border-orange-200">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  Trending
-                </Badge>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500 ml-2">
-            <span>{getTimeAgo(report.created_at)}</span>
-          </div>
-        </div>
-        
-        {report.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mt-2">
-            {report.description}
-          </p>
-        )}
-      </CardHeader>
-
-      <CardContent className="pt-0">
-        {report.image_url && (
-          <div className="mb-4">
-            <img
-              src={report.image_url}
-              alt={report.title}
-              className="w-full h-40 object-cover rounded-md border"
-            />
-          </div>
-        )}
-        
-        <div className="space-y-2 text-sm text-gray-600 mb-4">
-          {report.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-gray-400" />
-              <span className="truncate">{report.location}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-400" />
-            <span>{formatDate(report.created_at)}</span>
-          </div>
-        </div>
-
-        {showVoting && (
-          <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-4">
-              <Button
-                variant={report.user_vote === 'up' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleVote('up')}
-                disabled={isVoting}
-                className="flex items-center gap-1"
-              >
-                <ThumbsUp className="h-3 w-3" />
-                {report.votes_up || 0}
-              </Button>
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-eco-green-300 bg-white overflow-hidden">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingBadge trendingScore={report.trending_score} />
+                <PriorityBadge priority={report.priority} />
+              </div>
               
-              <Button
-                variant={report.user_vote === 'down' ? 'destructive' : 'outline'}
-                size="sm"
-                onClick={() => handleVote('down')}
-                disabled={isVoting}
-                className="flex items-center gap-1"
-              >
-                <ThumbsDown className="h-3 w-3" />
-                {report.votes_down || 0}
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="font-medium">Score: {voteScore}</span>
-              <div className="flex items-center gap-1">
-                <MessageSquare className="h-3 w-3" />
-                <span>{report.comments_count || 0}</span>
+              <CardTitle className="text-lg line-clamp-2 mb-2 hover:text-eco-green-600 transition-colors">
+                {report.title}
+              </CardTitle>
+              
+              <div className="flex items-center gap-2 mb-2">
+                <AnimatedStatusPill status={report.status} updatedAt={report.created_at} />
               </div>
             </div>
+            
+            <div className="flex items-center gap-1 text-xs text-gray-500 ml-2">
+              <motion.span
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {getTimeAgo(report.created_at)}
+              </motion.span>
+            </div>
           </div>
-        )}
+          
+          {report.description && (
+            <motion.p 
+              className="text-sm text-gray-600 line-clamp-2 mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {report.description}
+            </motion.p>
+          )}
+        </CardHeader>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="text-xs bg-eco-green-100 text-eco-green-700">
-                {report.user_id?.slice(0, 2).toUpperCase() || 'AN'}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-xs text-gray-500">Reporter</span>
+        <CardContent className="pt-0">
+          {report.image_url && (
+            <motion.div 
+              className="mb-4 relative group cursor-pointer"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                <img
+                  src={report.image_url}
+                  alt={report.title}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              
+              {/* Image overlay with gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
+            </motion.div>
+          )}
+
+          {/* Community Impact Score */}
+          <CommunityImpactScore
+            score={communityImpactScore}
+            voteCount={totalVotes}
+            commentCount={report.comments_count || 0}
+          />
+          
+          <div className="space-y-2 text-sm text-gray-600 mb-4">
+            {report.location && (
+              <motion.div 
+                className="flex items-center gap-2"
+                whileHover={{ x: 4 }}
+                transition={{ duration: 0.2 }}
+              >
+                <MapPin className="h-4 w-4 text-gray-400" />
+                <span className="truncate">{report.location}</span>
+              </motion.div>
+            )}
+            <motion.div 
+              className="flex items-center gap-2"
+              whileHover={{ x: 4 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Calendar className="h-4 w-4 text-gray-400" />
+              <span>{formatDate(report.created_at)}</span>
+            </motion.div>
           </div>
 
-          <Link to={`/citizen-reports/${report.id}`}>
-            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
-              <Eye className="h-3 w-3 mr-1" />
-              View Details
-            </Button>
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+          {showVoting && (
+            <motion.div 
+              className="flex items-center justify-between mb-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="flex items-center gap-4">
+                <motion.div className="relative">
+                  <Button
+                    variant={report.user_vote === 'up' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleVote('up')}
+                    disabled={isVoting}
+                    className={`flex items-center gap-2 transition-all duration-300 ${
+                      report.user_vote === 'up' 
+                        ? 'bg-eco-green-500 hover:bg-eco-green-600 shadow-lg shadow-eco-green-500/25' 
+                        : 'hover:border-eco-green-500 hover:bg-eco-green-50'
+                    }`}
+                  >
+                    <motion.div
+                      animate={report.user_vote === 'up' ? { rotate: [0, 15, -15, 0] } : {}}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                    </motion.div>
+                    <motion.span
+                      animate={isVoting ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {report.votes_up || 0}
+                    </motion.span>
+                  </Button>
+                  
+                  {/* Confetti animation */}
+                  <AnimatePresence>
+                    {showConfetti && report.user_vote === 'up' && (
+                      <motion.div className="absolute inset-0 pointer-events-none">
+                        {[...Array(6)].map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className="absolute w-2 h-2 bg-eco-green-500 rounded-full"
+                            initial={{ x: '50%', y: '50%', scale: 0 }}
+                            animate={{
+                              x: `${50 + (Math.random() - 0.5) * 200}%`,
+                              y: `${50 + (Math.random() - 0.5) * 200}%`,
+                              scale: [0, 1, 0],
+                            }}
+                            transition={{ duration: 1, delay: i * 0.1 }}
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+                
+                <motion.div className="relative">
+                  <Button
+                    variant={report.user_vote === 'down' ? 'destructive' : 'outline'}
+                    size="sm"
+                    onClick={() => handleVote('down')}
+                    disabled={isVoting}
+                    className="flex items-center gap-2 transition-all duration-300"
+                  >
+                    <motion.div
+                      animate={report.user_vote === 'down' ? { rotate: [0, -15, 15, 0] } : {}}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <ThumbsDown className="h-4 w-4" />
+                    </motion.div>
+                    <motion.span
+                      animate={isVoting ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {report.votes_down || 0}
+                    </motion.span>
+                  </Button>
+                </motion.div>
+              </div>
+              
+              <div className="flex items-center gap-4 text-sm text-gray-600">
+                <motion.div 
+                  className="flex items-center gap-1 font-medium"
+                  animate={{ scale: voteScore > 0 ? [1, 1.05, 1] : 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <span className={voteScore > 0 ? 'text-eco-green-600' : voteScore < 0 ? 'text-red-600' : 'text-gray-600'}>
+                    Score: {voteScore}
+                  </span>
+                </motion.div>
+                
+                <motion.div 
+                  className="flex items-center gap-1"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>{report.comments_count || 0}</span>
+                </motion.div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                  onClick={() => {
+                    navigator.share?.({ 
+                      title: report.title, 
+                      text: report.description || '', 
+                      url: window.location.href 
+                    });
+                  }}
+                >
+                  <Share2 className="h-4 w-4 text-gray-500" />
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="text-xs bg-eco-green-100 text-eco-green-700">
+                    {report.user_id?.slice(0, 2).toUpperCase() || 'AN'}
+                  </AvatarFallback>
+                </Avatar>
+              </motion.div>
+              <span className="text-xs text-gray-500">Reporter</span>
+            </div>
+
+            <Link to={`/citizen-reports/${report.id}`}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button variant="outline" size="sm" className="h-8 px-3 text-xs hover:bg-eco-green-50 hover:border-eco-green-500">
+                  <Eye className="h-3 w-3 mr-1" />
+                  View Details
+                </Button>
+              </motion.div>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

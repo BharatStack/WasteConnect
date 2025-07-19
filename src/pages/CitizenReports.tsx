@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -40,14 +41,12 @@ const CitizenReports = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Filter and sort state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Stats state
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -70,7 +69,6 @@ const CitizenReports = () => {
     try {
       console.log('Fetching reports...');
       
-      // First, fetch all reports
       const { data: reportsData, error: reportsError } = await supabase
         .from('citizen_reports')
         .select('*')
@@ -83,27 +81,22 @@ const CitizenReports = () => {
 
       console.log('Reports fetched:', reportsData?.length || 0);
 
-      // Then fetch votes for all reports
       const { data: votesData, error: votesError } = await supabase
         .from('report_votes')
         .select('*');
 
       if (votesError) {
         console.error('Error fetching votes:', votesError);
-        // Don't throw error, just log it and continue without vote data
       }
 
-      // Fetch comments count for all reports
       const { data: commentsData, error: commentsError } = await supabase
         .from('report_comments')
         .select('report_id');
 
       if (commentsError) {
         console.error('Error fetching comments:', commentsError);
-        // Don't throw error, just log it and continue without comments data
       }
 
-      // Process the data to include vote counts and user votes
       const processedReports = (reportsData || []).map(report => {
         const reportVotes = votesData?.filter(vote => vote.report_id === report.id) || [];
         const upVotes = reportVotes.filter(vote => vote.vote_type === 'up').length;
@@ -111,7 +104,6 @@ const CitizenReports = () => {
         const userVote = user ? reportVotes.find(vote => vote.user_id === user.id)?.vote_type as 'up' | 'down' | null || null : null;
         const commentsCount = commentsData?.filter(comment => comment.report_id === report.id).length || 0;
         
-        // Calculate trending score based on votes, comments, and recency
         const hoursOld = Math.max(1, (Date.now() - new Date(report.created_at).getTime()) / (1000 * 60 * 60));
         const trendingScore = (upVotes * 2 + commentsCount - downVotes) / Math.log(hoursOld + 1);
 
@@ -203,7 +195,6 @@ const CitizenReports = () => {
       return matchesSearch && matchesStatus && matchesPriority;
     });
 
-    // Filter by active tab
     switch (activeTab) {
       case 'public':
         filtered = filtered.filter(report => report.status !== 'resolved');
@@ -221,7 +212,6 @@ const CitizenReports = () => {
         break;
     }
 
-    // Sort reports (except for trending which is already sorted)
     if (activeTab !== 'trending') {
       filtered.sort((a, b) => {
         let aValue: any, bValue: any;
@@ -293,20 +283,11 @@ const CitizenReports = () => {
       }
 
       console.log('Vote successful, refreshing reports...');
-      // Refresh reports to update vote counts
       await fetchReports();
       
-      toast({
-        title: "Vote recorded",
-        description: `Your ${voteType === 'up' ? 'upvote' : 'downvote'} has been recorded.`,
-      });
     } catch (error: any) {
       console.error('Error in handleVote:', error);
-      toast({
-        title: "Error",
-        description: "Failed to record your vote. Please try again.",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
@@ -315,7 +296,11 @@ const CitizenReports = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600"></div>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="rounded-full h-12 w-12 border-b-2 border-eco-green-600"
+        />
       </div>
     );
   }
@@ -324,7 +309,12 @@ const CitizenReports = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6">
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link to="/dashboard" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
@@ -338,114 +328,176 @@ const CitizenReports = () => {
             </div>
             
             <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={refreshReports}
-                disabled={isRefreshing}
-                className="border-gray-300"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Link to="/citizen-reports/new">
-                <Button className="bg-eco-green-600 hover:bg-eco-green-700">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Report Issue
+                <Button
+                  variant="outline"
+                  onClick={refreshReports}
+                  disabled={isRefreshing}
+                  className="border-gray-300"
+                >
+                  <motion.div
+                    animate={{ rotate: isRefreshing ? 360 : 0 }}
+                    transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: "linear" }}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  </motion.div>
+                  Refresh
                 </Button>
+              </motion.div>
+              
+              <Link to="/citizen-reports/new">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button className="bg-eco-green-600 hover:bg-eco-green-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Report Issue
+                  </Button>
+                </motion.div>
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Statistics Dashboard */}
-        <ReportStats stats={stats} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <ReportStats stats={stats} />
+        </motion.div>
 
         {/* Tab Navigation */}
-        <ReportTabs 
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          stats={stats}
-        />
-
-        {/* Filters - only show for non-trending tabs */}
-        {activeTab !== 'trending' && (
-          <ReportFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            priorityFilter={priorityFilter}
-            onPriorityFilterChange={setPriorityFilter}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-            sortOrder={sortOrder}
-            onSortOrderChange={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            onClearFilters={handleClearFilters}
-            hasActiveFilters={hasActiveFilters}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <ReportTabs 
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            stats={stats}
           />
+        </motion.div>
+
+        {/* Filters */}
+        {activeTab !== 'trending' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            <ReportFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              priorityFilter={priorityFilter}
+              onPriorityFilterChange={setPriorityFilter}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              sortOrder={sortOrder}
+              onSortOrderChange={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              onClearFilters={handleClearFilters}
+              hasActiveFilters={hasActiveFilters}
+            />
+          </motion.div>
         )}
 
         {/* Results Summary */}
-        <div className="flex items-center justify-between mb-4">
+        <motion.div 
+          className="flex items-center justify-between mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+        >
           <div className="text-sm text-gray-600">
             Showing {filteredReports.length} of {reports.length} reports
           </div>
-        </div>
+        </motion.div>
 
         {/* Reports Grid */}
-        {filteredReports.length === 0 ? (
-          <Card className="border-dashed border-2 border-gray-300">
-            <CardContent className="text-center py-12">
-              <div className="flex flex-col items-center">
-                <Filter className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {reports.length === 0 ? 'No reports yet' : 'No reports match your filters'}
-                </h3>
-                <p className="text-gray-500 mb-4 max-w-md">
-                  {reports.length === 0 
-                    ? 'Be the first to report an environmental issue in your area.'
-                    : 'Try adjusting your search criteria or clearing the filters to see more results.'
-                  }
-                </p>
-                {reports.length === 0 ? (
-                  <Link to="/citizen-reports/new">
-                    <Button className="bg-eco-green-600 hover:bg-eco-green-700">
-                      Create First Report
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button onClick={handleClearFilters} variant="outline">
-                    Clear Filters
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredReports.map((report) => (
-              activeTab === 'public' || activeTab === 'trending' ? (
-                <VotingReportCard
-                  key={report.id}
-                  report={report}
-                  showVoting={activeTab === 'public'}
-                  onVote={handleVote}
-                />
-              ) : (
-                <ReportCard
-                  key={report.id}
-                  report={report}
-                  showAssignment={true}
-                  onQuickAction={(reportId, action) => {
-                    if (action === 'message') {
-                      window.location.href = `/citizen-reports/${reportId}`;
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
+        >
+          {filteredReports.length === 0 ? (
+            <Card className="border-dashed border-2 border-gray-300">
+              <CardContent className="text-center py-12">
+                <motion.div 
+                  className="flex flex-col items-center"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Filter className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {reports.length === 0 ? 'No reports yet' : 'No reports match your filters'}
+                  </h3>
+                  <p className="text-gray-500 mb-4 max-w-md">
+                    {reports.length === 0 
+                      ? 'Be the first to report an environmental issue in your area.'
+                      : 'Try adjusting your search criteria or clearing the filters to see more results.'
                     }
-                  }}
-                />
-              )
-            ))}
-          </div>
-        )}
+                  </p>
+                  {reports.length === 0 ? (
+                    <Link to="/citizen-reports/new">
+                      <Button className="bg-eco-green-600 hover:bg-eco-green-700">
+                        Create First Report
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button onClick={handleClearFilters} variant="outline">
+                      Clear Filters
+                    </Button>
+                  )}
+                </motion.div>
+              </CardContent>
+            </Card>
+          ) : (
+            <motion.div 
+              className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              layout
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredReports.map((report, index) => (
+                  <motion.div
+                    key={report.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    {activeTab === 'public' || activeTab === 'trending' ? (
+                      <VotingReportCard
+                        report={report}
+                        showVoting={activeTab === 'public'}
+                        onVote={handleVote}
+                      />
+                    ) : (
+                      <ReportCard
+                        report={report}
+                        showAssignment={true}
+                        onQuickAction={(reportId, action) => {
+                          if (action === 'message') {
+                            window.location.href = `/citizen-reports/${reportId}`;
+                          }
+                        }}
+                      />
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </motion.div>
       </div>
     </div>
   );

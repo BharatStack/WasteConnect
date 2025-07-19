@@ -163,7 +163,100 @@
   animation: float 3s ease-in-out infinite;
 }
 
+/* Vote button animations */
+@keyframes vote-success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes confetti-burst {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1) rotate(180deg); opacity: 0.8; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.vote-success {
+  animation: vote-success 0.6s ease-in-out;
+}
+
+.confetti-particle {
+  animation: confetti-burst 1s ease-out forwards;
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Trending badge animation */
+@keyframes trending-glow {
+  0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+  100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+}
+
+.trending-badge {
+  animation: trending-glow 2s infinite;
+}
+
 /* Improved focus states */
 .eco-focus {
   @apply focus:ring-4 focus:ring-eco-green-500/20 focus:border-eco-green-500 transition-all duration-200;
+}
+
+/* Card hover effects */
+.report-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.report-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .vote-button {
+    @apply px-4 py-3 text-base;
+    min-width: 70px;
+    min-height: 50px;
+  }
+  
+  .report-card {
+    @apply mx-2 rounded-2xl;
+  }
+}
+
+/* Touch feedback */
+.vote-button:active {
+  animation: haptic-feedback 0.1s ease-in-out;
+}
+
+@keyframes haptic-feedback {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
