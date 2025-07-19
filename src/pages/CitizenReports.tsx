@@ -4,12 +4,14 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Plus, Filter, Download, RefreshCw } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Plus, RefreshCw, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReportFilters from '@/components/reports/ReportFilters';
 import ReportCard from '@/components/reports/ReportCard';
+import VotingReportCard from '@/components/reports/VotingReportCard';
 import ReportStats from '@/components/reports/ReportStats';
+import ReportTabs from '@/components/reports/ReportTabs';
 
 interface CitizenReport {
   id: string;
@@ -23,6 +25,11 @@ interface CitizenReport {
   user_id: string | null;
   assigned_to: string | null;
   resolution_date: string | null;
+  votes_up?: number;
+  votes_down?: number;
+  user_vote?: 'up' | 'down' | null;
+  comments_count?: number;
+  trending_score?: number;
 }
 
 const CitizenReports = () => {
@@ -32,6 +39,7 @@ const CitizenReports = () => {
   const [filteredReports, setFilteredReports] = useState<CitizenReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
 
   // Filter and sort state
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,19 +65,51 @@ const CitizenReports = () => {
 
   useEffect(() => {
     filterAndSortReports();
-  }, [reports, searchTerm, statusFilter, priorityFilter, sortBy, sortOrder]);
+  }, [reports, searchTerm, statusFilter, priorityFilter, sortBy, sortOrder, activeTab]);
 
   const fetchReports = async () => {
     try {
+      // Fetch reports with voting data
       const { data, error } = await supabase
         .from('citizen_reports')
-        .select('*')
+        .select(`
+          *,
+          report_votes!left (
+            vote_type,
+            user_id
+          ),
+          report_comments!left (
+            id
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      setReports(data || []);
-      calculateStats(data || []);
+      // Process the data to include vote counts and user votes
+      const processedReports = (data || []).map(report => {
+        const votes = report.report_votes || [];
+        const upVotes = votes.filter((v: any) => v.vote_type === 'up').length;
+        const downVotes = votes.filter((v: any) => v.vote_type === 'down').length;
+        const userVote = user ? votes.find((v: any) => v.user_id === user.id)?.vote_type || null : null;
+        const commentsCount = report.report_comments?.length || 0;
+        
+        // Calculate trending score based on votes, comments, and recency
+        const hoursOld = Math.max(1, (Date.now() - new Date(report.created_at).getTime()) / (1000 * 60 * 60));
+        const trendingScore = (upVotes * 2 + commentsCount - downVotes) / Math.log(hoursOld + 1);
+
+        return {
+          ...report,
+          votes_up: upVotes,
+          votes_down: downVotes,
+          user_vote: userVote,
+          comments_count: commentsCount,
+          trending_score: trendingScore
+        };
+      });
+      
+      setReports(processedReports);
+      calculateStats(processedReports);
     } catch (error: any) {
       console.error('Error fetching reports:', error);
       toast({
@@ -145,35 +185,55 @@ const CitizenReports = () => {
       return matchesSearch && matchesStatus && matchesPriority;
     });
 
-    // Sort reports
-    filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+    // Filter by active tab
+    switch (activeTab) {
+      case 'public':
+        filtered = filtered.filter(report => report.status !== 'resolved');
+        break;
+      case 'trending':
+        filtered = filtered
+          .filter(report => (report.trending_score || 0) > 0)
+          .sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0))
+          .slice(0, Math.max(10, Math.floor(reports.length * 0.1)));
+        break;
+      case 'resolved':
+        filtered = filtered.filter(report => report.status === 'resolved');
+        break;
+      default:
+        break;
+    }
 
-      switch (sortBy) {
-        case 'title':
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
-          break;
-        case 'status':
-          aValue = a.status || '';
-          bValue = b.status || '';
-          break;
-        case 'priority':
-          const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-          aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0;
-          bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0;
-          break;
-        default:
-          aValue = new Date(a.created_at);
-          bValue = new Date(b.created_at);
-      }
+    // Sort reports (except for trending which is already sorted)
+    if (activeTab !== 'trending') {
+      filtered.sort((a, b) => {
+        let aValue: any, bValue: any;
 
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
+        switch (sortBy) {
+          case 'title':
+            aValue = a.title.toLowerCase();
+            bValue = b.title.toLowerCase();
+            break;
+          case 'status':
+            aValue = a.status || '';
+            bValue = b.status || '';
+            break;
+          case 'priority':
+            const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+            aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0;
+            bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0;
+            break;
+          default:
+            aValue = new Date(a.created_at);
+            bValue = new Date(b.created_at);
+        }
+
+        if (sortOrder === 'asc') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
+    }
 
     setFilteredReports(filtered);
   };
@@ -186,15 +246,38 @@ const CitizenReports = () => {
     setSortOrder('desc');
   };
 
-  const hasActiveFilters = searchTerm || statusFilter !== 'all' || priorityFilter !== 'all';
+  const handleVote = async (reportId: string, voteType: 'up' | 'down') => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to vote on reports.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const handleQuickAction = (reportId: string, action: string) => {
-    // This could navigate to the report details page or open a quick action modal
-    if (action === 'message') {
-      // Navigate to report details for messaging
-      window.location.href = `/citizen-reports/${reportId}`;
+    try {
+      const { error } = await supabase
+        .from('report_votes')
+        .upsert({
+          report_id: reportId,
+          user_id: user.id,
+          vote_type: voteType
+        }, {
+          onConflict: 'report_id,user_id'
+        });
+
+      if (error) throw error;
+
+      // Refresh reports to update vote counts
+      await fetchReports();
+    } catch (error: any) {
+      console.error('Error voting:', error);
+      throw error;
     }
   };
+
+  const hasActiveFilters = searchTerm || statusFilter !== 'all' || priorityFilter !== 'all';
 
   if (isLoading) {
     return (
@@ -217,7 +300,7 @@ const CitizenReports = () => {
               </Link>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Citizen Reports</h1>
-                <p className="text-gray-600 mt-1">Manage and track environmental issues reported by citizens</p>
+                <p className="text-gray-600 mt-1">Community-driven environmental issue tracking and resolution</p>
               </div>
             </div>
             
@@ -244,32 +327,35 @@ const CitizenReports = () => {
         {/* Statistics Dashboard */}
         <ReportStats stats={stats} />
 
-        {/* Filters */}
-        <ReportFilters
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          priorityFilter={priorityFilter}
-          onPriorityFilterChange={setPriorityFilter}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          sortOrder={sortOrder}
-          onSortOrderChange={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          onClearFilters={handleClearFilters}
-          hasActiveFilters={hasActiveFilters}
+        {/* Tab Navigation */}
+        <ReportTabs 
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          stats={stats}
         />
+
+        {/* Filters - only show for non-trending tabs */}
+        {activeTab !== 'trending' && (
+          <ReportFilters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            priorityFilter={priorityFilter}
+            onPriorityFilterChange={setPriorityFilter}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            sortOrder={sortOrder}
+            onSortOrderChange={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            onClearFilters={handleClearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        )}
 
         {/* Results Summary */}
         <div className="flex items-center justify-between mb-4">
           <div className="text-sm text-gray-600">
             Showing {filteredReports.length} of {reports.length} reports
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="text-xs">
-              <Download className="h-3 w-3 mr-1" />
-              Export
-            </Button>
           </div>
         </div>
 
@@ -305,12 +391,25 @@ const CitizenReports = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredReports.map((report) => (
-              <ReportCard
-                key={report.id}
-                report={report}
-                showAssignment={true}
-                onQuickAction={handleQuickAction}
-              />
+              activeTab === 'public' || activeTab === 'trending' ? (
+                <VotingReportCard
+                  key={report.id}
+                  report={report}
+                  showVoting={activeTab === 'public'}
+                  onVote={handleVote}
+                />
+              ) : (
+                <ReportCard
+                  key={report.id}
+                  report={report}
+                  showAssignment={true}
+                  onQuickAction={(reportId, action) => {
+                    if (action === 'message') {
+                      window.location.href = `/citizen-reports/${reportId}`;
+                    }
+                  }}
+                />
+              )
             ))}
           </div>
         )}
