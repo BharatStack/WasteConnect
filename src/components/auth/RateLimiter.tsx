@@ -1,107 +1,86 @@
 
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface RateLimitResult {
-  allowed: boolean;
-  remainingAttempts?: number;
-  resetTime?: Date;
-  blockedUntil?: Date;
+interface RateLimiterProps {
+  identifier: string;
+  maxAttempts: number;
+  windowMs: number;
+  children: React.ReactNode;
 }
 
-export class RateLimiter {
-  private static readonly LIMITS = {
-    login: { maxAttempts: 5, windowMinutes: 15 },
-    signup: { maxAttempts: 3, windowMinutes: 60 },
-    password_reset: { maxAttempts: 3, windowMinutes: 60 },
-    phone_verification: { maxAttempts: 5, windowMinutes: 15 }
+export const RateLimiter = ({ identifier, maxAttempts, windowMs, children }: RateLimiterProps) => {
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(0);
+
+  // Simple in-memory rate limiting for now
+  const checkRateLimit = () => {
+    const storageKey = `rate_limit_${identifier}`;
+    const storedData = localStorage.getItem(storageKey);
+    
+    if (storedData) {
+      const { attempts, lastAttempt } = JSON.parse(storedData);
+      const now = Date.now();
+      
+      if (now - lastAttempt < windowMs) {
+        if (attempts >= maxAttempts) {
+          setIsBlocked(true);
+          setRemainingTime(windowMs - (now - lastAttempt));
+          return false;
+        }
+        
+        localStorage.setItem(storageKey, JSON.stringify({
+          attempts: attempts + 1,
+          lastAttempt: now
+        }));
+      } else {
+        localStorage.setItem(storageKey, JSON.stringify({
+          attempts: 1,
+          lastAttempt: now
+        }));
+      }
+    } else {
+      localStorage.setItem(storageKey, JSON.stringify({
+        attempts: 1,
+        lastAttempt: Date.now()
+      }));
+    }
+    
+    return true;
   };
 
-  static async checkRateLimit(
-    identifier: string,
-    action: keyof typeof RateLimiter.LIMITS
-  ): Promise<RateLimitResult> {
-    const limit = this.LIMITS[action];
-    const windowStart = new Date();
-    windowStart.setMinutes(windowStart.getMinutes() - limit.windowMinutes);
+  useEffect(() => {
+    if (isBlocked && remainingTime > 0) {
+      const timer = setInterval(() => {
+        setRemainingTime(prev => {
+          if (prev <= 1000) {
+            setIsBlocked(false);
+            return 0;
+          }
+          return prev - 1000;
+        });
+      }, 1000);
 
-    try {
-      // Check existing rate limit record
-      const { data: existingLimit } = await supabase
-        .from('rate_limits')
-        .select('*')
-        .eq('identifier', identifier)
-        .eq('action', action)
-        .gte('window_start', windowStart.toISOString())
-        .single();
-
-      if (existingLimit) {
-        // Check if blocked
-        if (existingLimit.blocked_until && new Date(existingLimit.blocked_until) > new Date()) {
-          return {
-            allowed: false,
-            blockedUntil: new Date(existingLimit.blocked_until)
-          };
-        }
-
-        // Check if within rate limit
-        if (existingLimit.attempts >= limit.maxAttempts) {
-          // Block the identifier
-          const blockedUntil = new Date();
-          blockedUntil.setMinutes(blockedUntil.getMinutes() + limit.windowMinutes);
-          
-          await supabase
-            .from('rate_limits')
-            .update({ blocked_until: blockedUntil.toISOString() })
-            .eq('id', existingLimit.id);
-
-          return {
-            allowed: false,
-            blockedUntil
-          };
-        }
-
-        // Increment attempts
-        await supabase
-          .from('rate_limits')
-          .update({ attempts: existingLimit.attempts + 1 })
-          .eq('id', existingLimit.id);
-
-        return {
-          allowed: true,
-          remainingAttempts: limit.maxAttempts - existingLimit.attempts - 1
-        };
-      } else {
-        // Create new rate limit record
-        await supabase
-          .from('rate_limits')
-          .insert({
-            identifier,
-            action,
-            attempts: 1,
-            window_start: new Date().toISOString()
-          });
-
-        return {
-          allowed: true,
-          remainingAttempts: limit.maxAttempts - 1
-        };
-      }
-    } catch (error) {
-      console.error('Rate limit check failed:', error);
-      // Fail open in case of errors
-      return { allowed: true };
+      return () => clearInterval(timer);
     }
+  }, [isBlocked, remainingTime]);
+
+  const isRateLimited = () => {
+    return !checkRateLimit();
+  };
+
+  if (isBlocked) {
+    return (
+      <div className="flex items-center justify-center p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="text-center">
+          <p className="text-red-600 font-medium">Rate limit exceeded</p>
+          <p className="text-red-500 text-sm">
+            Try again in {Math.ceil(remainingTime / 1000)} seconds
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  static async resetRateLimit(identifier: string, action: string): Promise<void> {
-    try {
-      await supabase
-        .from('rate_limits')
-        .delete()
-        .eq('identifier', identifier)
-        .eq('action', action);
-    } catch (error) {
-      console.error('Failed to reset rate limit:', error);
-    }
-  }
-}
+  return <>{children}</>;
+};

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, 
   BarChart3, 
@@ -19,7 +20,11 @@ import {
   Shield,
   Globe,
   Zap,
-  AlertCircle
+  AlertCircle,
+  FileText,
+  Database,
+  Network,
+  Thermometer
 } from 'lucide-react';
 import ESGDashboard from '@/components/esg/ESGDashboard';
 import AIAnalysisDashboard from '@/components/esg/AIAnalysisDashboard';
@@ -30,6 +35,7 @@ import UserDataManagement from '@/components/esg/UserDataManagement';
 const ESGInvestmentTracking = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,6 +43,10 @@ const ESGInvestmentTracking = () => {
     // Initialize ESG tracking data
     setIsLoading(false);
   }, [user]);
+
+  const handleAccessReportingTools = () => {
+    navigate('/esg-reporting-tools');
+  };
 
   if (isLoading) {
     return (
@@ -78,8 +88,51 @@ const ESGInvestmentTracking = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto py-6 px-4">
+      {/* Reporting Tools Access Card */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <Card className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <FileText className="h-8 w-8" />
+              ESG Reporting & Compliance Tools
+            </CardTitle>
+            <CardDescription className="text-blue-100">
+              Access our comprehensive ESG reporting platform with 50+ frameworks, AI analytics, and real-time monitoring
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
+                <BarChart3 className="h-8 w-8 mx-auto mb-2 text-blue-200" />
+                <p className="font-semibold">Trading Floor</p>
+                <p className="text-sm text-blue-200">Real-time ESG performance</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
+                <Brain className="h-8 w-8 mx-auto mb-2 text-purple-200" />
+                <p className="font-semibold">AI Copilot</p>
+                <p className="text-sm text-purple-200">Intelligent insights</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
+                <Network className="h-8 w-8 mx-auto mb-2 text-green-200" />
+                <p className="font-semibold">Supply Chain</p>
+                <p className="text-sm text-green-200">End-to-end visibility</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
+                <Database className="h-8 w-8 mx-auto mb-2 text-yellow-200" />
+                <p className="font-semibold">Data Hub</p>
+                <p className="text-sm text-yellow-200">Centralized collection</p>
+              </div>
+            </div>
+            <Button 
+              onClick={handleAccessReportingTools}
+              className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3 text-lg"
+            >
+              Access Reporting Tools
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Original Tabs Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6 bg-white/70 backdrop-blur-md">
             <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
