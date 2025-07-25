@@ -2026,6 +2026,7 @@ export type Database = {
           full_name: string | null
           id: string
           last_login_at: string | null
+          locked_until: string | null
           phone: string | null
           phone_verified: boolean | null
           state: string | null
@@ -2044,6 +2045,7 @@ export type Database = {
           full_name?: string | null
           id: string
           last_login_at?: string | null
+          locked_until?: string | null
           phone?: string | null
           phone_verified?: boolean | null
           state?: string | null
@@ -2062,6 +2064,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_login_at?: string | null
+          locked_until?: string | null
           phone?: string | null
           phone_verified?: boolean | null
           state?: string | null
@@ -2069,6 +2072,39 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"]
           verification_status?: string | null
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          action_type: string
+          attempts: number | null
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          identifier: string
+          updated_at: string | null
+          window_start: string | null
+        }
+        Insert: {
+          action_type: string
+          attempts?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier: string
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          action_type?: string
+          attempts?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier?: string
+          updated_at?: string | null
+          window_start?: string | null
         }
         Relationships: []
       }
@@ -3202,6 +3238,14 @@ export type Database = {
           p_resource_id?: string
           p_metadata?: Json
         }
+        Returns: undefined
+      }
+      handle_failed_login: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
+      reset_failed_login_attempts: {
+        Args: { user_id: string }
         Returns: undefined
       }
     }

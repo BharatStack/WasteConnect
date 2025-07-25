@@ -41,7 +41,13 @@ export class SecurityManager {
 
   static async handleFailedLogin(email: string): Promise<void> {
     try {
-      await supabase.rpc('handle_failed_login', { user_email: email });
+      const { error } = await supabase.rpc('handle_failed_login', { 
+        user_email: email 
+      });
+      
+      if (error) {
+        console.error('Failed login handler error:', error);
+      }
     } catch (error) {
       console.error('Failed to handle failed login:', error);
     }
@@ -49,7 +55,13 @@ export class SecurityManager {
 
   static async handleSuccessfulLogin(userId: string): Promise<void> {
     try {
-      await supabase.rpc('reset_failed_login_attempts', { user_id: userId });
+      const { error } = await supabase.rpc('reset_failed_login_attempts', { 
+        user_id: userId 
+      });
+      
+      if (error) {
+        console.error('Reset failed login attempts error:', error);
+      }
     } catch (error) {
       console.error('Failed to reset failed login attempts:', error);
     }
