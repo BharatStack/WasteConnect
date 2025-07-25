@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Shield, Phone, ArrowLeft, Mail } from 'lucide-react';
+import { Eye, EyeOff, Shield, Phone, ArrowLeft, Mail, AlertTriangle } from 'lucide-react';
+import { SecurityManager } from './SecurityManager';
+import { RateLimiter } from './RateLimiter';
 
 interface EnhancedAuthFormProps {
   onSuccess: () => void;
@@ -20,6 +23,7 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
   const [step, setStep] = useState<'auth' | 'phone' | 'verification' | 'forgot-password'>('auth');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [securityWarning, setSecurityWarning] = useState<string | null>(null);
   
   const [authData, setAuthData] = useState({
     email: '',
@@ -43,12 +47,31 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setSecurityWarning(null);
 
     try {
+      // Check rate limit
+      const rateLimitResult = await RateLimiter.checkRateLimit(authData.email, 'signup');
+      if (!rateLimitResult.allowed) {
+        setSecurityWarning(rateLimitResult.blockedUntil 
+          ? `Too many signup attempts. Please try again after ${rateLimitResult.blockedUntil.toLocaleString()}.`
+          : 'Too many signup attempts. Please try again later.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // Log signup attempt
+      await SecurityManager.logSecurityEvent('signup_attempt', {
+        email: authData.email,
+        user_type: authData.user_type
+      });
+
       const { data, error } = await supabase.auth.signUp({
         email: authData.email,
         password: authData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: authData.full_name,
             user_type: authData.user_type
@@ -75,15 +98,10 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
 
         if (profileError) throw profileError;
 
-        // Create audit log
-        await supabase.rpc('create_audit_log', {
-          p_action: 'user_signup_completed',
-          p_resource_type: 'user',
-          p_resource_id: data.user.id,
-          p_metadata: { 
-            user_type: authData.user_type,
-            verification_required: authData.user_type === 'business' || authData.user_type === 'government'
-          }
+        // Log successful signup
+        await SecurityManager.logSecurityEvent('signup_success', {
+          user_id: data.user.id,
+          user_type: authData.user_type
         });
 
         toast({
@@ -99,6 +117,12 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
       }
     } catch (error: any) {
       console.error('Sign up error:', error);
+      
+      await SecurityManager.logSecurityEvent('signup_failed', {
+        email: authData.email,
+        error: error.message
+      });
+
       toast({
         title: "Registration Failed",
         description: error.message || "Failed to create account. Please try again.",
@@ -112,31 +136,58 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setSecurityWarning(null);
 
     try {
+      // Check rate limit
+      const rateLimitResult = await RateLimiter.checkRateLimit(authData.email, 'login');
+      if (!rateLimitResult.allowed) {
+        setSecurityWarning(rateLimitResult.blockedUntil 
+          ? `Too many login attempts. Please try again after ${rateLimitResult.blockedUntil.toLocaleString()}.`
+          : 'Too many login attempts. Please try again later.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // Check account security
+      const securityResult = await SecurityManager.checkAccountSecurity(authData.email);
+      if (!securityResult.success) {
+        setSecurityWarning(securityResult.message || 'Account security check failed');
+        setIsLoading(false);
+        return;
+      }
+
+      // Log login attempt
+      await SecurityManager.logSecurityEvent('login_attempt', {
+        email: authData.email
+      });
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: authData.email,
         password: authData.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Handle failed login
+        await SecurityManager.handleFailedLogin(authData.email);
+        await SecurityManager.logSecurityEvent('login_failed', {
+          email: authData.email,
+          error: error.message
+        });
+        
+        throw error;
+      }
 
       if (data.user) {
-        // Update last login time
-        await supabase
-          .from('profiles')
-          .update({ 
-            last_login_at: new Date().toISOString(),
-            failed_login_attempts: 0
-          })
-          .eq('id', data.user.id);
-
-        // Create audit log
-        await supabase.rpc('create_audit_log', {
-          p_action: 'user_login',
-          p_resource_type: 'user',
-          p_resource_id: data.user.id
+        // Handle successful login
+        await SecurityManager.handleSuccessfulLogin(data.user.id);
+        await SecurityManager.logSecurityEvent('login_success', {
+          user_id: data.user.id
         });
+
+        // Reset rate limit on successful login
+        await RateLimiter.resetRateLimit(authData.email, 'login');
 
         toast({
           title: "Login Successful",
@@ -148,14 +199,8 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     } catch (error: any) {
       console.error('Sign in error:', error);
       
-      // Handle failed login attempts
       if (error.message.includes('Invalid login credentials')) {
-        // In a real app, you'd increment failed_login_attempts
-        toast({
-          title: "Login Failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
+        setSecurityWarning("Invalid email or password. Please check your credentials and try again.");
       } else {
         toast({
           title: "Login Failed", 
@@ -173,6 +218,22 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     setIsLoading(true);
 
     try {
+      const securityResult = await SecurityManager.createPasswordResetRequest(resetEmail);
+      
+      if (!securityResult.success) {
+        if (securityResult.rateLimited) {
+          setSecurityWarning(securityResult.message || 'Too many password reset attempts');
+        } else {
+          toast({
+            title: "Reset Failed",
+            description: securityResult.message || "Failed to process password reset request",
+            variant: "destructive",
+          });
+        }
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -200,6 +261,17 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
     setPhoneVerification(prev => ({ ...prev, isVerifying: true }));
 
     try {
+      // Check rate limit
+      const rateLimitResult = await RateLimiter.checkRateLimit(authData.phone, 'phone_verification');
+      if (!rateLimitResult.allowed) {
+        setSecurityWarning(rateLimitResult.blockedUntil 
+          ? `Too many verification attempts. Please try again after ${rateLimitResult.blockedUntil.toLocaleString()}.`
+          : 'Too many verification attempts. Please try again later.'
+        );
+        setPhoneVerification(prev => ({ ...prev, isVerifying: false }));
+        return;
+      }
+
       // In a real implementation, you would verify the SMS code here
       // For demo purposes, we'll simulate verification
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -212,11 +284,9 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
           .update({ phone_verified: true })
           .eq('id', user.id);
 
-        // Create audit log
-        await supabase.rpc('create_audit_log', {
-          p_action: 'phone_verified',
-          p_resource_type: 'user',
-          p_resource_id: user.id
+        await SecurityManager.logSecurityEvent('phone_verified', {
+          user_id: user.id,
+          phone: authData.phone
         });
       }
 
@@ -250,6 +320,12 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {securityWarning && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <span className="text-sm text-red-700">{securityWarning}</span>
+            </div>
+          )}
           <form onSubmit={handlePhoneVerification} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="verification_code">Verification Code</Label>
@@ -298,6 +374,12 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {securityWarning && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+                <span className="text-sm text-red-700">{securityWarning}</span>
+              </div>
+            )}
             {!resetEmailSent ? (
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
@@ -337,6 +419,7 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
                   setShowForgotPassword(false);
                   setResetEmailSent(false);
                   setResetEmail('');
+                  setSecurityWarning(null);
                 }}
                 className="w-full text-eco-green-600 hover:text-eco-green-700 hover:bg-eco-green-50"
               >
@@ -363,6 +446,12 @@ const EnhancedAuthForm = ({ onSuccess }: EnhancedAuthFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {securityWarning && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <span className="text-sm text-red-700">{securityWarning}</span>
+            </div>
+          )}
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>

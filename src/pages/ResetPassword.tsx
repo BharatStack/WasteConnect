@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Shield, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
+import { SecurityManager } from '@/components/auth/SecurityManager';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [securityWarning, setSecurityWarning] = useState<string | null>(null);
   const [passwords, setPasswords] = useState({
     password: '',
     confirmPassword: ''
@@ -25,21 +28,21 @@ const ResetPassword = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast({
-          title: "Invalid Reset Link",
-          description: "This password reset link is invalid or has expired.",
-          variant: "destructive",
-        });
-        navigate('/enhanced-auth');
+        setSecurityWarning("This password reset link is invalid or has expired.");
+        setTimeout(() => navigate('/enhanced-auth'), 3000);
       }
     };
 
     checkSession();
-  }, [navigate, toast]);
+  }, [navigate]);
 
   const validatePassword = (password: string) => {
     const requirements = {
-      length: password.length >= 6,
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
       match: password === passwords.confirmPassword
     };
     return requirements;
@@ -48,25 +51,24 @@ const ResetPassword = () => {
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setSecurityWarning(null);
 
     const validation = validatePassword(passwords.password);
 
     if (!validation.length) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
+      setSecurityWarning("Password must be at least 8 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!validation.uppercase || !validation.lowercase || !validation.number || !validation.special) {
+      setSecurityWarning("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
       setIsLoading(false);
       return;
     }
 
     if (!validation.match) {
-      toast({
-        title: "Passwords Don't Match",
-        description: "Please make sure both passwords match.",
-        variant: "destructive",
-      });
+      setSecurityWarning("Passwords do not match.");
       setIsLoading(false);
       return;
     }
@@ -78,13 +80,11 @@ const ResetPassword = () => {
 
       if (error) throw error;
 
-      // Create audit log
+      // Log password reset completion
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.rpc('create_audit_log', {
-          p_action: 'password_reset_completed',
-          p_resource_type: 'user',
-          p_resource_id: user.id
+        await SecurityManager.logSecurityEvent('password_reset_completed', {
+          user_id: user.id
         });
       }
 
@@ -101,11 +101,12 @@ const ResetPassword = () => {
 
     } catch (error: any) {
       console.error('Password reset error:', error);
-      toast({
-        title: "Password Reset Failed",
-        description: error.message || "Failed to reset password. Please try again.",
-        variant: "destructive",
+      
+      await SecurityManager.logSecurityEvent('password_reset_failed', {
+        error: error.message
       });
+
+      setSecurityWarning(error.message || "Failed to reset password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -160,6 +161,12 @@ const ResetPassword = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {securityWarning && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <span className="text-sm text-red-700">{securityWarning}</span>
+            </div>
+          )}
           <form onSubmit={handlePasswordReset} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">New Password</Label>
@@ -171,7 +178,7 @@ const ResetPassword = () => {
                   onChange={(e) => setPasswords(prev => ({ ...prev, password: e.target.value }))}
                   placeholder="Enter new password"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <Button
                   type="button"
@@ -195,7 +202,7 @@ const ResetPassword = () => {
                   onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   placeholder="Confirm new password"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <Button
                   type="button"
@@ -215,7 +222,23 @@ const ResetPassword = () => {
                 <div className="text-sm">
                   <div className={`flex items-center gap-2 ${validation.length ? 'text-green-600' : 'text-red-600'}`}>
                     <div className={`w-2 h-2 rounded-full ${validation.length ? 'bg-green-600' : 'bg-red-600'}`} />
-                    At least 6 characters
+                    At least 8 characters
+                  </div>
+                  <div className={`flex items-center gap-2 ${validation.uppercase ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`w-2 h-2 rounded-full ${validation.uppercase ? 'bg-green-600' : 'bg-red-600'}`} />
+                    One uppercase letter
+                  </div>
+                  <div className={`flex items-center gap-2 ${validation.lowercase ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`w-2 h-2 rounded-full ${validation.lowercase ? 'bg-green-600' : 'bg-red-600'}`} />
+                    One lowercase letter
+                  </div>
+                  <div className={`flex items-center gap-2 ${validation.number ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`w-2 h-2 rounded-full ${validation.number ? 'bg-green-600' : 'bg-red-600'}`} />
+                    One number
+                  </div>
+                  <div className={`flex items-center gap-2 ${validation.special ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`w-2 h-2 rounded-full ${validation.special ? 'bg-green-600' : 'bg-red-600'}`} />
+                    One special character
                   </div>
                   {passwords.confirmPassword && (
                     <div className={`flex items-center gap-2 ${validation.match ? 'text-green-600' : 'text-red-600'}`}>
@@ -230,7 +253,7 @@ const ResetPassword = () => {
             <Button
               type="submit"
               className="w-full bg-eco-green-600 hover:bg-eco-green-700"
-              disabled={isLoading || !validation.length || !validation.match}
+              disabled={isLoading || !validation.length || !validation.uppercase || !validation.lowercase || !validation.number || !validation.special || !validation.match}
             >
               {isLoading ? "Updating Password..." : "Update Password"}
             </Button>
