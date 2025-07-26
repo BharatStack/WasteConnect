@@ -35,7 +35,7 @@ const ESGDataCollection = ({ onProfileComplete, onDataComplete, currentStep }: E
 
   const [esgData, setEsgData] = useState({
     sustainability_goals: '',
-    esg_frameworks: [],
+    esg_frameworks: [] as string[],
     reporting_frequency: 'quarterly',
     data_sources: '',
     key_metrics: '',

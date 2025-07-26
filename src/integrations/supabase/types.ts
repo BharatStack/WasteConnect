@@ -1216,6 +1216,51 @@ export type Database = {
         }
         Relationships: []
       }
+      esg_user_profiles: {
+        Row: {
+          compliance_requirements: string | null
+          created_at: string
+          data_sources: string | null
+          esg_frameworks: string[] | null
+          id: string
+          key_metrics: string | null
+          onboarding_completed: boolean | null
+          reporting_frequency: string | null
+          stakeholder_groups: string | null
+          sustainability_goals: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          compliance_requirements?: string | null
+          created_at?: string
+          data_sources?: string | null
+          esg_frameworks?: string[] | null
+          id?: string
+          key_metrics?: string | null
+          onboarding_completed?: boolean | null
+          reporting_frequency?: string | null
+          stakeholder_groups?: string | null
+          sustainability_goals?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          compliance_requirements?: string | null
+          created_at?: string
+          data_sources?: string | null
+          esg_frameworks?: string[] | null
+          id?: string
+          key_metrics?: string | null
+          onboarding_completed?: boolean | null
+          reporting_frequency?: string | null
+          stakeholder_groups?: string | null
+          sustainability_goals?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       government_analytics: {
         Row: {
           analytics_type: string
@@ -2019,58 +2064,79 @@ export type Database = {
         Row: {
           account_locked_until: string | null
           address: string | null
+          annual_revenue: number | null
           city: string | null
           created_at: string
           email: string
+          employee_count: number | null
           failed_login_attempts: number | null
           full_name: string | null
+          headquarters_location: string | null
           id: string
+          industry_sector: string | null
           last_login_at: string | null
           locked_until: string | null
+          organization_name: string | null
+          organization_type: string | null
           phone: string | null
           phone_verified: boolean | null
           state: string | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
           verification_status: string | null
+          website: string | null
           zip_code: string | null
         }
         Insert: {
           account_locked_until?: string | null
           address?: string | null
+          annual_revenue?: number | null
           city?: string | null
           created_at?: string
           email: string
+          employee_count?: number | null
           failed_login_attempts?: number | null
           full_name?: string | null
+          headquarters_location?: string | null
           id: string
+          industry_sector?: string | null
           last_login_at?: string | null
           locked_until?: string | null
+          organization_name?: string | null
+          organization_type?: string | null
           phone?: string | null
           phone_verified?: boolean | null
           state?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
           verification_status?: string | null
+          website?: string | null
           zip_code?: string | null
         }
         Update: {
           account_locked_until?: string | null
           address?: string | null
+          annual_revenue?: number | null
           city?: string | null
           created_at?: string
           email?: string
+          employee_count?: number | null
           failed_login_attempts?: number | null
           full_name?: string | null
+          headquarters_location?: string | null
           id?: string
+          industry_sector?: string | null
           last_login_at?: string | null
           locked_until?: string | null
+          organization_name?: string | null
+          organization_type?: string | null
           phone?: string | null
           phone_verified?: boolean | null
           state?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
           verification_status?: string | null
+          website?: string | null
           zip_code?: string | null
         }
         Relationships: []

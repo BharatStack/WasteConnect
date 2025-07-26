@@ -1,6 +1,6 @@
+
 import {
   Home,
-  Dashboard,
   Users,
   Settings,
   PlusSquare,
@@ -24,7 +24,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Brain,
-  Map
+  Map,
+  LayoutDashboard
 } from "lucide-react";
 
 export type NavItem = {
@@ -37,7 +38,7 @@ export type NavItem = {
 
 const icons = {
   home: Home,
-  dashboard: Dashboard,
+  dashboard: LayoutDashboard,
   users: Users,
   settings: Settings,
   plusSquare: PlusSquare,
