@@ -1,103 +1,159 @@
+import {
+  Home,
+  Dashboard,
+  Users,
+  Settings,
+  PlusSquare,
+  FileText,
+  ListChecks,
+  BarChart3,
+  Leaf,
+  Coins,
+  TrendingUp,
+  MessageSquare,
+  HelpCircle,
+  Contact2,
+  Building,
+  Network,
+  Zap,
+  Thermometer,
+  Globe,
+  Shield,
+  Target,
+  Activity,
+  AlertTriangle,
+  CheckCircle,
+  Brain,
+  Map
+} from "lucide-react";
 
-import { HomeIcon, Users, Building2, Recycle, BarChart3, MessageSquare, Route, Leaf, DollarSign, TrendingUp } from "lucide-react";
-import Index from "./pages/Index.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import UserTypes from "./pages/UserTypes.jsx";
-import HouseholdUsers from "./pages/HouseholdUsers.jsx";
-import IndustryUsers from "./pages/IndustryUsers.jsx";
-import MunicipalityUsers from "./pages/MunicipalityUsers.jsx";
-import GovernmentUsers from "./pages/GovernmentUsers.jsx";
-import WasteEntry from "./pages/WasteEntry.jsx";
-import Marketplace from "./pages/Marketplace.jsx";
-import Analytics from "./pages/Analytics.jsx";
-import AIAssistant from "./pages/AIAssistant.jsx";
-import RouteOptimization from "./pages/RouteOptimization.jsx";
-import CarbonCreditTrading from "./pages/CarbonCreditTrading.jsx";
-import GreenBonds from "./pages/GreenBonds.jsx";
+export type NavItem = {
+  title: string;
+  to: string;
+  icon: keyof typeof icons;
+  page: string;
+  restricted?: string[];
+};
 
-export const navItems = [
+const icons = {
+  home: Home,
+  dashboard: Dashboard,
+  users: Users,
+  settings: Settings,
+  plusSquare: PlusSquare,
+  fileText: FileText,
+  listChecks: ListChecks,
+  barChart3: BarChart3,
+  leaf: Leaf,
+  coins: Coins,
+  trendingUp: TrendingUp,
+  messageSquare: MessageSquare,
+  helpCircle: HelpCircle,
+  contact2: Contact2,
+  building: Building,
+  network: Network,
+  zap: Zap,
+  thermometer: Thermometer,
+  globe: Globe,
+  shield: Shield,
+  target: Target,
+  activity: Activity,
+  alertTriangle: AlertTriangle,
+  checkCircle: CheckCircle,
+  brain: Brain,
+  map: Map
+};
+
+export const navItems: NavItem[] = [
   {
     title: "Home",
     to: "/",
-    icon: <HomeIcon className="h-4 w-4" />,
-    page: <Index />,
+    icon: "home",
+    page: "Index",
   },
   {
     title: "Dashboard",
     to: "/dashboard",
-    icon: <BarChart3 className="h-4 w-4" />,
-    page: <Dashboard />,
+    icon: "dashboard",
+    page: "Dashboard",
   },
   {
-    title: "User Types",
-    to: "/user-types", 
-    icon: <Users className="h-4 w-4" />,
-    page: <UserTypes />,
+    title: "Features",
+    to: "/features",
+    icon: "settings",
+    page: "Features",
+    restricted: ["government"]
   },
   {
-    title: "Household Users",
-    to: "/household-users",
-    icon: <HomeIcon className="h-4 w-4" />,
-    page: <HouseholdUsers />,
+    title: "Waste Management",
+    to: "/waste-management",
+    icon: "listChecks",
+    page: "WasteManagement",
   },
   {
-    title: "Industry Users", 
-    to: "/industry-users",
-    icon: <Building2 className="h-4 w-4" />,
-    page: <IndustryUsers />,
-  },
-  {
-    title: "Municipality Users",
-    to: "/municipality-users", 
-    icon: <Building2 className="h-4 w-4" />,
-    page: <MunicipalityUsers />,
-  },
-  {
-    title: "Government Users",
-    to: "/government-users",
-    icon: <Building2 className="h-4 w-4" />,
-    page: <GovernmentUsers />,
-  },
-  {
-    title: "Waste Entry",
-    to: "/waste-entry",
-    icon: <Recycle className="h-4 w-4" />,
-    page: <WasteEntry />,
+    title: "Recycling Programs",
+    to: "/recycling-programs",
+    icon: "leaf",
+    page: "RecyclingPrograms",
   },
   {
     title: "Marketplace",
-    to: "/marketplace", 
-    icon: <DollarSign className="h-4 w-4" />,
-    page: <Marketplace />,
+    to: "/marketplace",
+    icon: "coins",
+    page: "Marketplace",
   },
   {
-    title: "Analytics",
-    to: "/analytics",
-    icon: <BarChart3 className="h-4 w-4" />,
-    page: <Analytics />,
+    title: "Green Finance",
+    to: "/green-finance",
+    icon: "trendingUp",
+    page: "GreenFinance",
   },
   {
-    title: "AI Assistant",
-    to: "/ai-assistant",
-    icon: <MessageSquare className="h-4 w-4" />,
-    page: <AIAssistant />,
+    title: "Community Forum",
+    to: "/community-forum",
+    icon: "messageSquare",
+    page: "CommunityForum",
   },
   {
-    title: "Route Optimization",
-    to: "/route-optimization",
-    icon: <Route className="h-4 w-4" />,
-    page: <RouteOptimization />,
+    title: "Support",
+    to: "/support",
+    icon: "helpCircle",
+    page: "Support",
   },
   {
-    title: "Carbon Credits",
-    to: "/carbon-credit-trading",
-    icon: <Leaf className="h-4 w-4" />,
-    page: <CarbonCreditTrading />,
+    title: "Contact Us",
+    to: "/contact-us",
+    icon: "contact2",
+    page: "ContactUs",
   },
   {
-    title: "Green Bonds",
-    to: "/green-bonds",
-    icon: <TrendingUp className="h-4 w-4" />,
-    page: <GreenBonds />,
+    title: "Enhanced Auth",
+    to: "/enhanced-auth",
+    icon: "settings",
+    page: "EnhancedAuth",
+  },
+   {
+    title: "ESG Investment Tracking",
+    to: "/esg-investment-tracking",
+    icon: "leaf",
+    page: "ESGInvestmentTracking",
+  },
+  {
+    title: "ESG Reporting & Compliance",
+    to: "/esg-reporting-compliance",
+    icon: "fileText",
+    page: "ESGReportingCompliance",
+  },
+  {
+    title: "ESG Reporting Tools",
+    to: "/esg-reporting-tools",
+    icon: "barChart3",
+    page: "ESGReportingTools",
+  },
+  {
+    title: "Admin Dashboard",
+    to: "/admin-dashboard",
+    icon: "dashboard",
+    page: "AdminDashboard",
   },
 ];

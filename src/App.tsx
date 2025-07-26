@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,17 +33,17 @@ import EnhancedMicroFinance from './pages/EnhancedMicroFinance';
 import ResetPassword from './pages/ResetPassword';
 import ESGInvestmentTracking from './pages/ESGInvestmentTracking';
 import ESGReportingTools from './pages/ESGReportingTools';
+import ESGReportingCompliance from "@/pages/ESGReportingCompliance";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="min-h-screen bg-background">
-          <MainNavigation />
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -153,12 +152,17 @@ const App = () => (
                 <ESGReportingTools />
               </ProtectedRoute>
             } />
+            <Route path="/esg-reporting-compliance" element={
+              <ProtectedRoute>
+                <ESGReportingCompliance />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

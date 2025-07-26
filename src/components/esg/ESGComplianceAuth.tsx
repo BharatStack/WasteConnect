@@ -1,0 +1,203 @@
+
+import React, { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { Eye, EyeOff, Mail, Lock, User, Building2 } from 'lucide-react';
+
+interface ESGComplianceAuthProps {
+  onComplete: () => void;
+}
+
+const ESGComplianceAuth = ({ onComplete }: ESGComplianceAuthProps) => {
+  const { toast } = useToast();
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    organizationName: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to ESG Reporting & Compliance!",
+        });
+        onComplete();
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/esg-reporting-compliance`,
+            data: {
+              full_name: formData.fullName,
+              organization_name: formData.organizationName
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Account Created",
+          description: "Please check your email to verify your account.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Authentication Error",
+        description: error.message || "An error occurred during authentication.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      <Card className="bg-white shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl text-green-800">
+            {isLogin ? 'Sign In' : 'Create Account'}
+          </CardTitle>
+          <CardDescription>
+            {isLogin 
+              ? 'Access your ESG reporting dashboard' 
+              : 'Join our ESG compliance platform'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Full Name
+                  </Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                    required={!isLogin}
+                    placeholder="Enter your full name"
+                    className="pl-4"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="organizationName" className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4" />
+                    Organization Name
+                  </Label>
+                  <Input
+                    id="organizationName"
+                    type="text"
+                    value={formData.organizationName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, organizationName: e.target.value }))}
+                    placeholder="Enter your organization name"
+                    className="pl-4"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                Email Address
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                required
+                placeholder="Enter your email"
+                className="pl-4"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  required
+                  placeholder="Enter your password"
+                  className="pl-4 pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              {isLoading 
+                ? "Processing..." 
+                : isLogin 
+                  ? "Sign In" 
+                  : "Create Account"}
+            </Button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-green-600 hover:text-green-700 text-sm underline"
+              >
+                {isLogin 
+                  ? "Don't have an account? Sign up" 
+                  : "Already have an account? Sign in"}
+              </button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ESGComplianceAuth;
