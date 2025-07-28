@@ -4,12 +4,13 @@ import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, MapPin, Calendar, Send, Upload } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ArrowLeft, MapPin, Calendar, User, Eye, Maximize2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ReportComments from '@/components/reports/ReportComments';
 
 interface CitizenReport {
   id: string;
@@ -18,13 +19,6 @@ interface CitizenReport {
   location: string | null;
   image_url: string | null;
   status: string | null;
-  created_at: string;
-  user_id: string | null;
-}
-
-interface ReportMessage {
-  id: string;
-  message: string;
   created_at: string;
   user_id: string | null;
 }
@@ -42,47 +36,13 @@ const CitizenReportDetails = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [report, setReport] = useState<CitizenReport | null>(null);
-  const [messages, setMessages] = useState<ReportMessage[]>([]);
   const [municipalityResponses, setMunicipalityResponses] = useState<MunicipalityResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState('');
-  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchReportDetails();
-      fetchMessages();
       fetchMunicipalityResponses();
-      
-      // Set up real-time subscriptions
-      const messagesSubscription = supabase
-        .channel('report-messages')
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'report_messages',
-          filter: `report_id=eq.${id}`
-        }, (payload) => {
-          setMessages(prev => [...prev, payload.new as ReportMessage]);
-        })
-        .subscribe();
-
-      const responsesSubscription = supabase
-        .channel('municipality-responses')
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'municipality_responses',
-          filter: `report_id=eq.${id}`
-        }, (payload) => {
-          setMunicipalityResponses(prev => [...prev, payload.new as MunicipalityResponse]);
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(messagesSubscription);
-        supabase.removeChannel(responsesSubscription);
-      };
     }
   }, [id]);
 
@@ -106,21 +66,6 @@ const CitizenReportDetails = () => {
     }
   };
 
-  const fetchMessages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('report_messages')
-        .select('*')
-        .eq('report_id', id)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setMessages(data || []);
-    } catch (error: any) {
-      console.error('Error fetching messages:', error);
-    }
-  };
-
   const fetchMunicipalityResponses = async () => {
     try {
       const { data, error } = await supabase
@@ -138,43 +83,13 @@ const CitizenReportDetails = () => {
     }
   };
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !user) return;
-
-    setIsSendingMessage(true);
-
-    try {
-      const { error } = await supabase
-        .from('report_messages')
-        .insert({
-          report_id: id,
-          user_id: user.id,
-          message: newMessage.trim()
-        });
-
-      if (error) throw error;
-
-      setNewMessage('');
-    } catch (error: any) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSendingMessage(false);
-    }
-  };
-
   const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'in_progress':
         return 'bg-blue-100 text-blue-800';
-      case 'completed':
+      case 'resolved':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -225,128 +140,125 @@ const CitizenReportDetails = () => {
           </Link>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
           {/* Report Details */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-xl">{report.title}</CardTitle>
-                  <Badge className={getStatusColor(report.status)}>
-                    {report.status || 'pending'}
-                  </Badge>
-                </div>
-                {report.description && (
-                  <CardDescription className="text-base">
-                    {report.description}
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                {report.image_url && (
-                  <img
-                    src={report.image_url}
-                    alt={report.title}
-                    className="w-full h-64 object-cover rounded-md mb-4"
-                  />
-                )}
-                
-                <div className="space-y-3 text-sm text-gray-600">
-                  {report.location && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>{report.location}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>Reported on {formatDate(report.created_at)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Municipality Responses */}
-            {municipalityResponses.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Municipality Updates</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {municipalityResponses.map((response) => (
-                    <div key={response.id} className="border-l-4 border-eco-green-500 pl-4">
-                      {response.message && (
-                        <p className="text-gray-700 mb-2">{response.message}</p>
-                      )}
-                      {response.after_image_url && (
-                        <img
-                          src={response.after_image_url}
-                          alt="After cleanup"
-                          className="w-full h-40 object-cover rounded-md mb-2"
-                        />
-                      )}
-                      <p className="text-xs text-gray-500">
-                        {formatDate(response.created_at)}
-                      </p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Chat Section */}
-          <Card className="h-fit">
+          <Card>
             <CardHeader>
-              <CardTitle>Discussion</CardTitle>
-              <CardDescription>
-                Chat with municipality representatives about this report
-              </CardDescription>
+              <div className="flex items-start justify-between">
+                <CardTitle className="text-xl">{report.title}</CardTitle>
+                <Badge className={getStatusColor(report.status)}>
+                  {report.status || 'pending'}
+                </Badge>
+              </div>
+              {report.description && (
+                <CardDescription className="text-base">
+                  {report.description}
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
-              <div className="space-y-4 mb-4 max-h-96 overflow-y-auto">
-                {messages.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">No messages yet. Start the conversation!</p>
-                ) : (
-                  messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.user_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.user_id === user?.id
-                          ? 'bg-eco-green-600 text-white'
-                          : 'bg-gray-200 text-gray-700'
-                      }`}>
-                        <p className="text-sm">{message.message}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.user_id === user?.id ? 'text-eco-green-100' : 'text-gray-500'
-                        }`}>
-                          {formatDate(message.created_at)}
-                        </p>
+              {report.image_url && (
+                <div className="mb-4">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <div className="relative group cursor-pointer">
+                        <img
+                          src={report.image_url}
+                          alt={report.title}
+                          className="w-full h-64 object-cover rounded-md"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center rounded-md">
+                          <Maximize2 className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl">
+                      <DialogHeader>
+                        <DialogTitle>{report.title}</DialogTitle>
+                      </DialogHeader>
+                      <img
+                        src={report.image_url}
+                        alt={report.title}
+                        className="w-full h-auto max-h-[80vh] object-contain rounded-md"
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              )}
+              
+              <div className="space-y-3 text-sm text-gray-600">
+                {report.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{report.location}</span>
+                  </div>
                 )}
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Reported on {formatDate(report.created_at)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <Avatar className="h-5 w-5">
+                    <AvatarFallback className="text-xs bg-eco-green-100 text-eco-green-700">
+                      {report.user_id?.slice(0, 2).toUpperCase() || 'AN'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>Reporter</span>
+                </div>
               </div>
-
-              <form onSubmit={sendMessage} className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  disabled={isSendingMessage}
-                />
-                <Button
-                  type="submit"
-                  disabled={isSendingMessage || !newMessage.trim()}
-                  className="bg-eco-green-600 hover:bg-eco-green-700"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
             </CardContent>
           </Card>
+
+          {/* Municipality Responses */}
+          {municipalityResponses.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Municipality Updates</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {municipalityResponses.map((response) => (
+                  <div key={response.id} className="border-l-4 border-eco-green-500 pl-4">
+                    {response.message && (
+                      <p className="text-gray-700 mb-2">{response.message}</p>
+                    )}
+                    {response.after_image_url && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="relative group cursor-pointer">
+                            <img
+                              src={response.after_image_url}
+                              alt="After cleanup"
+                              className="w-full h-40 object-cover rounded-md mb-2"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center rounded-md">
+                              <Maximize2 className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                            </div>
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogHeader>
+                            <DialogTitle>After Cleanup</DialogTitle>
+                          </DialogHeader>
+                          <img
+                            src={response.after_image_url}
+                            alt="After cleanup"
+                            className="w-full h-auto max-h-[80vh] object-contain rounded-md"
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      {formatDate(response.created_at)}
+                    </p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Comments Section */}
+          <ReportComments reportId={id!} />
         </div>
       </div>
     </div>

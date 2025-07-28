@@ -12,6 +12,7 @@ import ReportCard from '@/components/reports/ReportCard';
 import VotingReportCard from '@/components/reports/VotingReportCard';
 import ReportStats from '@/components/reports/ReportStats';
 import ReportTabs from '@/components/reports/ReportTabs';
+import ReportProgressChart from '@/components/reports/ReportProgressChart';
 
 interface CitizenReport {
   id: string;
@@ -370,6 +371,16 @@ const CitizenReports = () => {
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <ReportStats stats={stats} />
+        </motion.div>
+
+        {/* Progress Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="mt-6"
+        >
+          <ReportProgressChart stats={stats} />
         </motion.div>
 
         {/* Tab Navigation */}
