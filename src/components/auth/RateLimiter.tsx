@@ -183,3 +183,6 @@ export const RateLimiterComponent = ({ identifier, maxAttempts, windowMs, childr
 
   return <>{children}</>;
 };
+
+// Export as default for backward compatibility
+export default RateLimiterComponent;

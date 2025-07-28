@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, CheckCircle, Mail, Lock, User, Phone } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import RateLimiter from './RateLimiter';
+import { RateLimiterComponent as RateLimiter } from './RateLimiter';
 
 interface AuthFormProps {
   onSuccess?: () => void;
@@ -90,7 +90,7 @@ const EnhancedAuthForm = ({ onSuccess }: AuthFormProps) => {
         return;
       }
 
-      // Store phone number if provided
+      // Store phone number if provided - use raw SQL since types aren't updated yet
       if (formData.phoneNumber && data.user) {
         await supabase
           .from('user_phone_numbers')
@@ -190,7 +190,7 @@ const EnhancedAuthForm = ({ onSuccess }: AuthFormProps) => {
         </CardHeader>
         
         <CardContent>
-          <RateLimiter>
+          <RateLimiter identifier="auth-form" maxAttempts={5} windowMs={300000}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>

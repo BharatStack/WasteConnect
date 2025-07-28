@@ -80,20 +80,25 @@ const ReportComments = ({ reportId }: ReportCommentsProps) => {
       const topLevelComments: Comment[] = [];
       const commentMap = new Map<string, Comment>();
 
-      // First pass: create all comment objects
+      // First pass: create all comment objects with proper typing
       data.forEach(comment => {
-        commentMap.set(comment.id, { ...comment, replies: [] });
+        commentMap.set(comment.id, { 
+          ...comment, 
+          parent_comment_id: comment.parent_comment_id || null,
+          replies: [] 
+        });
       });
 
       // Second pass: organize into tree structure
       data.forEach(comment => {
+        const commentWithReplies = commentMap.get(comment.id)!;
         if (comment.parent_comment_id) {
           const parent = commentMap.get(comment.parent_comment_id);
           if (parent) {
-            parent.replies!.push(commentMap.get(comment.id)!);
+            parent.replies!.push(commentWithReplies);
           }
         } else {
-          topLevelComments.push(commentMap.get(comment.id)!);
+          topLevelComments.push(commentWithReplies);
         }
       });
 

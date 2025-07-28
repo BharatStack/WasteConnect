@@ -2221,6 +2221,7 @@ export type Database = {
           comment: string
           created_at: string
           id: string
+          parent_comment_id: string | null
           report_id: string
           updated_at: string
           user_id: string
@@ -2229,6 +2230,7 @@ export type Database = {
           comment: string
           created_at?: string
           id?: string
+          parent_comment_id?: string | null
           report_id: string
           updated_at?: string
           user_id: string
@@ -2237,11 +2239,19 @@ export type Database = {
           comment?: string
           created_at?: string
           id?: string
+          parent_comment_id?: string | null
           report_id?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "report_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "report_comments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "report_comments_report_id_fkey"
             columns: ["report_id"]
@@ -2578,6 +2588,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_phone_numbers: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          is_verified: boolean
+          phone_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          is_verified?: boolean
+          phone_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          is_verified?: boolean
+          phone_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_portfolios: {
         Row: {
