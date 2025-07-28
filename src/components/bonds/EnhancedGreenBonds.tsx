@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,12 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Leaf, TrendingUp, AlertTriangle, DollarSign, BarChart3, Shield } from 'lucide-react';
+import { Leaf, TrendingUp, AlertTriangle, DollarSign, BarChart3, Shield, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const EnhancedGreenBonds = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Fetch active green bonds
   const { data: bonds = [] } = useQuery({
@@ -155,6 +156,14 @@ const EnhancedGreenBonds = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-eco-green-600 hover:text-eco-green-700 hover:bg-eco-green-50"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Enhanced Green Bonds Platform</h1>
           <p className="text-gray-600">AI-powered sustainable finance with real-time impact tracking</p>
         </div>

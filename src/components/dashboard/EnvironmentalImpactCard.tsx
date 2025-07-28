@@ -25,7 +25,7 @@ const EnvironmentalImpactCard = ({ environmentalImpact }: EnvironmentalImpactCar
   };
 
   const co2Reduction = getCO2Reduction(environmentalImpact);
-  const costSavings = co2Reduction * 45.67; // Example conversion rate
+  const costSavings = co2Reduction * 3800; // Updated conversion rate for INR (approximately 45.67 * 83 INR/USD)
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

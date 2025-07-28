@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,16 +10,16 @@ import { Trash2, Route, ShoppingCart, BarChart3, MessageSquare, TrendingUp, Leaf
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardIntegrations from '@/components/dashboard/DashboardIntegrations';
 import NetworkDashboard from '@/components/network/NetworkDashboard';
+
 interface WasteStats {
   totalWaste: number;
   recyclingRate: number;
   carbonReduction: number;
   costSavings: number;
 }
+
 const Dashboard = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const [wasteStats, setWasteStats] = useState<WasteStats>({
     totalWaste: 0,
     recyclingRate: 0,
@@ -27,11 +28,14 @@ const Dashboard = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [showNetworkDashboard, setShowNetworkDashboard] = useState(false);
+
   useEffect(() => {
     fetchWasteStats();
   }, [user]);
+
   const fetchWasteStats = async () => {
     if (!user) return;
+
     try {
       // Fetch waste data logs
       const {
@@ -68,8 +72,19 @@ const Dashboard = () => {
       setIsLoading(false);
     }
   };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
+
   if (showNetworkDashboard) {
-    return <div className="min-h-screen bg-gray-50">
+    return (
+      <div className="min-h-screen bg-gray-50">
         <DashboardHeader />
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
@@ -81,9 +96,12 @@ const Dashboard = () => {
             <NetworkDashboard />
           </div>
         </main>
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen bg-gray-50">
+
+  return (
+    <div className="min-h-screen bg-gray-50">
       <DashboardHeader />
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -144,7 +162,7 @@ const Dashboard = () => {
                     <TrendingUp className="h-4 w-4 text-eco-green-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">${wasteStats.costSavings.toFixed(2)}</div>
+                    <div className="text-2xl font-bold">{formatCurrency(wasteStats.costSavings)}</div>
                     <p className="text-xs text-muted-foreground">Estimated savings</p>
                   </CardContent>
                 </Card>
@@ -509,6 +527,8 @@ const Dashboard = () => {
           </Tabs>
         </div>
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default Dashboard;

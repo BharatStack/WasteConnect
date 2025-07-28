@@ -21,6 +21,8 @@ const CommunityImpactScore: React.FC<CommunityImpactScoreProps> = ({
     low: 'from-red-400 to-red-500'
   };
 
+  const formattedScore = score.toFixed(2);
+
   return (
     <motion.div 
       className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200 mb-4"
@@ -38,7 +40,7 @@ const CommunityImpactScore: React.FC<CommunityImpactScoreProps> = ({
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 0.5 }}
         >
-          {score}/100
+          {formattedScore}
         </motion.span>
       </div>
       
