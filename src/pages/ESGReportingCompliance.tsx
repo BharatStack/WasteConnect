@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Building, Users, Database, BarChart3, Brain, Network, Thermometer, Shield, CheckCircle } from 'lucide-react';
+import { FileText, Building, Users, Database, BarChart3, Brain, Network, Thermometer, Shield, CheckCircle, ArrowLeft } from 'lucide-react';
 import ESGComplianceAuth from '@/components/esg/ESGComplianceAuth';
 import ESGDataCollection from '@/components/esg/ESGDataCollection';
 import ESGReportingTools from '@/pages/ESGReportingTools';
@@ -19,20 +19,17 @@ const ESGReportingCompliance = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simplified loading check - just check if we have a user
-    if (user) {
-      setShowDashboard(true);
-    }
     setIsLoading(false);
   }, [user]);
 
   const handleAccessReportingTools = () => {
     console.log('Access Reporting Tools clicked');
-    setShowDashboard(true);
+    setCurrentView('dashboard');
     toast({
       title: "Welcome to ESG Dashboard",
       description: "Access all your ESG reporting tools and compliance features.",
@@ -40,11 +37,15 @@ const ESGReportingCompliance = () => {
   };
 
   const handleAuthComplete = () => {
-    setShowDashboard(true);
+    setCurrentView('dashboard');
     toast({
       title: "Welcome to ESG Dashboard",
       description: "You can now access all ESG reporting features.",
     });
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing');
   };
 
   if (isLoading) {
@@ -55,22 +56,29 @@ const ESGReportingCompliance = () => {
     );
   }
 
-  // Show dashboard if user is authenticated or if explicitly requested
-  if (showDashboard && user) {
+  // Show dashboard if user is authenticated and currentView is dashboard
+  if (currentView === 'dashboard') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-        {/* Header */}
+        {/* Header with Back Button */}
         <div className="bg-gradient-to-r from-green-700 via-emerald-600 to-teal-700 text-white py-8">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center mb-4">
+                  <Button
+                    variant="ghost"
+                    onClick={handleBackToLanding}
+                    className="text-white hover:bg-green-600 mr-4 p-2"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
                   <FileText className="h-8 w-8 mr-3" />
                   <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-green-100 bg-clip-text text-transparent">
-                    ESG Reporting & Compliance
+                    ESG Reporting & Compliance Dashboard
                   </h1>
                 </div>
-                <p className="text-green-100 text-lg">
+                <p className="text-green-100 text-lg ml-16">
                   Comprehensive ESG reporting platform with regulatory compliance tracking
                 </p>
               </div>
