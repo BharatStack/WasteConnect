@@ -10,6 +10,10 @@ import { FileText, Building, Users, Database, BarChart3, Brain, Network, Thermom
 import ESGComplianceAuth from '@/components/esg/ESGComplianceAuth';
 import ESGDataCollection from '@/components/esg/ESGDataCollection';
 import ESGReportingTools from '@/pages/ESGReportingTools';
+import ESGDashboardOverview from '@/components/esg/ESGDashboardOverview';
+import ESGDataInputModule from '@/components/esg/ESGDataInputModule';
+import ESGProgressTracker from '@/components/esg/ESGProgressTracker';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ESGReportingCompliance = () => {
   const { user } = useAuth();
@@ -18,7 +22,7 @@ const ESGReportingCompliance = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [esgProfile, setEsgProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentStep, setCurrentStep] = useState<'auth' | 'profile' | 'data-collection' | 'tools'>('auth');
+  const [currentStep, setCurrentStep] = useState<'auth' | 'profile' | 'data-collection' | 'dashboard'>('auth');
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -43,7 +47,7 @@ const ESGReportingCompliance = () => {
           setEsgProfile(esgData);
 
           if (esgData && esgData.onboarding_completed) {
-            setCurrentStep('tools');
+            setCurrentStep('dashboard');
           } else if (esgData) {
             setCurrentStep('data-collection');
           } else {
@@ -70,10 +74,10 @@ const ESGReportingCompliance = () => {
   };
 
   const handleDataCollectionComplete = () => {
-    setCurrentStep('tools');
+    setCurrentStep('dashboard');
     toast({
       title: "Setup Complete",
-      description: "You can now access the ESG Reporting & Compliance tools.",
+      description: "You can now access the ESG Reporting & Compliance dashboard.",
     });
   };
 
@@ -85,8 +89,119 @@ const ESGReportingCompliance = () => {
     );
   }
 
-  if (currentStep === 'tools') {
-    return <ESGReportingTools />;
+  if (currentStep === 'dashboard') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-green-700 via-emerald-600 to-teal-700 text-white py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center mb-4">
+                  <FileText className="h-8 w-8 mr-3" />
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-green-100 bg-clip-text text-transparent">
+                    ESG Reporting & Compliance
+                  </h1>
+                </div>
+                <p className="text-green-100 text-lg">
+                  Comprehensive ESG reporting platform with regulatory compliance tracking
+                </p>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">24.7M</div>
+                  <div className="text-sm text-green-200">Data Points</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">50+</div>
+                  <div className="text-sm text-green-200">Frameworks</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">99.9%</div>
+                  <div className="text-sm text-green-200">Uptime</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Dashboard Content */}
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="overview">Dashboard</TabsTrigger>
+              <TabsTrigger value="data-input">Data Input</TabsTrigger>
+              <TabsTrigger value="progress">Progress</TabsTrigger>
+              <TabsTrigger value="reports">Reports</TabsTrigger>
+              <TabsTrigger value="compliance">Compliance</TabsTrigger>
+              <TabsTrigger value="tools">Advanced Tools</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview">
+              <ESGDashboardOverview />
+            </TabsContent>
+
+            <TabsContent value="data-input">
+              <ESGDataInputModule />
+            </TabsContent>
+
+            <TabsContent value="progress">
+              <ESGProgressTracker />
+            </TabsContent>
+
+            <TabsContent value="reports">
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold">Report Generation</h3>
+                <ESGReportingTools />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="compliance">
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold">Compliance Management</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                    <CardContent className="p-6 text-center">
+                      <BarChart3 className="h-10 w-10 text-blue-600 mx-auto mb-4" />
+                      <h3 className="font-semibold text-blue-900 mb-2">GRI Standards</h3>
+                      <p className="text-sm text-blue-700">Global Reporting Initiative compliance tracking</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                    <CardContent className="p-6 text-center">
+                      <Shield className="h-10 w-10 text-purple-600 mx-auto mb-4" />
+                      <h3 className="font-semibold text-purple-900 mb-2">SASB Framework</h3>
+                      <p className="text-sm text-purple-700">Sustainability Accounting Standards Board</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                    <CardContent className="p-6 text-center">
+                      <Thermometer className="h-10 w-10 text-orange-600 mx-auto mb-4" />
+                      <h3 className="font-semibold text-orange-900 mb-2">TCFD</h3>
+                      <p className="text-sm text-orange-700">Task Force on Climate-related Financial Disclosures</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200">
+                    <CardContent className="p-6 text-center">
+                      <CheckCircle className="h-10 w-10 text-teal-600 mx-auto mb-4" />
+                      <h3 className="font-semibold text-teal-900 mb-2">EU CSRD</h3>
+                      <p className="text-sm text-teal-700">Corporate Sustainability Reporting Directive</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tools">
+              <ESGReportingTools />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    );
   }
 
   return (
