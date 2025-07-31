@@ -81,6 +81,14 @@ const ESGReportingCompliance = () => {
     });
   };
 
+  const handleAccessReportingTools = () => {
+    setCurrentStep('dashboard');
+    toast({
+      title: "Welcome to ESG Dashboard",
+      description: "Access all your ESG reporting tools and compliance features.",
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50">
@@ -257,6 +265,16 @@ const ESGReportingCompliance = () => {
               <p className="text-sm text-teal-700">Centralized ESG data collection with IoT integration and validation</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center mb-12">
+          <Button 
+            onClick={handleAccessReportingTools}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            Access Reporting Tools
+          </Button>
         </div>
 
         {/* Step Content */}
