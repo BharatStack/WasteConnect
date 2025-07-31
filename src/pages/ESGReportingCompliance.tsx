@@ -19,73 +19,31 @@ const ESGReportingCompliance = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [esgProfile, setEsgProfile] = useState<any>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentStep, setCurrentStep] = useState<'auth' | 'profile' | 'data-collection' | 'dashboard'>('auth');
 
   useEffect(() => {
-    const checkUserStatus = async () => {
-      if (user) {
-        // Check if user has a profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        setUserProfile(profile);
-
-        if (profile && profile.full_name) {
-          // Check if user has ESG profile
-          const { data: esgData } = await supabase
-            .from('esg_user_profiles')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          setEsgProfile(esgData);
-
-          if (esgData && esgData.onboarding_completed) {
-            setCurrentStep('dashboard');
-          } else if (esgData) {
-            setCurrentStep('data-collection');
-          } else {
-            setCurrentStep('profile');
-          }
-        } else {
-          setCurrentStep('profile');
-        }
-      } else {
-        setCurrentStep('auth');
-      }
-      setIsLoading(false);
-    };
-
-    checkUserStatus();
+    // Simplified loading check - just check if we have a user
+    if (user) {
+      setShowDashboard(true);
+    }
+    setIsLoading(false);
   }, [user]);
 
-  const handleAuthComplete = () => {
-    setCurrentStep('profile');
-  };
-
-  const handleProfileComplete = () => {
-    setCurrentStep('data-collection');
-  };
-
-  const handleDataCollectionComplete = () => {
-    setCurrentStep('dashboard');
-    toast({
-      title: "Setup Complete",
-      description: "You can now access the ESG Reporting & Compliance dashboard.",
-    });
-  };
-
   const handleAccessReportingTools = () => {
-    setCurrentStep('dashboard');
+    console.log('Access Reporting Tools clicked');
+    setShowDashboard(true);
     toast({
       title: "Welcome to ESG Dashboard",
       description: "Access all your ESG reporting tools and compliance features.",
+    });
+  };
+
+  const handleAuthComplete = () => {
+    setShowDashboard(true);
+    toast({
+      title: "Welcome to ESG Dashboard",
+      description: "You can now access all ESG reporting features.",
     });
   };
 
@@ -97,7 +55,8 @@ const ESGReportingCompliance = () => {
     );
   }
 
-  if (currentStep === 'dashboard') {
+  // Show dashboard if user is authenticated or if explicitly requested
+  if (showDashboard && user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         {/* Header */}
@@ -212,6 +171,7 @@ const ESGReportingCompliance = () => {
     );
   }
 
+  // Landing page for users who haven't accessed the dashboard yet
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {/* Header */}
@@ -231,8 +191,9 @@ const ESGReportingCompliance = () => {
         </div>
       </div>
 
-      {/* Features Overview */}
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-12">
+        {/* Features Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow">
             <CardContent className="p-6 text-center">
@@ -267,57 +228,55 @@ const ESGReportingCompliance = () => {
           </Card>
         </div>
 
-        {/* Call to Action */}
+        {/* Main Call to Action */}
         <div className="text-center mb-12">
-          <Button 
-            onClick={handleAccessReportingTools}
-            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            Access Reporting Tools
-          </Button>
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Started with ESG Reporting</h2>
+            <p className="text-lg text-gray-600 mb-8">Access comprehensive ESG tools and compliance features</p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={handleAccessReportingTools}
+                size="lg"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <BarChart3 className="h-5 w-5 mr-2" />
+                Access Reporting Tools
+              </Button>
+              
+              {!user && (
+                <Button 
+                  onClick={() => navigate('/enhanced-auth')}
+                  variant="outline"
+                  size="lg"
+                  className="px-8 py-4 text-lg font-semibold rounded-lg border-green-600 text-green-600 hover:bg-green-50"
+                >
+                  Sign Up / Sign In
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Step Content */}
-        <div className="max-w-4xl mx-auto">
-          {currentStep === 'auth' && (
+        {/* Authentication Component for Non-Users */}
+        {!user && (
+          <div className="max-w-4xl mx-auto mb-12">
             <Card className="shadow-xl bg-white/70 backdrop-blur-sm border-0">
               <CardHeader className="text-center pb-8">
-                <CardTitle className="text-3xl text-green-800 mb-2">Get Started</CardTitle>
+                <CardTitle className="text-3xl text-green-800 mb-2">Create Account</CardTitle>
                 <CardDescription className="text-lg">
-                  Create your account to access our comprehensive ESG reporting platform
+                  Join our platform to access comprehensive ESG reporting tools
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ESGComplianceAuth onComplete={handleAuthComplete} />
               </CardContent>
             </Card>
-          )}
-
-          {(currentStep === 'profile' || currentStep === 'data-collection') && (
-            <Card className="shadow-xl bg-white/70 backdrop-blur-sm border-0">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-3xl text-green-800 mb-2">
-                  {currentStep === 'profile' ? 'Complete Your Profile' : 'ESG Data Collection'}
-                </CardTitle>
-                <CardDescription className="text-lg">
-                  {currentStep === 'profile' 
-                    ? 'Help us understand your organization for personalized ESG insights' 
-                    : 'Provide your ESG data for detailed analysis and reporting'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ESGDataCollection 
-                  onProfileComplete={handleProfileComplete}
-                  onDataComplete={handleDataCollectionComplete}
-                  currentStep={currentStep}
-                />
-              </CardContent>
-            </Card>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Platform Benefits */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
