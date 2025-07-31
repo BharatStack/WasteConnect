@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -255,7 +254,7 @@ const ESGProgressTracker = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold">{subcategory.progress}%</span>
-                          <Badge className={getStatusColor(subcategory.status)} size="sm">
+                          <Badge className={getStatusColor(subcategory.status)}>
                             {subcategory.status.replace('-', ' ')}
                           </Badge>
                         </div>
