@@ -41,7 +41,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       rotate: 0,
       transition: {
         duration: prefersReducedMotion ? 0.5 : 1.2,
-        ease: [0.68, -0.55, 0.265, 1.55], // Elastic easing
+        ease: "backOut"
       }
     },
     glow: {
