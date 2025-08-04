@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { RateLimiter } from './RateLimiter';
 
@@ -136,7 +135,7 @@ export class SecurityManager {
     try {
       const { data: resetRequest } = await supabase
         .from('password_reset_requests')
-        .select('user_id, expires_at, used_at')
+        .select('user_id, expires_at, used')
         .eq('token', token)
         .single();
 
@@ -144,7 +143,7 @@ export class SecurityManager {
         return { valid: false };
       }
 
-      if (resetRequest.used_at) {
+      if (resetRequest.used) {
         return { valid: false };
       }
 
@@ -163,7 +162,7 @@ export class SecurityManager {
     try {
       await supabase
         .from('password_reset_requests')
-        .update({ used_at: new Date().toISOString() })
+        .update({ used: true })
         .eq('token', token);
     } catch (error) {
       console.error('Failed to mark token as used:', error);
