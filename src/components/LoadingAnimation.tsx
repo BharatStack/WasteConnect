@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, easeOut, easeInOut } from 'framer-motion';
+import { motion, AnimatePresence, easeOut, easeInOut, cubicBezier } from 'framer-motion';
 import { Leaf } from 'lucide-react';
 
 interface LoadingAnimationProps {
@@ -41,7 +40,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       rotate: 0,
       transition: {
         duration: prefersReducedMotion ? 0.5 : 1.2,
-        ease: [0.68, -0.55, 0.265, 1.55] // back out cubic bezier
+        ease: cubicBezier(0.68, -0.55, 0.265, 1.55) // back out cubic bezier
       }
     },
     glow: {
