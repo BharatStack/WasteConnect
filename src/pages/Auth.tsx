@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import AuthForm from '@/components/auth/AuthForm';
+import SecureAuthForm from '@/components/auth/SecureAuthForm';
 import ProfileSetup from '@/components/auth/ProfileSetup';
 import { User, Session } from '@supabase/supabase-js';
 
@@ -75,21 +75,35 @@ const Auth = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-eco-green-50 to-eco-green-100">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600"></div>
       </div>
     );
   }
 
   if (user && needsProfileSetup) {
-    return <ProfileSetup onComplete={handleProfileComplete} />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-eco-green-50 to-eco-green-100 flex items-center justify-center p-4">
+        <ProfileSetup onComplete={handleProfileComplete} />
+      </div>
+    );
   }
 
   if (user) {
     return null; // Will redirect to dashboard
   }
 
-  return <AuthForm onSuccess={handleAuthSuccess} />;
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-eco-green-50 to-eco-green-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-eco-green-800 mb-2">WasteConnect</h1>
+          <p className="text-eco-green-600">Secure access to your waste management platform</p>
+        </div>
+        <SecureAuthForm onSuccess={handleAuthSuccess} />
+      </div>
+    </div>
+  );
 };
 
 export default Auth;
