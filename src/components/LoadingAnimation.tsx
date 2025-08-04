@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, easeOut, easeInOut } from 'framer-motion';
 import { Leaf } from 'lucide-react';
 
 interface LoadingAnimationProps {
@@ -41,7 +41,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       rotate: 0,
       transition: {
         duration: prefersReducedMotion ? 0.5 : 1.2,
-        ease: "backOut"
+        ease: [0.68, -0.55, 0.265, 1.55] // back out cubic bezier
       }
     },
     glow: {
@@ -49,7 +49,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       transition: {
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: easeInOut
       }
     }
   };
@@ -62,7 +62,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       transition: {
         delay: prefersReducedMotion ? 0.3 : 0.8,
         duration: prefersReducedMotion ? 0.3 : 0.6,
-        ease: "easeOut"
+        ease: easeOut
       }
     }
   };
@@ -77,7 +77,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       transition: {
         duration: prefersReducedMotion ? 0.5 : 1.5,
         delay: custom * 0.1,
-        ease: "easeOut"
+        ease: easeOut
       }
     })
   };
@@ -88,7 +88,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
       opacity: 0,
       transition: { 
         duration: prefersReducedMotion ? 0.3 : 0.8,
-        ease: "easeInOut"
+        ease: easeInOut
       }
     }
   };
@@ -147,7 +147,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
                 transition={{
                   duration: prefersReducedMotion ? 0 : 3,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: easeInOut
                 }}
                 style={{
                   width: '120px',
@@ -201,7 +201,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
                     duration: prefersReducedMotion ? 0.5 : 1,
                     repeat: Infinity,
                     delay: i * 0.2,
-                    ease: "easeInOut"
+                    ease: easeInOut
                   }}
                 />
               ))}
