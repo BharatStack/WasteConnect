@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -5,7 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Plus, RefreshCw, Filter } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, Plus, RefreshCw, Filter, LayoutDashboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReportFilters from '@/components/reports/ReportFilters';
 import ReportCard from '@/components/reports/ReportCard';
@@ -13,6 +15,7 @@ import VotingReportCard from '@/components/reports/VotingReportCard';
 import ReportStats from '@/components/reports/ReportStats';
 import ReportTabs from '@/components/reports/ReportTabs';
 import ReportProgressChart from '@/components/reports/ReportProgressChart';
+import ReportDashboard from '@/components/reports/ReportDashboard';
 
 interface CitizenReport {
   id: string;
@@ -41,6 +44,7 @@ const CitizenReports = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+  const [mainTab, setMainTab] = useState('reports');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -364,151 +368,171 @@ const CitizenReports = () => {
           </div>
         </motion.div>
 
-        {/* Statistics Dashboard */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <ReportStats stats={stats} />
-        </motion.div>
+        {/* Main Tab Navigation */}
+        <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              Report Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              All Reports
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Progress Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
-          className="mt-6"
-        >
-          <ReportProgressChart stats={stats} />
-        </motion.div>
+          <TabsContent value="dashboard">
+            <ReportDashboard />
+          </TabsContent>
 
-        {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <ReportTabs 
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            stats={stats}
-          />
-        </motion.div>
-
-        {/* Filters */}
-        {activeTab !== 'trending' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-          >
-            <ReportFilters
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              priorityFilter={priorityFilter}
-              onPriorityFilterChange={setPriorityFilter}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              sortOrder={sortOrder}
-              onSortOrderChange={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              onClearFilters={handleClearFilters}
-              hasActiveFilters={hasActiveFilters}
-            />
-          </motion.div>
-        )}
-
-        {/* Results Summary */}
-        <motion.div 
-          className="flex items-center justify-between mb-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-        >
-          <div className="text-sm text-gray-600">
-            Showing {filteredReports.length} of {reports.length} reports
-          </div>
-        </motion.div>
-
-        {/* Reports Grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
-        >
-          {filteredReports.length === 0 ? (
-            <Card className="border-dashed border-2 border-gray-300">
-              <CardContent className="text-center py-12">
-                <motion.div 
-                  className="flex flex-col items-center"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Filter className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {reports.length === 0 ? 'No reports yet' : 'No reports match your filters'}
-                  </h3>
-                  <p className="text-gray-500 mb-4 max-w-md">
-                    {reports.length === 0 
-                      ? 'Be the first to report an environmental issue in your area.'
-                      : 'Try adjusting your search criteria or clearing the filters to see more results.'
-                    }
-                  </p>
-                  {reports.length === 0 ? (
-                    <Link to="/citizen-reports/new">
-                      <Button className="bg-eco-green-600 hover:bg-eco-green-700">
-                        Create First Report
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button onClick={handleClearFilters} variant="outline">
-                      Clear Filters
-                    </Button>
-                  )}
-                </motion.div>
-              </CardContent>
-            </Card>
-          ) : (
-            <motion.div 
-              className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              layout
+          <TabsContent value="reports" className="space-y-6">
+            {/* Statistics Dashboard */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
             >
-              <AnimatePresence mode="popLayout">
-                {filteredReports.map((report, index) => (
-                  <motion.div
-                    key={report.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    {activeTab === 'public' || activeTab === 'trending' ? (
-                      <VotingReportCard
-                        report={report}
-                        showVoting={activeTab === 'public'}
-                        onVote={handleVote}
-                      />
-                    ) : (
-                      <ReportCard
-                        report={report}
-                        showAssignment={true}
-                        onQuickAction={(reportId, action) => {
-                          if (action === 'message') {
-                            window.location.href = `/citizen-reports/${reportId}`;
-                          }
-                        }}
-                      />
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              <ReportStats stats={stats} />
             </motion.div>
-          )}
-        </motion.div>
+
+            {/* Progress Chart */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.15 }}
+              className="mt-6"
+            >
+              <ReportProgressChart stats={stats} />
+            </motion.div>
+
+            {/* Tab Navigation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <ReportTabs 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                stats={stats}
+              />
+            </motion.div>
+
+            {/* Filters */}
+            {activeTab !== 'trending' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+                <ReportFilters
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  statusFilter={statusFilter}
+                  onStatusFilterChange={setStatusFilter}
+                  priorityFilter={priorityFilter}
+                  onPriorityFilterChange={setPriorityFilter}
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                  sortOrder={sortOrder}
+                  onSortOrderChange={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  onClearFilters={handleClearFilters}
+                  hasActiveFilters={hasActiveFilters}
+                />
+              </motion.div>
+            )}
+
+            {/* Results Summary */}
+            <motion.div 
+              className="flex items-center justify-between mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+            >
+              <div className="text-sm text-gray-600">
+                Showing {filteredReports.length} of {reports.length} reports
+              </div>
+            </motion.div>
+
+            {/* Reports Grid */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
+            >
+              {filteredReports.length === 0 ? (
+                <Card className="border-dashed border-2 border-gray-300">
+                  <CardContent className="text-center py-12">
+                    <motion.div 
+                      className="flex flex-col items-center"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Filter className="h-12 w-12 text-gray-400 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        {reports.length === 0 ? 'No reports yet' : 'No reports match your filters'}
+                      </h3>
+                      <p className="text-gray-500 mb-4 max-w-md">
+                        {reports.length === 0 
+                          ? 'Be the first to report an environmental issue in your area.'
+                          : 'Try adjusting your search criteria or clearing the filters to see more results.'
+                        }
+                      </p>
+                      {reports.length === 0 ? (
+                        <Link to="/citizen-reports/new">
+                          <Button className="bg-eco-green-600 hover:bg-eco-green-700">
+                            Create First Report
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Button onClick={handleClearFilters} variant="outline">
+                          Clear Filters
+                        </Button>
+                      )}
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <motion.div 
+                  className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                  layout
+                >
+                  <AnimatePresence mode="popLayout">
+                    {filteredReports.map((report, index) => (
+                      <motion.div
+                        key={report.id}
+                        layout
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                      >
+                        {activeTab === 'public' || activeTab === 'trending' ? (
+                          <VotingReportCard
+                            report={report}
+                            showVoting={activeTab === 'public'}
+                            onVote={handleVote}
+                          />
+                        ) : (
+                          <ReportCard
+                            report={report}
+                            showAssignment={true}
+                            onQuickAction={(reportId, action) => {
+                              if (action === 'message') {
+                                window.location.href = `/citizen-reports/${reportId}`;
+                              }
+                            }}
+                          />
+                        )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </motion.div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

@@ -2,12 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, User } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { LogOut, Settings, User, Sun, Moon, Monitor } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from 'next-themes';
 
 const DashboardHeader = () => {
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     await signOut();
@@ -42,6 +44,37 @@ const DashboardHeader = () => {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1">
+                  <p className="text-xs text-gray-500 mb-2">Theme</p>
+                  <div className="grid grid-cols-3 gap-1">
+                    <Button
+                      variant={theme === 'light' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setTheme('light')}
+                      className="h-8 px-2"
+                    >
+                      <Sun className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant={theme === 'dark' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setTheme('dark')}
+                      className="h-8 px-2"
+                    >
+                      <Moon className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant={theme === 'system' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setTheme('system')}
+                      className="h-8 px-2"
+                    >
+                      <Monitor className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign out</span>
