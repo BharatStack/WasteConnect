@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -47,6 +48,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/enhanced-auth" element={<EnhancedAuth />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/user-types" element={<ProtectedRoute><UserTypes /></ProtectedRoute>} />
               <Route path="/features" element={<ProtectedRoute><Features /></ProtectedRoute>} />
@@ -61,7 +63,6 @@ function App() {
               <Route path="/esg-investment-tracking" element={<ProtectedRoute><ESGInvestmentTracking /></ProtectedRoute>} />
               <Route path="/esg-reporting-compliance" element={<ProtectedRoute><ESGReportingCompliance /></ProtectedRoute>} />
               <Route path="/micro-finance" element={<ProtectedRoute><MicroFinance /></ProtectedRoute>} />
-              <Route path="/enhanced-auth" element={<ProtectedRoute><EnhancedAuth /></ProtectedRoute>} />
               <Route path="/esg" element={<ProtectedRoute><EsgTradingFloor /></ProtectedRoute>} />
               <Route path="/water-credit-trading" element={<ProtectedRoute><WaterCreditTrading /></ProtectedRoute>} />
             </Routes>
