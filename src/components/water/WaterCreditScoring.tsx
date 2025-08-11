@@ -54,13 +54,13 @@ const WaterCreditScoring: React.FC<WaterCreditScoringProps> = ({ onScoreUpdate }
         compliance: Math.min(150, Math.floor(Math.random() * 40) + 110)
       };
       
-      newScore.total = newScore.efficiency + newScore.treatment + newScore.innovation + newScore.compliance;
-      setCurrentScore(newScore);
+      const total = newScore.efficiency + newScore.treatment + newScore.innovation + newScore.compliance;
+      setCurrentScore({ ...newScore, total });
       setCalculating(false);
       
       toast({
         title: "Score Calculated",
-        description: `Your new water credit score is ${newScore.total}/1000`,
+        description: `Your new water credit score is ${total}/1000`,
       });
       
       onScoreUpdate();
@@ -306,7 +306,7 @@ const WaterCreditScoring: React.FC<WaterCreditScoringProps> = ({ onScoreUpdate }
                   <div className="font-medium">Water Efficiency (350 pts)</div>
                   <div className="text-sm text-gray-600">Recycling ratio, consumption intensity, source diversity</div>
                 </div>
-                <Badge variant="outline">40%</Badge>
+                <Badge variant="outline">35%</Badge>
               </div>
               
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">

@@ -49,42 +49,65 @@ const WaterCreditTrading = () => {
     if (!user) return;
 
     try {
-      // Fetch water credit profile
-      const { data: profile, error: profileError } = await supabase
-        .from('water_credit_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Try to fetch water credit profile, but handle if table doesn't exist
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('water_credit_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Profile error:', profileError);
+        if (profileError && profileError.code !== 'PGRST116' && !profileError.message.includes('does not exist')) {
+          console.error('Profile error:', profileError);
+        } else {
+          setWaterProfile(profile);
+        }
+      } catch (error) {
+        console.log('Water credit profiles table may not exist yet');
+        setWaterProfile(null);
       }
 
-      setWaterProfile(profile);
+      // Try to fetch user stats, but handle if table doesn't exist
+      try {
+        const { data: stats, error: statsError } = await supabase
+          .from('water_user_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      // Fetch user stats or create default
-      const { data: stats, error: statsError } = await supabase
-        .from('water_user_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (statsError && statsError.code !== 'PGRST116') {
-        console.error('Stats error:', statsError);
+        if (statsError && statsError.code !== 'PGRST116' && !statsError.message.includes('does not exist')) {
+          console.error('Stats error:', statsError);
+        } else {
+          setUserStats(stats || {
+            total_credits_earned: 0,
+            total_earnings: 0,
+            current_score: 750,
+            efficiency_rating: 85
+          });
+        }
+      } catch (error) {
+        console.log('Water user stats table may not exist yet');
+        setUserStats({
+          total_credits_earned: 0,
+          total_earnings: 0,
+          current_score: 750,
+          efficiency_rating: 85
+        });
       }
-
-      setUserStats(stats || {
-        total_credits_earned: 0,
-        total_earnings: 0,
-        current_score: 750,
-        efficiency_rating: 85
-      });
     } catch (error: any) {
       console.error('Error fetching user data:', error);
       toast({
         title: "Error",
         description: "Failed to load user data. Please try again.",
         variant: "destructive",
+      });
+      
+      // Set default values if there's an error
+      setUserStats({
+        total_credits_earned: 0,
+        total_earnings: 0,
+        current_score: 750,
+        efficiency_rating: 85
       });
     } finally {
       setIsLoading(false);

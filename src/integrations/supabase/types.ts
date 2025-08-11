@@ -3296,6 +3296,48 @@ export type Database = {
         }
         Relationships: []
       }
+      water_credit_profiles: {
+        Row: {
+          capacity_rating: number | null
+          certification_level: string | null
+          created_at: string
+          facility_name: string | null
+          gps_coordinates: unknown | null
+          id: string
+          industry_type: string | null
+          location: string | null
+          onboarding_completed: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          capacity_rating?: number | null
+          certification_level?: string | null
+          created_at?: string
+          facility_name?: string | null
+          gps_coordinates?: unknown | null
+          id?: string
+          industry_type?: string | null
+          location?: string | null
+          onboarding_completed?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          capacity_rating?: number | null
+          certification_level?: string | null
+          created_at?: string
+          facility_name?: string | null
+          gps_coordinates?: unknown | null
+          id?: string
+          industry_type?: string | null
+          location?: string | null
+          onboarding_completed?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       water_meters: {
         Row: {
           created_at: string | null
@@ -3328,6 +3370,42 @@ export type Database = {
           last_reading_date?: string | null
           location?: string | null
           meter_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      water_user_stats: {
+        Row: {
+          created_at: string
+          current_score: number | null
+          efficiency_rating: number | null
+          id: string
+          last_updated: string | null
+          total_credits_earned: number | null
+          total_earnings: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_score?: number | null
+          efficiency_rating?: number | null
+          id?: string
+          last_updated?: string | null
+          total_credits_earned?: number | null
+          total_earnings?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_score?: number | null
+          efficiency_rating?: number | null
+          id?: string
+          last_updated?: string | null
+          total_credits_earned?: number | null
+          total_earnings?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
