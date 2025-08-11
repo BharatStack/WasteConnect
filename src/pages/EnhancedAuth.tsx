@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,100 +16,139 @@ const EnhancedAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        setSession(session);
-        setUser(session?.user ?? null);
+    let mounted = true;
+
+    const checkAuthAndProfile = async (currentSession: Session | null) => {
+      if (!mounted) return;
+      
+      console.log('Checking auth and profile for session:', currentSession?.user?.email);
+      
+      if (currentSession?.user) {
+        setUser(currentSession.user);
+        setSession(currentSession);
         
-        if (session?.user) {
+        try {
           // Check if user has completed profile setup
-          const { data: profile } = await supabase
+          const { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', session.user.id)
+            .eq('id', currentSession.user.id)
             .single();
+          
+          console.log('Profile data:', profile, 'Error:', error);
+          
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching profile:', error);
+          }
           
           setUserProfile(profile);
           
           if (!profile || !profile.full_name) {
+            console.log('Profile setup needed');
             setNeedsProfileSetup(true);
           } else {
-            // Check if user is government official - redirect to government dashboard
+            console.log('Profile complete, user type:', profile.user_type);
+            setNeedsProfileSetup(false);
+            
+            // Redirect based on user type
             if (profile.user_type === 'government') {
+              console.log('Government user - staying on this page');
               // Stay on this page to show government dashboard
-              setNeedsProfileSetup(false);
             } else {
+              console.log('Regular user - redirecting to dashboard');
               navigate('/dashboard');
+              return;
             }
           }
+        } catch (error) {
+          console.error('Error in profile check:', error);
+          setNeedsProfileSetup(true);
         }
+      } else {
+        console.log('No user session found');
+        setUser(null);
+        setSession(null);
+        setUserProfile(null);
+        setNeedsProfileSetup(false);
+      }
+      
+      if (mounted) {
         setIsLoading(false);
+      }
+    };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.email);
+        await checkAuthAndProfile(session);
       }
     );
 
-    // Then check for existing session
+    // Check for existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      if (!mounted) return;
       
-      if (session?.user) {
-        // Check if user has completed profile setup
+      console.log('Initial session check:', session?.user?.email);
+      await checkAuthAndProfile(session);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const handleAuthSuccess = () => {
+    console.log('Auth success handler called');
+    // The auth state change handler will take care of navigation
+  };
+
+  const handleProfileComplete = async () => {
+    console.log('Profile complete handler called');
+    setNeedsProfileSetup(false);
+    
+    if (user) {
+      try {
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', session.user.id)
+          .eq('id', user.id)
           .single();
         
         setUserProfile(profile);
         
-        if (!profile || !profile.full_name) {
-          setNeedsProfileSetup(true);
+        if (profile?.user_type === 'government') {
+          console.log('Government user - staying on this page after profile setup');
+          // Stay on this page for government dashboard
         } else {
-          // Check if user is government official
-          if (profile.user_type === 'government') {
-            // Stay on this page to show government dashboard
-            setNeedsProfileSetup(false);
-          } else {
-            navigate('/dashboard');
-          }
+          console.log('Regular user - redirecting to dashboard after profile setup');
+          navigate('/dashboard');
         }
+      } catch (error) {
+        console.error('Error fetching updated profile:', error);
+        navigate('/dashboard');
       }
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleAuthSuccess = () => {
-    // The auth state change handler will take care of navigation
-  };
-
-  const handleProfileComplete = () => {
-    setNeedsProfileSetup(false);
-    // Re-fetch profile to check user type
-    if (user) {
-      supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-        .then(({ data: profile }) => {
-          setUserProfile(profile);
-          if (profile?.user_type === 'government') {
-            // Stay on this page for government dashboard
-          } else {
-            navigate('/dashboard');
-          }
-        });
     }
   };
+
+  console.log('EnhancedAuth render state:', {
+    isLoading,
+    hasUser: !!user,
+    hasProfile: !!userProfile,
+    needsProfileSetup,
+    userType: userProfile?.user_type
+  });
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-eco-green-50 to-eco-green-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600 mx-auto mb-4"></div>
+          <p className="text-eco-green-600">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -125,8 +165,11 @@ const EnhancedAuth = () => {
     return <GovernmentDashboard />;
   }
 
-  if (user) {
-    return null; // Will redirect to dashboard
+  if (user && !needsProfileSetup) {
+    // This should not happen as we should have redirected to dashboard
+    console.log('User authenticated but still on auth page - redirecting');
+    navigate('/dashboard');
+    return null;
   }
 
   return (
