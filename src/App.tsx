@@ -25,19 +25,9 @@ import MicroFinance from '@/pages/MicroFinance';
 import EnhancedAuth from '@/pages/EnhancedAuth';
 import EsgTradingFloor from '@/components/esg/ESGTradingFloor';
 import WaterCreditTrading from "@/pages/WaterCreditTrading";
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const queryClient = new QueryClient();
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = localStorage.getItem('accessToken'); // Check if the token exists
-
-  if (!isAuthenticated) {
-    // Redirect to the home page if not authenticated
-    return <Navigate to="/" />;
-  }
-
-  return <>{children}</>;
-};
 
 function App() {
   return (
