@@ -1,169 +1,73 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import MainNavigation from "./components/navigation/MainNavigation";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import Auth from "./pages/Auth";
-import EnhancedAuth from "./pages/EnhancedAuth";
-import About from "./pages/About";
-import Features from "./pages/Features";
-import UserTypes from "./pages/UserTypes";
-import WasteEntry from "./pages/WasteEntry";
-import Analytics from "./pages/Analytics";
-import RouteOptimization from "./pages/RouteOptimization";
-import CitizenReports from "./pages/CitizenReports";
-import NewCitizenReport from "./pages/NewCitizenReport";
-import CitizenReportDetails from "./pages/CitizenReportDetails";
-import Marketplace from "./pages/Marketplace";
-import NotFound from "./pages/NotFound";
-import HouseholdUsers from "./pages/HouseholdUsers";
-import MunicipalityUsers from "./pages/MunicipalityUsers";
-import IndustryUsers from "./pages/IndustryUsers";
-import GovernmentUsers from "./pages/GovernmentUsers";
-import AIAssistant from "./pages/AIAssistant";
-import CarbonCreditTrading from './pages/CarbonCreditTrading';
-import GreenBonds from './pages/GreenBonds';
-import MicroFinance from './pages/MicroFinance';
-import EnhancedGreenBonds from './pages/EnhancedGreenBonds';
-import EnhancedMicroFinance from './pages/EnhancedMicroFinance';
-import ResetPassword from './pages/ResetPassword';
-import ESGInvestmentTracking from './pages/ESGInvestmentTracking';
-import ESGReportingTools from './pages/ESGReportingTools';
-import ESGReportingCompliance from "@/pages/ESGReportingCompliance";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
+
+import Home from '@/pages/Home';
+import Dashboard from '@/pages/Dashboard';
+import UserTypes from '@/pages/UserTypes';
+import Features from '@/pages/Features';
+import About from '@/pages/About';
+import CitizenReports from '@/pages/CitizenReports';
+import WasteEntry from '@/pages/WasteEntry';
+import Marketplace from '@/pages/Marketplace';
+import RouteOptimization from '@/pages/RouteOptimization';
+import CarbonCreditTrading from '@/pages/CarbonCreditTrading';
+import GreenBonds from '@/pages/GreenBonds';
+import ESGReportingTools from '@/pages/ESGReportingTools';
+import ESGInvestmentTracking from '@/pages/ESGInvestmentTracking';
+import ESGReportingCompliance from '@/pages/ESGReportingCompliance';
+import MicroFinance from '@/pages/MicroFinance';
+import EnhancedAuth from '@/pages/EnhancedAuth';
+import EsgTradingFloor from '@/components/esg/ESGTradingFloor';
+import WaterCreditTrading from "@/pages/WaterCreditTrading";
 
 const queryClient = new QueryClient();
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('accessToken'); // Check if the token exists
+
+  if (!isAuthenticated) {
+    // Redirect to the home page if not authenticated
+    return <Navigate to="/" />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
+      <TooltipProvider>
+        <ThemeProvider>
           <Toaster />
-          <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/enhanced-auth" element={<EnhancedAuth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/features" element={
-                <ProtectedRoute>
-                  <Features />
-                </ProtectedRoute>
-              } />
-              <Route path="/user-types" element={<UserTypes />} />
-              <Route path="/household-users" element={
-                <ProtectedRoute>
-                  <HouseholdUsers />
-                </ProtectedRoute>
-              } />
-              <Route path="/municipality-users" element={
-                <ProtectedRoute>
-                  <MunicipalityUsers />
-                </ProtectedRoute>
-              } />
-              <Route path="/industry-users" element={
-                <ProtectedRoute>
-                  <IndustryUsers />
-                </ProtectedRoute>
-              } />
-              <Route path="/government-users" element={
-                <ProtectedRoute>
-                  <GovernmentUsers />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/waste-entry" element={
-                <ProtectedRoute>
-                  <WasteEntry />
-                </ProtectedRoute>
-              } />
-              <Route path="/analytics" element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              } />
-              <Route path="/route-optimization" element={
-                <ProtectedRoute>
-                  <RouteOptimization />
-                </ProtectedRoute>
-              } />
-              <Route path="/citizen-reports" element={
-                <ProtectedRoute>
-                  <CitizenReports />
-                </ProtectedRoute>
-              } />
-              <Route path="/citizen-reports/new" element={
-                <ProtectedRoute>
-                  <NewCitizenReport />
-                </ProtectedRoute>
-              } />
-              <Route path="/citizen-reports/:id" element={
-                <ProtectedRoute>
-                  <CitizenReportDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/marketplace" element={
-                <ProtectedRoute>
-                  <Marketplace />
-                </ProtectedRoute>
-              } />
-              <Route path="/ai-assistant" element={
-                <ProtectedRoute>
-                  <AIAssistant />
-                </ProtectedRoute>
-              } />
-              <Route path="/carbon-trading" element={<CarbonCreditTrading />} />
-              <Route path="/green-bonds" element={
-                <ProtectedRoute>
-                  <GreenBonds />
-                </ProtectedRoute>
-              } />
-              <Route path="/micro-finance" element={
-                <ProtectedRoute>
-                  <MicroFinance />
-                </ProtectedRoute>
-              } />
-              <Route path="/enhanced-green-bonds" element={
-                <ProtectedRoute>
-                  <EnhancedGreenBonds />
-                </ProtectedRoute>
-              } />
-              <Route path="/enhanced-micro-finance" element={
-                <ProtectedRoute>
-                  <EnhancedMicroFinance />
-                </ProtectedRoute>
-              } />
-              <Route path="/esg-investment-tracking" element={
-                <ProtectedRoute>
-                  <ESGInvestmentTracking />
-                </ProtectedRoute>
-              } />
-              <Route path="/esg-reporting-tools" element={
-                <ProtectedRoute>
-                  <ESGReportingTools />
-                </ProtectedRoute>
-              } />
-              <Route path="/esg-reporting-compliance" element={
-                <ProtectedRoute>
-                  <ESGReportingCompliance />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/user-types" element={<ProtectedRoute><UserTypes /></ProtectedRoute>} />
+              <Route path="/features" element={<ProtectedRoute><Features /></ProtectedRoute>} />
+              <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+              <Route path="/citizen-reports" element={<ProtectedRoute><CitizenReports /></ProtectedRoute>} />
+              <Route path="/waste-entry" element={<ProtectedRoute><WasteEntry /></ProtectedRoute>} />
+              <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+              <Route path="/route-optimization" element={<ProtectedRoute><RouteOptimization /></ProtectedRoute>} />
+              <Route path="/carbon-credit-trading" element={<ProtectedRoute><CarbonCreditTrading /></ProtectedRoute>} />
+              <Route path="/green-bonds" element={<ProtectedRoute><GreenBonds /></ProtectedRoute>} />
+              <Route path="/esg-reporting-tools" element={<ProtectedRoute><ESGReportingTools /></ProtectedRoute>} />
+              <Route path="/esg-investment-tracking" element={<ProtectedRoute><ESGInvestmentTracking /></ProtectedRoute>} />
+              <Route path="/esg-reporting-compliance" element={<ProtectedRoute><ESGReportingCompliance /></ProtectedRoute>} />
+              <Route path="/micro-finance" element={<ProtectedRoute><MicroFinance /></ProtectedRoute>} />
+              <Route path="/enhanced-auth" element={<ProtectedRoute><EnhancedAuth /></ProtectedRoute>} />
+              <Route path="/esg" element={<ProtectedRoute><EsgTradingFloor /></ProtectedRoute>} />
+              <Route path="/water-credit-trading" element={<ProtectedRoute><WaterCreditTrading /></ProtectedRoute>} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
