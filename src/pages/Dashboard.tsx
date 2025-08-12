@@ -215,7 +215,14 @@ const Dashboard = () => {
 
         {/* Analytics and Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <EnvironmentalImpactCard />
+          <EnvironmentalImpactCard 
+            environmentalImpact={{
+              carbonFootprintReduced: userStats?.total_credits_earned || 125,
+              wasteRecycled: userStats?.activities_completed * 10 || 150,
+              energySaved: userStats?.total_credits_earned * 5 || 625,
+              waterSaved: userStats?.activities_completed * 20 || 300
+            }}
+          />
           <RecentActivity />
         </div>
       </div>
