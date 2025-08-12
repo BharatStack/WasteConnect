@@ -34,7 +34,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userStats, setUserStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     if (user) {
@@ -77,7 +76,7 @@ const Dashboard = () => {
     navigate(route);
   };
 
-  const coreFeaturesCards = [
+  const featureCards = [
     {
       id: 'waste-data',
       title: 'Waste Data Entry',
@@ -122,10 +121,7 @@ const Dashboard = () => {
       route: '/citizen-reports',
       buttonText: 'View Reports',
       color: 'text-orange-600'
-    }
-  ];
-
-  const greenFinanceCards = [
+    },
     {
       id: 'esg-investment',
       title: 'ESG Investment Tracking',
@@ -153,36 +149,6 @@ const Dashboard = () => {
       buttonText: 'Apply for Micro-Finance',
       color: 'text-purple-600'
     },
-    {
-      id: 'green-insurance',
-      title: 'Green Insurance',
-      description: 'Parametric insurance for waste management operations and climate risk coverage',
-      icon: Shield,
-      route: '/features',
-      buttonText: 'Get Insurance Quote',
-      color: 'text-teal-600'
-    },
-    {
-      id: 'equipment-financing',
-      title: 'Equipment Financing',
-      description: 'Asset financing for waste collection vehicles, sorting equipment, and processing machinery',
-      icon: Truck,
-      route: '/features',
-      buttonText: 'Apply for Equipment Loan',
-      color: 'text-indigo-600'
-    },
-    {
-      id: 'esg-reporting',
-      title: 'ESG Reporting & Compliance',
-      description: 'Automated ESG reporting platform with regulatory compliance tracking',
-      icon: FileText,
-      route: '/esg-reporting-tools',
-      buttonText: 'Access Reporting Tools',
-      color: 'text-gray-600'
-    }
-  ];
-
-  const tradingMarketsCards = [
     {
       id: 'carbon-credit',
       title: 'Carbon Credit Trading',
@@ -236,47 +202,35 @@ const Dashboard = () => {
       route: '/green-bonds',
       buttonText: 'Corporate Solutions',
       color: 'text-gray-600'
-    }
-  ];
-
-  const integrationCards = [
+    },
     {
-      id: 'esg-tools',
-      title: 'ESG Reporting Tools',
-      description: 'Comprehensive ESG reporting and compliance management',
+      id: 'green-insurance',
+      title: 'Green Insurance',
+      description: 'Parametric insurance for waste management operations and climate risk coverage',
+      icon: Shield,
+      route: '/features',
+      buttonText: 'Get Insurance Quote',
+      color: 'text-teal-600'
+    },
+    {
+      id: 'equipment-financing',
+      title: 'Equipment Financing',
+      description: 'Asset financing for waste collection vehicles, sorting equipment, and processing machinery',
+      icon: Truck,
+      route: '/features',
+      buttonText: 'Apply for Equipment Loan',
+      color: 'text-indigo-600'
+    },
+    {
+      id: 'esg-reporting',
+      title: 'ESG Reporting & Compliance',
+      description: 'Automated ESG reporting platform with regulatory compliance tracking',
       icon: FileText,
       route: '/esg-reporting-tools',
-      buttonText: 'Access Tools',
-      color: 'text-blue-600'
+      buttonText: 'Access Reporting Tools',
+      color: 'text-gray-600'
     }
   ];
-
-  const renderFeatureCards = (cards: any[]) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {cards.map((card) => {
-        const IconComponent = card.icon;
-        return (
-          <Card key={card.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <IconComponent className={`h-6 w-6 ${card.color}`} />
-                {card.title}
-              </CardTitle>
-              <CardDescription>{card.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => handleNavigation(card.route)}
-                className="w-full bg-eco-green-600 hover:bg-eco-green-700 text-white"
-              >
-                {card.buttonText}
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
 
   if (isLoading) {
     return (
@@ -291,120 +245,62 @@ const Dashboard = () => {
       <DashboardHeader />
       
       <div className="max-w-7xl mx-auto py-6 px-4">
-        {/* Header Section */}
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Manage your waste data, environmental impact, and green finance opportunities</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, {user?.email?.split('@')[0] || 'User'}!
+          </h1>
+          <p className="text-gray-600">
+            Manage your waste data, track environmental impact, and access green finance opportunities
+          </p>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="flex space-x-8 border-b border-gray-200">
-            <button 
-              onClick={() => setActiveTab('overview')}
-              className={`pb-4 px-1 border-b-2 font-medium ${
-                activeTab === 'overview' 
-                  ? 'border-eco-green-600 text-eco-green-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Overview
-            </button>
-            <button 
-              onClick={() => setActiveTab('core-features')}
-              className={`pb-4 px-1 border-b-2 font-medium ${
-                activeTab === 'core-features' 
-                  ? 'border-eco-green-600 text-eco-green-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Core Features
-            </button>
-            <button 
-              onClick={() => setActiveTab('green-finance')}
-              className={`pb-4 px-1 border-b-2 font-medium ${
-                activeTab === 'green-finance' 
-                  ? 'border-eco-green-600 text-eco-green-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Green Finance
-            </button>
-            <button 
-              onClick={() => setActiveTab('trading-markets')}
-              className={`pb-4 px-1 border-b-2 font-medium ${
-                activeTab === 'trading-markets' 
-                  ? 'border-eco-green-600 text-eco-green-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Trading & Markets
-            </button>
-            <button 
-              onClick={() => setActiveTab('integrations')}
-              className={`pb-4 px-1 border-b-2 font-medium ${
-                activeTab === 'integrations' 
-                  ? 'border-eco-green-600 text-eco-green-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Integrations
-            </button>
-          </div>
+        {/* Stats Dashboard */}
+        <DashboardStats userStats={userStats} />
+
+        {/* Analytics and Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <EnvironmentalImpactCard 
+            environmentalImpact={{
+              carbonFootprintReduced: userStats?.total_credits_earned || 125,
+              wasteRecycled: userStats?.activities_completed * 10 || 150,
+              energySaved: userStats?.total_credits_earned * 5 || 625,
+              waterSaved: userStats?.activities_completed * 20 || 300
+            }}
+          />
+          <RecentActivity />
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'overview' && (
-          <>
-            {/* Stats Dashboard */}
-            <DashboardStats userStats={userStats} />
-
-            {/* Analytics and Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <EnvironmentalImpactCard 
-                environmentalImpact={{
-                  carbonFootprintReduced: userStats?.total_credits_earned || 125,
-                  wasteRecycled: userStats?.activities_completed * 10 || 150,
-                  energySaved: userStats?.total_credits_earned * 5 || 625,
-                  waterSaved: userStats?.activities_completed * 20 || 300
-                }}
-              />
-              <RecentActivity />
-            </div>
-          </>
-        )}
-
-        {activeTab === 'core-features' && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Core Features</h2>
-            <p className="text-gray-600 mb-6">Essential waste management and environmental tracking tools</p>
-            {renderFeatureCards(coreFeaturesCards)}
+        {/* Features Grid */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Available Features</h2>
+          <p className="text-gray-600 mb-6">Explore all the features available in your dashboard</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featureCards.map((card) => {
+              const IconComponent = card.icon;
+              return (
+                <Card key={card.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <IconComponent className={`h-6 w-6 ${card.color}`} />
+                      {card.title}
+                    </CardTitle>
+                    <CardDescription>{card.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      onClick={() => handleNavigation(card.route)}
+                      className="w-full bg-eco-green-600 hover:bg-eco-green-700 text-white"
+                    >
+                      {card.buttonText}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-        )}
-
-        {activeTab === 'green-finance' && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Green Finance Solutions</h2>
-            <p className="text-gray-600 mb-6">Access sustainable financing options and environmental investments</p>
-            {renderFeatureCards(greenFinanceCards)}
-          </div>
-        )}
-
-        {activeTab === 'trading-markets' && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Environmental Asset Trading</h2>
-            <p className="text-gray-600 mb-6">Trade carbon credits, plastic credits, and other environmental assets</p>
-            {renderFeatureCards(tradingMarketsCards)}
-          </div>
-        )}
-
-        {activeTab === 'integrations' && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Integrations</h2>
-            <p className="text-gray-600 mb-6">Connect with external tools and reporting platforms</p>
-            {renderFeatureCards(integrationCards)}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
