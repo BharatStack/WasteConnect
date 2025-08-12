@@ -38,8 +38,13 @@ function App() {
           <Toaster />
           <BrowserRouter>
             <Routes>
+              {/* Home route - handles opening animation and auth redirect */}
               <Route path="/" element={<Home />} />
+              
+              {/* Authentication route */}
               <Route path="/enhanced-auth" element={<EnhancedAuth />} />
+              
+              {/* Protected routes - require authentication */}
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/user-types" element={<ProtectedRoute><UserTypes /></ProtectedRoute>} />
@@ -57,6 +62,9 @@ function App() {
               <Route path="/micro-finance" element={<ProtectedRoute><MicroFinance /></ProtectedRoute>} />
               <Route path="/esg" element={<ProtectedRoute><EsgTradingFloor /></ProtectedRoute>} />
               <Route path="/water-credit-trading" element={<ProtectedRoute><WaterCreditTrading /></ProtectedRoute>} />
+              
+              {/* Catch all route - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </ThemeProvider>

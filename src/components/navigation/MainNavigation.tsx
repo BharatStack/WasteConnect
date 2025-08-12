@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Home, BarChart3, ShoppingCart, Info, LogOut, User, Leaf } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import ProfileMenu from '@/components/ProfileMenu';
 
 const MainNavigation = () => {
   const location = useLocation();
@@ -84,7 +85,7 @@ const MainNavigation = () => {
   );
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -99,16 +100,8 @@ const MainNavigation = () => {
             <NavigationContent />
             
             {isAuthenticated ? (
-              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">
-                    {user?.email?.split('@')[0] || 'User'}
-                  </span>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-gray-600 hover:text-red-600">
-                  <LogOut className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center ml-4 pl-4 border-l border-gray-200">
+                <ProfileMenu />
               </div>
             ) : (
               <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
@@ -120,7 +113,8 @@ const MainNavigation = () => {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
+            {isAuthenticated && <ProfileMenu />}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm">
