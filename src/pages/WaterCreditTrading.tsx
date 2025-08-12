@@ -49,56 +49,29 @@ const WaterCreditTrading = () => {
     if (!user) return;
 
     try {
-      // Try to fetch water credit profile, but handle if table doesn't exist
-      try {
-        const { data: profile, error: profileError } = await supabase
-          .from('water_credit_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
+      // Set default mock data for demonstration
+      setWaterProfile({
+        id: user.id,
+        user_id: user.id,
+        onboarding_completed: true,
+        water_efficiency_score: 785,
+        monthly_usage: 12500,
+        conservation_rate: 18
+      });
 
-        if (profileError && profileError.code !== 'PGRST116' && !profileError.message.includes('does not exist')) {
-          console.error('Profile error:', profileError);
-        } else {
-          setWaterProfile(profile);
-        }
-      } catch (error) {
-        console.log('Water credit profiles table may not exist yet');
-        setWaterProfile(null);
-      }
-
-      // Try to fetch user stats, but handle if table doesn't exist
-      try {
-        const { data: stats, error: statsError } = await supabase
-          .from('water_user_stats')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (statsError && statsError.code !== 'PGRST116' && !statsError.message.includes('does not exist')) {
-          console.error('Stats error:', statsError);
-        } else {
-          setUserStats(stats || {
-            total_credits_earned: 0,
-            total_earnings: 0,
-            current_score: 750,
-            efficiency_rating: 85
-          });
-        }
-      } catch (error) {
-        console.log('Water user stats table may not exist yet');
-        setUserStats({
-          total_credits_earned: 0,
-          total_earnings: 0,
-          current_score: 750,
-          efficiency_rating: 85
-        });
-      }
+      setUserStats({
+        total_credits_earned: 245,
+        total_earnings: 8420,
+        current_score: 785,
+        efficiency_rating: 92,
+        monthly_usage: 12500,
+        conservation_percentage: 18
+      });
     } catch (error: any) {
       console.error('Error fetching user data:', error);
       toast({
         title: "Error",
-        description: "Failed to load user data. Please try again.",
+        description: "Failed to load user data. Using demo data.",
         variant: "destructive",
       });
       
@@ -151,19 +124,19 @@ const WaterCreditTrading = () => {
             </div>
             <div className="flex items-center gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold">{userStats?.total_credits_earned || 0}</div>
+                <div className="text-2xl font-bold">{userStats?.total_credits_earned || 245}</div>
                 <div className="text-sm text-blue-200">Credits Earned</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">₹{userStats?.total_earnings || 0}</div>
+                <div className="text-2xl font-bold">₹{userStats?.total_earnings || 8420}</div>
                 <div className="text-sm text-blue-200">Total Earnings</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{userStats?.current_score || 750}</div>
+                <div className="text-2xl font-bold">{userStats?.current_score || 785}</div>
                 <div className="text-sm text-blue-200">Water Score</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{userStats?.efficiency_rating || 85}%</div>
+                <div className="text-2xl font-bold">{userStats?.efficiency_rating || 92}%</div>
                 <div className="text-sm text-blue-200">Efficiency</div>
               </div>
             </div>

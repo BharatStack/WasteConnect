@@ -12,6 +12,7 @@ import Dashboard from '@/pages/Dashboard';
 import UserTypes from '@/pages/UserTypes';
 import Features from '@/pages/Features';
 import About from '@/pages/About';
+import Analytics from '@/pages/Analytics';
 import CitizenReports from '@/pages/CitizenReports';
 import WasteEntry from '@/pages/WasteEntry';
 import Marketplace from '@/pages/Marketplace';
@@ -40,6 +41,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/enhanced-auth" element={<EnhancedAuth />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/user-types" element={<ProtectedRoute><UserTypes /></ProtectedRoute>} />
               <Route path="/features" element={<ProtectedRoute><Features /></ProtectedRoute>} />
               <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
