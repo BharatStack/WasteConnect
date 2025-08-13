@@ -142,34 +142,36 @@ const PlasticCreditMarketplace = () => {
       </div>
 
       {/* CSS for animations */}
-      <style jsx>{`
-        .wave-animation {
-          background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
-          animation: wave 3s ease-in-out infinite;
-        }
-        
-        .floating-particles::before {
-          content: '';
-          position: absolute;
-          width: 4px;
-          height: 4px;
-          background: rgba(255,255,255,0.6);
-          border-radius: 50%;
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes wave {
-          0%, 100% { transform: translateX(-100%); }
-          50% { transform: translateX(100%); }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          25% { transform: translateY(-20px) rotate(90deg); }
-          50% { transform: translateY(-10px) rotate(180deg); }
-          75% { transform: translateY(-30px) rotate(270deg); }
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .wave-animation {
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: wave 3s ease-in-out infinite;
+          }
+          
+          .floating-particles::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+          }
+          
+          @keyframes wave {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(90deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+            75% { transform: translateY(-30px) rotate(270deg); }
+          }
+        `
+      }} />
     </div>
   );
 };

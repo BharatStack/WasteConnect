@@ -47,21 +47,21 @@ import AIAssistant from "./pages/AIAssistant";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { showAnimation, animationComplete } = useAppOpeningAnimation();
+  const { isAuthenticated, loading } = useAuth();
+  const { showOpeningAnimation, handleOpeningComplete } = useAppOpeningAnimation();
 
   // Show opening animation first
-  if (showAnimation && !animationComplete) {
-    return <AppOpeningAnimation />;
+  if (showOpeningAnimation) {
+    return <AppOpeningAnimation onComplete={handleOpeningComplete} />;
   }
 
   // Show authentication if not authenticated and animation is complete
-  if (!isAuthenticated && !isLoading && animationComplete) {
+  if (!isAuthenticated && !loading) {
     return <EnhancedAuth />;
   }
 
   // Show main app if authenticated
-  if (isAuthenticated && animationComplete) {
+  if (isAuthenticated) {
     return (
       <>
         <MainNavigation />
