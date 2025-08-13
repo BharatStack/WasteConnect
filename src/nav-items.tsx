@@ -17,7 +17,8 @@ import {
   Leaf,
   Target,
   DollarSign,
-  Globe
+  Globe,
+  Recycle
 } from "lucide-react";
 
 export const navItems = [
@@ -67,6 +68,12 @@ export const navItems = [
     title: "Marketplace",
     to: "/marketplace",
     icon: Building2,
+    variant: "ghost" as const,
+  },
+  {
+    title: "Plastic Credit Marketplace",
+    to: "/plastic-credit-marketplace",
+    icon: Recycle,
     variant: "ghost" as const,
   },
   {
