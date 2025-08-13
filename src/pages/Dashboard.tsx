@@ -163,7 +163,7 @@ const Dashboard = () => {
       title: 'Plastic Credit Marketplace',
       description: 'Trade plastic credits and achieve plastic neutrality through verified collection',
       icon: Recycle,
-      route: '/marketplace',
+      route: '/plastic-credit-marketplace',
       buttonText: 'Trade Plastic Credits',
       color: 'text-blue-600'
     },
