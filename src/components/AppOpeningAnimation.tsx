@@ -68,7 +68,7 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
       scale: 1, 
       rotate: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 15,
         duration: 1.5
@@ -84,18 +84,6 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
       transition: {
         delay: 1,
         duration: 0.8
-      }
-    }
-  };
-
-  const orbVariants = {
-    animate: {
-      scale: [1, 1.2, 1],
-      rotate: [0, 360],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "linear"
       }
     }
   };
@@ -126,20 +114,41 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
           {/* Animated background orbs */}
           <motion.div 
             className="absolute top-1/4 left-1/4 w-32 h-32 bg-eco-green-400/20 rounded-full blur-xl"
-            variants={orbVariants}
-            animate="animate"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear"
+            }}
           />
           <motion.div 
             className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-emerald-400/20 rounded-full blur-xl"
-            variants={orbVariants}
-            animate="animate"
-            style={{ animationDelay: '1s' }}
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 1
+            }}
           />
           <motion.div 
             className="absolute top-1/2 right-1/3 w-24 h-24 bg-teal-400/20 rounded-full blur-xl"
-            variants={orbVariants}
-            animate="animate"
-            style={{ animationDelay: '2s' }}
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 2
+            }}
           />
 
           {/* Floating sparkles */}
