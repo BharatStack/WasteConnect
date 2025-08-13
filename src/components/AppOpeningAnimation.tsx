@@ -9,9 +9,71 @@ interface AppOpeningAnimationProps {
 
 const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete }) => {
   const [showAnimation, setShowAnimation] = useState(true);
-  const [audioStarted, setAudioStarted] = useState(false);
 
   useEffect(() => {
+    // Create Netflix-style opening sound immediately when component mounts
+    const createOpeningSound = () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        
+        // Create multiple oscillators for a rich, memorable sound
+        const createTone = (frequency: number, startTime: number, duration: number, volume: number) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          const filterNode = audioContext.createBiquadFilter();
+          
+          oscillator.connect(filterNode);
+          filterNode.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          // Configure filter for warmth
+          filterNode.type = 'lowpass';
+          filterNode.frequency.setValueAtTime(2000, audioContext.currentTime);
+          
+          oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + startTime);
+          oscillator.type = 'sine';
+          
+          // Volume envelope
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+          gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + startTime + 0.1);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
+          
+          oscillator.start(audioContext.currentTime + startTime);
+          oscillator.stop(audioContext.currentTime + startTime + duration);
+          
+          return oscillator;
+        };
+
+        // Netflix-style chord progression: C major to F major to G major
+        // Main melody notes
+        createTone(523.25, 0, 1.2, 0.15);    // C5
+        createTone(659.25, 0.3, 1.2, 0.12);  // E5
+        createTone(783.99, 0.6, 1.5, 0.1);   // G5
+        createTone(1046.5, 1.0, 2.0, 0.08);  // C6
+
+        // Harmony notes
+        createTone(261.63, 0, 1.5, 0.08);    // C4
+        createTone(329.63, 0.3, 1.5, 0.06);  // E4
+        createTone(392.00, 0.6, 1.8, 0.05);  // G4
+
+        // Bass notes for depth
+        createTone(130.81, 0, 2.5, 0.1);     // C3
+        createTone(174.61, 1.2, 1.5, 0.08);  // F3
+        createTone(196.00, 2.0, 1.5, 0.08);  // G3
+
+        // Add some sparkle with higher frequencies
+        createTone(1567.98, 1.5, 0.8, 0.03); // G6
+        createTone(2093.00, 2.2, 0.6, 0.02); // C7
+
+        console.log('WasteConnect opening sound started');
+      } catch (error) {
+        console.log('Audio context not available, continuing silently');
+      }
+    };
+
+    // Start sound immediately
+    createOpeningSound();
+
     // Auto-complete animation after 4 seconds
     const timer = setTimeout(() => {
       setShowAnimation(false);
@@ -20,34 +82,6 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
 
     return () => clearTimeout(timer);
   }, [onComplete]);
-
-  const startAudio = () => {
-    if (!audioStarted) {
-      setAudioStarted(true);
-      // Create a simple ambient sound using Web Audio API
-      try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + 2);
-        oscillator.frequency.exponentialRampToValueAtTime(330, audioContext.currentTime + 4);
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.5);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 4);
-      } catch (error) {
-        console.log('Audio not supported');
-      }
-    }
-  };
 
   const containerVariants = {
     initial: { opacity: 0 },
@@ -104,12 +138,11 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
     <AnimatePresence>
       {showAnimation && (
         <motion.div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-eco-green-900 via-eco-green-700 to-emerald-800 overflow-hidden cursor-pointer"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-eco-green-900 via-eco-green-700 to-emerald-800 overflow-hidden"
           variants={containerVariants}
           initial="initial"
           animate="animate"
           exit="exit"
-          onClick={startAudio}
         >
           {/* Animated background orbs */}
           <motion.div 
@@ -270,17 +303,6 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
                 ))}
               </div>
             </motion.div>
-
-            {/* Click to start audio hint */}
-            {!audioStarted && (
-              <motion.p 
-                className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-eco-green-200 text-sm"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                Click anywhere to enable sound
-              </motion.p>
-            )}
           </div>
         </motion.div>
       )}
