@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, Sparkles, Globe, Recycle } from 'lucide-react';
@@ -11,12 +10,12 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
   const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
-    // Create Netflix-style opening sound immediately when component mounts
+    // Create Netflix-style opening sound with better timing and volume
     const createOpeningSound = () => {
       try {
         const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         
-        // Create multiple oscillators for a rich, memorable sound
+        // Create multiple oscillators for a rich, memorable sound with increased volume
         const createTone = (frequency: number, startTime: number, duration: number, volume: number) => {
           const oscillator = audioContext.createOscillator();
           const gainNode = audioContext.createGain();
@@ -33,7 +32,7 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
           oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + startTime);
           oscillator.type = 'sine';
           
-          // Volume envelope
+          // Enhanced volume envelope with higher base volume
           gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
           gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + startTime + 0.1);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
@@ -44,37 +43,44 @@ const AppOpeningAnimation: React.FC<AppOpeningAnimationProps> = ({ onComplete })
           return oscillator;
         };
 
-        // Netflix-style chord progression: C major to F major to G major
-        // Main melody notes
-        createTone(523.25, 0, 1.2, 0.15);    // C5
-        createTone(659.25, 0.3, 1.2, 0.12);  // E5
-        createTone(783.99, 0.6, 1.5, 0.1);   // G5
-        createTone(1046.5, 1.0, 2.0, 0.08);  // C6
+        // Synchronized with animation timing - Netflix-style chord progression with increased volume
+        // Logo scale animation starts immediately, so sound starts immediately too
+        
+        // Main melody notes - increased volume (was 0.15, now 0.35)
+        createTone(523.25, 0, 1.2, 0.35);    // C5 - matches logo scale start
+        createTone(659.25, 0.4, 1.2, 0.28);  // E5 - matches logo scale completion
+        createTone(783.99, 0.8, 1.5, 0.25);   // G5 - matches text fade in
+        createTone(1046.5, 1.5, 2.0, 0.22);  // C6 - matches sparkle animations
 
-        // Harmony notes
-        createTone(261.63, 0, 1.5, 0.08);    // C4
-        createTone(329.63, 0.3, 1.5, 0.06);  // E4
-        createTone(392.00, 0.6, 1.8, 0.05);  // G4
+        // Harmony notes - increased volume (was 0.08, now 0.2)
+        createTone(261.63, 0, 1.5, 0.2);    // C4
+        createTone(329.63, 0.4, 1.5, 0.18);  // E4
+        createTone(392.00, 0.8, 1.8, 0.16);  // G4
 
-        // Bass notes for depth
-        createTone(130.81, 0, 2.5, 0.1);     // C3
-        createTone(174.61, 1.2, 1.5, 0.08);  // F3
-        createTone(196.00, 2.0, 1.5, 0.08);  // G3
+        // Bass notes for depth - increased volume (was 0.1, now 0.25)
+        createTone(130.81, 0, 2.5, 0.25);     // C3 - provides foundation
+        createTone(174.61, 1.5, 1.5, 0.2);   // F3 - builds progression
+        createTone(196.00, 2.5, 1.5, 0.18);  // G3 - resolves progression
 
-        // Add some sparkle with higher frequencies
-        createTone(1567.98, 1.5, 0.8, 0.03); // G6
-        createTone(2093.00, 2.2, 0.6, 0.02); // C7
+        // Add some sparkle with higher frequencies - increased volume
+        createTone(1567.98, 2.0, 0.8, 0.08); // G6 - matches sparkles
+        createTone(2093.00, 2.8, 0.6, 0.06); // C7 - final sparkle
 
-        console.log('WasteConnect opening sound started');
+        // Add a subtle reverb effect with delayed echoes
+        createTone(523.25, 0.2, 0.8, 0.08);  // C5 echo
+        createTone(659.25, 0.6, 0.8, 0.06);  // E5 echo
+        createTone(783.99, 1.0, 0.8, 0.05);  // G5 echo
+
+        console.log('WasteConnect opening sound started with enhanced volume and sync');
       } catch (error) {
         console.log('Audio context not available, continuing silently');
       }
     };
 
-    // Start sound immediately
+    // Start sound immediately when component mounts (synced with animation start)
     createOpeningSound();
 
-    // Auto-complete animation after 4 seconds
+    // Auto-complete animation after 4 seconds (matches sound duration)
     const timer = setTimeout(() => {
       setShowAnimation(false);
       onComplete();
