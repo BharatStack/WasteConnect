@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { useUserActivities } from '@/hooks/useUserActivities';
 
 interface FeatureTrackerProps {
   featureName: string;
@@ -10,6 +10,7 @@ interface FeatureTrackerProps {
 
 const FeatureTracker = ({ featureName, children }: FeatureTrackerProps) => {
   const { user } = useAuth();
+  const { createActivity } = useUserActivities();
 
   useEffect(() => {
     if (user) {
@@ -19,16 +20,16 @@ const FeatureTracker = ({ featureName, children }: FeatureTrackerProps) => {
 
   const trackFeatureUsage = async () => {
     try {
-      // For now, we'll just log to console
-      // In a real app, you'd want to store this in a feature_usage table
       console.log(`Feature accessed: ${featureName} by user: ${user?.id}`);
       
-      // You could extend this to store in Supabase:
-      // await supabase.from('feature_usage').insert({
-      //   user_id: user.id,
-      //   feature_name: featureName,
-      //   accessed_at: new Date().toISOString()
-      // });
+      // Create activity log for feature usage
+      await createActivity(
+        'feature_accessed',
+        'Feature Accessed',
+        `Accessed ${featureName} feature`,
+        'active',
+        { feature_name: featureName }
+      );
     } catch (error) {
       console.error('Error tracking feature usage:', error);
     }

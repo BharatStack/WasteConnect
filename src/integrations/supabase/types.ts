@@ -2849,6 +2849,45 @@ export type Database = {
           },
         ]
       }
+      user_activities: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          related_id: string | null
+          status: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          related_id?: string | null
+          status: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          related_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -3704,6 +3743,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_activity_log: {
+        Args: {
+          p_user_id: string
+          p_activity_type: string
+          p_title: string
+          p_description: string
+          p_status: string
+          p_metadata?: Json
+          p_related_id?: string
+        }
+        Returns: string
+      }
       create_audit_log: {
         Args: {
           p_action: string

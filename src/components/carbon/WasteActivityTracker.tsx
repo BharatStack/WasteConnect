@@ -1,6 +1,6 @@
-
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserActivities } from '@/hooks/useUserActivities';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ type WasteType = 'organic' | 'recyclable' | 'plastic' | 'paper' | 'metal' | 'gla
 const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { createActivity } = useUserActivities();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -59,7 +60,7 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
     if (!selectedType || !activityData.quantity) return '0';
     
     const quantity = parseFloat(activityData.quantity);
-    return (quantity * selectedType.factor * 0.1).toFixed(2); // Base calculation
+    return (quantity * selectedType.factor * 0.1).toFixed(2);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,7 +79,6 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
     setIsLoading(true);
 
     try {
-      // Calculate estimated carbon credits
       const estimatedCredits = parseFloat(calculateEstimatedCredits());
 
       // Create waste activity record
@@ -110,27 +110,26 @@ const WasteActivityTracker = ({ onActivityLogged }: ActivityTrackerProps) => {
           credits_amount: estimatedCredits,
           credits_type: 'waste_reduction',
           status: 'pending',
-          expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() // 1 year from now
+          expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
         });
 
       if (creditsError) throw creditsError;
 
-      // Update user stats
-      const { error: statsError } = await supabase
-        .from('user_stats')
-        .upsert({
-          user_id: user.id,
-          total_activities: 1,
-          total_waste_processed: parseFloat(activityData.quantity),
-          total_credits_earned: estimatedCredits,
-          co2_saved: estimatedCredits * 2.5, // Rough CO2 calculation
-          last_activity_date: new Date().toISOString().split('T')[0]
-        }, {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
-
-      if (statsError) console.error('Stats update error:', statsError);
+      // Create activity log using the hook
+      await createActivity(
+        'waste_activity_logged',
+        'Waste Activity Logged',
+        `Logged ${activityData.quantity} ${activityData.unit} of ${activityData.activity_type} waste`,
+        'pending',
+        {
+          waste_type: activityData.activity_type,
+          quantity: parseFloat(activityData.quantity),
+          unit: activityData.unit,
+          estimated_credits: estimatedCredits,
+          location: activityData.location_name
+        },
+        activity.id
+      );
 
       toast({
         title: "Activity Logged Successfully!",
