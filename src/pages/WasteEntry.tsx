@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserActivities } from '@/hooks/useUserActivities';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 const WasteEntry = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { createActivity } = useUserActivities();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,9 +91,24 @@ const WasteEntry = () => {
 
       if (error) throw error;
 
+      // Create activity log manually for immediate feedback
+      await createActivity(
+        'waste_logged',
+        'Waste Data Recorded',
+        `${quantity} ${formData.unit} of ${formData.waste_type} waste logged`,
+        'completed',
+        {
+          quantity: quantity,
+          unit: formData.unit,
+          waste_type: formData.waste_type,
+          co2_reduced: environmentalImpact.co2_reduction_kg,
+          cost_savings: environmentalImpact.co2_reduction_kg * 3800
+        }
+      );
+
       toast({
         title: "Waste Data Recorded",
-        description: "Your waste data has been successfully logged with environmental impact calculations.",
+        description: `Your waste data has been successfully logged. CO₂ reduced: ${environmentalImpact.co2_reduction_kg.toFixed(2)} kg`,
       });
 
       // Reset form

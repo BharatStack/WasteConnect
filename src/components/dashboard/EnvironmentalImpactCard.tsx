@@ -2,18 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Leaf, IndianRupee } from 'lucide-react';
+import { useUserStats } from '@/hooks/useUserStats';
 
-interface EnvironmentalImpactCardProps {
-  environmentalImpact: any;
-}
-
-const EnvironmentalImpactCard = ({ environmentalImpact }: EnvironmentalImpactCardProps) => {
-  const getCO2Reduction = (impact: any): number => {
-    if (typeof impact === 'object' && impact !== null) {
-      return impact.co2_reduction_kg || 0;
-    }
-    return 0;
-  };
+const EnvironmentalImpactCard = () => {
+  const { stats, loading } = useUserStats();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -24,8 +16,25 @@ const EnvironmentalImpactCard = ({ environmentalImpact }: EnvironmentalImpactCar
     }).format(amount);
   };
 
-  const co2Reduction = getCO2Reduction(environmentalImpact);
-  const costSavings = co2Reduction * 3800; // Updated conversion rate for INR (approximately 45.67 * 83 INR/USD)
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        {[...Array(2)].map((_, i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  const co2Reduction = stats?.total_co2_reduced_kg || 0;
+  const costSavings = stats?.total_cost_savings || 0;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

@@ -8,44 +8,64 @@ import {
   Award, 
   Activity, 
   Target,
-  BarChart3
+  BarChart3,
+  IndianRupee,
+  Leaf
 } from 'lucide-react';
+import { useUserStats } from '@/hooks/useUserStats';
 
-interface DashboardStatsProps {
-  userStats: any;
-}
-
-const DashboardStats: React.FC<DashboardStatsProps> = ({ userStats }) => {
+const DashboardStats: React.FC = () => {
   const navigate = useNavigate();
+  const { stats, loading } = useUserStats();
 
-  const stats = [
+  if (loading) {
+    return (
+      <div className="mb-8">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const statsData = [
     {
-      title: 'Total Credits Earned',
-      value: userStats?.total_credits_earned || 0,
+      title: 'Waste Logged',
+      value: `${stats?.total_waste_logged_kg?.toFixed(1) || 0} kg`,
       icon: Target,
       color: 'text-eco-green-600',
       bgColor: 'bg-eco-green-50'
     },
     {
-      title: 'Total Earnings',
-      value: `₹${userStats?.total_earnings || 0}`,
-      icon: TrendingUp,
+      title: 'CO₂ Reduced',
+      value: `${stats?.total_co2_reduced_kg?.toFixed(1) || 0} kg`,
+      icon: Leaf,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      title: 'Cost Savings',
+      value: `₹${stats?.total_cost_savings?.toFixed(0) || 0}`,
+      icon: IndianRupee,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
       title: 'Activities Completed',
-      value: userStats?.activities_completed || 0,
+      value: stats?.activities_completed || 0,
       icon: Activity,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
-    },
-    {
-      title: 'Current Level',
-      value: userStats?.current_level || 1,
-      icon: Award,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
     }
   ];
 
@@ -65,7 +85,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ userStats }) => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => {
+        {statsData.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
             <Card key={index} className="hover:shadow-md transition-shadow">

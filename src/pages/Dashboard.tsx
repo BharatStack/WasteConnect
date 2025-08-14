@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -28,49 +27,15 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import EnvironmentalImpactCard from '@/components/dashboard/EnvironmentalImpactCard';
+import VisitTracker from '@/components/dashboard/VisitTracker';
+import { useVisitTracker } from '@/hooks/useVisitTracker';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [userStats, setUserStats] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserData();
-    }
-  }, [user]);
-
-  const fetchUserData = async () => {
-    if (!user) return;
-
-    try {
-      // Fetch user stats with fallback
-      const { data: stats } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      setUserStats(stats || {
-        total_credits_earned: 0,
-        total_earnings: 0,
-        activities_completed: 0,
-        current_level: 1
-      });
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      // Set default values on error
-      setUserStats({
-        total_credits_earned: 0,
-        total_earnings: 0,
-        activities_completed: 0,
-        current_level: 1
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  
+  // Track user visit
+  useVisitTracker();
 
   const handleNavigation = (route: string) => {
     navigate(route);
@@ -232,14 +197,6 @@ const Dashboard = () => {
     }
   ];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader />
@@ -256,18 +213,18 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Dashboard */}
-        <DashboardStats userStats={userStats} />
+        <DashboardStats />
+
+        {/* Visit Tracking Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Engagement Insights</h2>
+          <p className="text-gray-600 mb-4">Track your app usage and build streaks to maximize your environmental impact!</p>
+          <VisitTracker />
+        </div>
 
         {/* Analytics and Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <EnvironmentalImpactCard 
-            environmentalImpact={{
-              carbonFootprintReduced: userStats?.total_credits_earned || 125,
-              wasteRecycled: userStats?.activities_completed * 10 || 150,
-              energySaved: userStats?.total_credits_earned * 5 || 625,
-              waterSaved: userStats?.activities_completed * 20 || 300
-            }}
-          />
+          <EnvironmentalImpactCard />
           <RecentActivity />
         </div>
 
