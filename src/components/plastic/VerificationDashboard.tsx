@@ -7,66 +7,78 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
+import { usePlasticMarketplace } from '@/hooks/usePlasticMarketplace';
 import { CheckCircle, Clock, AlertCircle, Upload, MapPin, Camera, FileText } from 'lucide-react';
 
 const VerificationDashboard = () => {
-  const [selectedVerification, setSelectedVerification] = useState(null);
+  const { user } = useAuth();
+  const { 
+    collections, 
+    collectionsLoading, 
+    submitCollection, 
+    isSubmittingCollection 
+  } = usePlasticMarketplace();
 
-  const verificationData = {
-    pending: 15,
-    inProgress: 8,
-    completed: 142,
-    rejected: 3,
-    submissions: [
-      {
-        id: 'VER-2024-001',
-        type: 'PET Bottles Collection',
-        location: 'Marina Beach, Chennai',
-        submittedBy: 'Ocean Cleanup Collective',
-        status: 'pending',
-        evidence: ['photos', 'gps', 'receipt'],
-        amount: 450,
-        estimatedCredits: 90,
-        submissionDate: '2024-01-15',
-        verifier: null,
-        progress: 25
-      },
-      {
-        id: 'VER-2024-002',
-        type: 'HDPE Containers',
-        location: 'Ganges River, Varanasi',
-        submittedBy: 'River Warriors India',
-        status: 'in-progress',
-        evidence: ['photos', 'gps', 'weight-cert'],
-        amount: 325,
-        estimatedCredits: 65,
-        submissionDate: '2024-01-12',
-        verifier: 'Dr. Priya Sharma',
-        progress: 75
-      },
-      {
-        id: 'VER-2024-003',
-        type: 'Mixed Plastics',
-        location: 'Boracay Beach, Philippines',
-        submittedBy: 'Island Guardians',
-        status: 'completed',
-        evidence: ['photos', 'gps', 'receipt', 'quality-test'],
-        amount: 672,
-        estimatedCredits: 134,
-        submissionDate: '2024-01-08',
-        verifier: 'Prof. Maria Santos',
-        progress: 100
+  const [selectedVerification, setSelectedVerification] = useState(null);
+  const [newCollection, setNewCollection] = useState({
+    collection_type: '',
+    quantity: '',
+    location: '',
+    description: ''
+  });
+
+  // Calculate verification statistics
+  const verificationData = React.useMemo(() => {
+    if (!collections) return { pending: 0, inProgress: 0, completed: 0, rejected: 0 };
+
+    return collections.reduce((acc, collection) => {
+      switch (collection.verification_status) {
+        case 'pending':
+          acc.pending++;
+          break;
+        case 'verified':
+          acc.completed++;
+          break;
+        case 'rejected':
+          acc.rejected++;
+          break;
+        default:
+          acc.pending++;
       }
-    ]
+      return acc;
+    }, { pending: 0, inProgress: 0, completed: 0, rejected: 0 });
+  }, [collections]);
+
+  const handleSubmitCollection = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newCollection.collection_type || !newCollection.quantity || !newCollection.location) {
+      return;
+    }
+
+    submitCollection({
+      collection_type: newCollection.collection_type,
+      quantity: parseInt(newCollection.quantity),
+      location: newCollection.location,
+      description: newCollection.description || undefined
+    });
+
+    // Reset form
+    setNewCollection({
+      collection_type: '',
+      quantity: '',
+      location: '',
+      description: ''
+    });
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
         return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'in-progress':
-        return <AlertCircle className="h-5 w-5 text-blue-500" />;
-      case 'completed':
+      case 'verified':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'rejected':
         return <AlertCircle className="h-5 w-5 text-red-500" />;
@@ -75,13 +87,11 @@ const VerificationDashboard = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
+      case 'verified':
         return 'bg-green-100 text-green-800';
       case 'rejected':
         return 'bg-red-100 text-red-800';
@@ -89,6 +99,35 @@ const VerificationDashboard = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const calculateProgress = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 25;
+      case 'verified':
+        return 100;
+      case 'rejected':
+        return 100;
+      default:
+        return 0;
+    }
+  };
+
+  if (collectionsLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Please log in to access verification features.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -150,76 +189,91 @@ const VerificationDashboard = () => {
       {/* Verification Tabs */}
       <Tabs defaultValue="submissions" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="submissions">Verification Queue</TabsTrigger>
-          <TabsTrigger value="submit">Submit for Verification</TabsTrigger>
-          <TabsTrigger value="guidelines">Verification Guidelines</TabsTrigger>
+          <TabsTrigger value="submissions">Your Submissions</TabsTrigger>
+          <TabsTrigger value="submit">Submit Collection</TabsTrigger>
+          <TabsTrigger value="guidelines">Guidelines</TabsTrigger>
         </TabsList>
 
         <TabsContent value="submissions">
           <Card>
             <CardHeader>
-              <CardTitle>Verification Submissions</CardTitle>
+              <CardTitle>Your Verification Submissions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {verificationData.submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        {getStatusIcon(submission.status)}
+                {collections && collections.length > 0 ? (
+                  collections.map((collection) => (
+                    <div key={collection.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          {getStatusIcon(collection.verification_status)}
+                          <div>
+                            <h3 className="font-semibold">
+                              {collection.collection_type} Collection
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              Submitted {new Date(collection.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={getStatusColor(collection.verification_status)}>
+                          {collection.verification_status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
                         <div>
-                          <h3 className="font-semibold">{submission.id}</h3>
-                          <p className="text-sm text-gray-600">{submission.type}</p>
+                          <p className="text-sm text-gray-600 flex items-center">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            Location
+                          </p>
+                          <p className="font-medium">{collection.location}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Quantity</p>
+                          <p className="font-medium">{collection.quantity} items</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Credits Earned</p>
+                          <p className="font-medium">
+                            {collection.verification_status === 'verified' 
+                              ? `${collection.credits_earned} credits`
+                              : 'Pending verification'
+                            }
+                          </p>
                         </div>
                       </div>
-                      <Badge className={getStatusColor(submission.status)}>
-                        {submission.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                      <div>
-                        <p className="text-sm text-gray-600 flex items-center">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          Location
-                        </p>
-                        <p className="font-medium">{submission.location}</p>
+                      
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-sm text-gray-600">Verification Progress</p>
+                          <p className="text-sm font-medium">
+                            {calculateProgress(collection.verification_status)}%
+                          </p>
+                        </div>
+                        <Progress value={calculateProgress(collection.verification_status)} className="h-2" />
                       </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Submitted by</p>
-                        <p className="font-medium">{submission.submittedBy}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Amount</p>
-                        <p className="font-medium">{submission.amount} items</p>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm text-gray-600">Verification Progress</p>
-                        <p className="text-sm font-medium">{submission.progress}%</p>
-                      </div>
-                      <Progress value={submission.progress} className="h-2" />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex space-x-2">
-                        {submission.evidence.map((evidence) => (
-                          <Badge key={evidence} variant="outline" className="text-xs">
-                            {evidence}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex space-x-2">
+
+                      {collection.description && (
+                        <div className="mb-3">
+                          <p className="text-sm text-gray-600">Description</p>
+                          <p className="text-sm">{collection.description}</p>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                          ID: {collection.id.substring(0, 8)}...
+                        </div>
                         <Button variant="outline" size="sm">View Details</Button>
-                        {submission.status === 'pending' && (
-                          <Button size="sm">Start Verification</Button>
-                        )}
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No submissions yet. Submit your first collection to get started!</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -231,31 +285,56 @@ const VerificationDashboard = () => {
               <CardTitle>Submit Collection for Verification</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
+              <form onSubmit={handleSubmitCollection} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Collection Type</label>
-                    <select className="w-full p-2 border rounded-md">
-                      <option>PET Bottles</option>
-                      <option>HDPE Containers</option>
-                      <option>Mixed Plastics</option>
-                      <option>Film Plastics</option>
-                    </select>
+                    <Select 
+                      value={newCollection.collection_type} 
+                      onValueChange={(value) => setNewCollection(prev => ({ ...prev, collection_type: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select collection type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PET Bottles">PET Bottles</SelectItem>
+                        <SelectItem value="HDPE Containers">HDPE Containers</SelectItem>
+                        <SelectItem value="Mixed Plastics">Mixed Plastics</SelectItem>
+                        <SelectItem value="Film Plastics">Film Plastics</SelectItem>
+                        <SelectItem value="Foam Containers">Foam Containers</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">Quantity (items)</label>
-                    <Input type="number" placeholder="Enter number of items" />
+                    <Input 
+                      type="number" 
+                      placeholder="Enter number of items" 
+                      value={newCollection.quantity}
+                      onChange={(e) => setNewCollection(prev => ({ ...prev, quantity: e.target.value }))}
+                      min="1"
+                      required
+                    />
                   </div>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium mb-2">Collection Location</label>
-                  <Input placeholder="Enter collection location" />
+                  <Input 
+                    placeholder="Enter collection location" 
+                    value={newCollection.location}
+                    onChange={(e) => setNewCollection(prev => ({ ...prev, location: e.target.value }))}
+                    required
+                  />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
-                  <Textarea placeholder="Describe the collection process, conditions, and any relevant details" />
+                  <label className="block text-sm font-medium mb-2">Description (Optional)</label>
+                  <Textarea 
+                    placeholder="Describe the collection process, conditions, and any relevant details" 
+                    value={newCollection.description}
+                    onChange={(e) => setNewCollection(prev => ({ ...prev, description: e.target.value }))}
+                  />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -263,26 +342,41 @@ const VerificationDashboard = () => {
                     <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600">Upload Photos</p>
                     <p className="text-xs text-gray-500">Collection evidence</p>
+                    <p className="text-xs text-blue-500 mt-1">Coming soon</p>
                   </div>
                   
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
                     <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600">GPS Coordinates</p>
                     <p className="text-xs text-gray-500">Location proof</p>
+                    <p className="text-xs text-blue-500 mt-1">Coming soon</p>
                   </div>
                   
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
                     <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600">Documentation</p>
                     <p className="text-xs text-gray-500">Receipts, certificates</p>
+                    <p className="text-xs text-blue-500 mt-1">Coming soon</p>
                   </div>
                 </div>
                 
                 <div className="flex space-x-4">
-                  <Button className="flex-1">Submit for Verification</Button>
-                  <Button variant="outline">Save as Draft</Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1"
+                    disabled={isSubmittingCollection}
+                  >
+                    {isSubmittingCollection ? 'Submitting...' : 'Submit for Verification'}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setNewCollection({ collection_type: '', quantity: '', location: '', description: '' })}
+                  >
+                    Clear
+                  </Button>
                 </div>
-              </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
@@ -324,8 +418,8 @@ const VerificationDashboard = () => {
                       <p className="text-sm text-gray-600">Automated checks for completeness and basic requirements</p>
                     </div>
                     <div className="border-l-4 border-yellow-500 pl-4">
-                      <h4 className="font-medium">Step 2: Expert Verification</h4>
-                      <p className="text-sm text-gray-600">Third-party verifier reviews evidence and validates claims</p>
+                      <h4 className="font-medium">Step 2: AI Verification</h4>
+                      <p className="text-sm text-gray-600">AI analyzes submitted evidence and validates claims</p>
                     </div>
                     <div className="border-l-4 border-green-500 pl-4">
                       <h4 className="font-medium">Step 3: Credit Issuance</h4>
@@ -343,6 +437,19 @@ const VerificationDashboard = () => {
                       <li>• Location data must be accurate and verifiable</li>
                       <li>• Collection must follow environmental best practices</li>
                       <li>• All documentation must be authentic and complete</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3">Credit Calculation</h3>
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <ul className="space-y-1 text-sm">
+                      <li>• PET Bottles: 0.2 credits per item</li>
+                      <li>• HDPE Containers: 0.3 credits per item</li>
+                      <li>• Mixed Plastics: 0.15 credits per item</li>
+                      <li>• Film Plastics: 0.1 credits per item</li>
+                      <li>• Foam Containers: 0.25 credits per item</li>
                     </ul>
                   </div>
                 </div>

@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { usePlasticMarketplace } from '@/hooks/usePlasticMarketplace';
 import { 
   TrendingUp, 
   Waves, 
@@ -18,6 +20,18 @@ import {
 } from 'lucide-react';
 
 const MarketplaceDashboard = () => {
+  const { user } = useAuth();
+  const { 
+    portfolio, 
+    portfolioLoading, 
+    credits, 
+    creditsLoading, 
+    orders, 
+    ordersLoading,
+    collections,
+    collectionsLoading 
+  } = usePlasticMarketplace();
+
   const [animatedValues, setAnimatedValues] = useState({
     totalCredits: 0,
     tradingVolume: 0,
@@ -26,17 +40,19 @@ const MarketplaceDashboard = () => {
   });
 
   useEffect(() => {
-    // Animate numbers on load
+    if (!portfolio) return;
+
+    // Animate numbers based on real data
     const targets = {
-      totalCredits: 1247,
-      tradingVolume: 89750,
-      impactScore: 92,
-      oceanHealth: 78
+      totalCredits: portfolio.total_credits || 0,
+      tradingVolume: portfolio.total_value || 0,
+      impactScore: Math.min(92, (portfolio.total_collections || 0) * 10), // Cap at 92%
+      oceanHealth: Math.min(85, (portfolio.co2_offset || 0) * 2) // Cap at 85%
     };
 
     Object.keys(targets).forEach(key => {
       let current = 0;
-      const target = targets[key];
+      const target = targets[key as keyof typeof targets];
       const increment = target / 50;
       
       const timer = setInterval(() => {
@@ -48,21 +64,69 @@ const MarketplaceDashboard = () => {
         setAnimatedValues(prev => ({ ...prev, [key]: Math.floor(current) }));
       }, 30);
     });
-  }, []);
+  }, [portfolio]);
 
-  const recentActivity = [
-    { id: 1, type: 'buy', amount: 50, price: 125, user: 'EcoCollector', time: '2 min ago', verified: true },
-    { id: 2, type: 'sell', amount: 25, price: 130, user: 'OceanGuard', time: '5 min ago', verified: true },
-    { id: 3, type: 'verify', amount: 100, user: 'PlasticHero', time: '8 min ago', verified: false },
-    { id: 4, type: 'buy', amount: 75, price: 128, user: 'GreenFuture', time: '12 min ago', verified: true },
-  ];
+  // Get recent activity from collections and orders
+  const recentActivity = React.useMemo(() => {
+    const activities = [];
+    
+    // Add recent collections
+    if (collections) {
+      collections.slice(0, 2).forEach(collection => {
+        activities.push({
+          id: collection.id,
+          type: 'verify',
+          amount: collection.quantity,
+          user: user?.user_metadata?.full_name || 'You',
+          time: new Date(collection.created_at).toLocaleString(),
+          verified: collection.verification_status === 'verified'
+        });
+      });
+    }
+
+    // Add recent orders (limited to user's orders for privacy)
+    if (orders && user) {
+      orders
+        .filter(order => order.user_id === user.id)
+        .slice(0, 2)
+        .forEach(order => {
+          activities.push({
+            id: order.id,
+            type: order.order_type,
+            amount: order.quantity,
+            price: order.price_per_credit,
+            user: 'You',
+            time: new Date(order.created_at).toLocaleString(),
+            verified: true
+          });
+        });
+    }
+
+    return activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 4);
+  }, [collections, orders, user]);
 
   const achievements = [
-    { icon: '🌊', title: 'Ocean Protector', description: 'Traded 1000+ credits', unlocked: true },
-    { icon: '♻️', title: 'Recycling Champion', description: 'Verified 500+ collections', unlocked: true },
-    { icon: '🌱', title: 'Green Pioneer', description: 'First 100 trades', unlocked: true },
-    { icon: '🏆', title: 'Impact Master', description: 'Top 10% impact score', unlocked: false },
+    { icon: '🌊', title: 'Ocean Protector', description: 'Traded 1000+ credits', unlocked: (portfolio?.total_trades || 0) >= 1000 },
+    { icon: '♻️', title: 'Recycling Champion', description: 'Verified 500+ collections', unlocked: (portfolio?.total_collections || 0) >= 500 },
+    { icon: '🌱', title: 'Green Pioneer', description: 'First 100 trades', unlocked: (portfolio?.total_trades || 0) >= 100 },
+    { icon: '🏆', title: 'Impact Master', description: 'Top 10% impact score', unlocked: (portfolio?.co2_offset || 0) >= 10 },
   ];
+
+  if (portfolioLoading || creditsLoading || ordersLoading || collectionsLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Please log in to view your plastic credit dashboard.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -74,7 +138,9 @@ const MarketplaceDashboard = () => {
               <div>
                 <p className="text-blue-100 text-sm font-medium">My Credits</p>
                 <p className="text-3xl font-bold">{animatedValues.totalCredits.toLocaleString()}</p>
-                <p className="text-blue-200 text-sm">+12% this month</p>
+                <p className="text-blue-200 text-sm">
+                  {credits && credits.length > 0 ? `+${credits.length} active` : 'Start collecting!'}
+                </p>
               </div>
               <div className="bg-white/20 p-3 rounded-full">
                 <Recycle className="h-8 w-8" />
@@ -87,9 +153,11 @@ const MarketplaceDashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-teal-100 text-sm font-medium">Trading Volume</p>
+                <p className="text-teal-100 text-sm font-medium">Portfolio Value</p>
                 <p className="text-3xl font-bold">₹{animatedValues.tradingVolume.toLocaleString()}</p>
-                <p className="text-teal-200 text-sm">+24% this week</p>
+                <p className="text-teal-200 text-sm">
+                  {portfolio?.total_trades || 0} trades completed
+                </p>
               </div>
               <div className="bg-white/20 p-3 rounded-full">
                 <TrendingUp className="h-8 w-8" />
@@ -104,7 +172,9 @@ const MarketplaceDashboard = () => {
               <div>
                 <p className="text-green-100 text-sm font-medium">Impact Score</p>
                 <p className="text-3xl font-bold">{animatedValues.impactScore}%</p>
-                <p className="text-green-200 text-sm">Excellent rating</p>
+                <p className="text-green-200 text-sm">
+                  {portfolio?.total_collections || 0} collections
+                </p>
               </div>
               <div className="bg-white/20 p-3 rounded-full">
                 <Target className="h-8 w-8" />
@@ -117,9 +187,9 @@ const MarketplaceDashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm font-medium">Ocean Health</p>
-                <p className="text-3xl font-bold">{animatedValues.oceanHealth}%</p>
-                <p className="text-purple-200 text-sm">Your contribution</p>
+                <p className="text-purple-100 text-sm font-medium">CO₂ Offset</p>
+                <p className="text-3xl font-bold">{(portfolio?.co2_offset || 0).toFixed(1)} tons</p>
+                <p className="text-purple-200 text-sm">Environmental impact</p>
               </div>
               <div className="bg-white/20 p-3 rounded-full">
                 <Waves className="h-8 w-8" />
@@ -136,38 +206,44 @@ const MarketplaceDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-blue-600" />
-              Recent Market Activity
+              Your Recent Activity
             </CardTitle>
-            <CardDescription>Live transactions and verifications</CardDescription>
+            <CardDescription>Your latest marketplace activities</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50/80 rounded-lg hover:bg-gray-100/80 transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-full ${
-                      activity.type === 'buy' ? 'bg-green-100 text-green-600' :
-                      activity.type === 'sell' ? 'bg-blue-100 text-blue-600' :
-                      'bg-purple-100 text-purple-600'
-                    }`}>
-                      {activity.type === 'buy' ? '📈' : activity.type === 'sell' ? '📉' : '✅'}
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50/80 rounded-lg hover:bg-gray-100/80 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-full ${
+                        activity.type === 'buy' ? 'bg-green-100 text-green-600' :
+                        activity.type === 'sell' ? 'bg-blue-100 text-blue-600' :
+                        'bg-purple-100 text-purple-600'
+                      }`}>
+                        {activity.type === 'buy' ? '📈' : activity.type === 'sell' ? '📉' : '✅'}
+                      </div>
+                      <div>
+                        <p className="font-medium">{activity.user}</p>
+                        <p className="text-sm text-gray-600">
+                          {activity.type === 'verify' ? 
+                            `Submitted ${activity.amount} items for verification` :
+                            `${activity.type === 'buy' ? 'Bought' : 'Sold'} ${activity.amount} credits at ₹${activity.price}`
+                          }
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{activity.user}</p>
-                      <p className="text-sm text-gray-600">
-                        {activity.type === 'verify' ? 
-                          `Verified ${activity.amount} credits` :
-                          `${activity.type === 'buy' ? 'Bought' : 'Sold'} ${activity.amount} credits at ₹${activity.price}`
-                        }
-                      </p>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500">{activity.time}</p>
+                      {activity.verified && <Badge variant="secondary" className="text-xs">Verified</Badge>}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-500">{activity.time}</p>
-                    {activity.verified && <Badge variant="secondary" className="text-xs">Verified</Badge>}
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No recent activity. Start by submitting a collection or placing an order!</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -221,10 +297,15 @@ const MarketplaceDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <Progress value={85} className="transform rotate-90 w-24 h-2" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-blue-600">85%</span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    {Math.min(100, (portfolio?.total_collections || 0) * 5)}%
+                  </span>
                 </div>
+                <Progress 
+                  value={Math.min(100, (portfolio?.total_collections || 0) * 5)} 
+                  className="transform rotate-90 w-24 h-2" 
+                />
               </div>
               <h3 className="font-semibold text-blue-800">Ocean Cleanup</h3>
               <p className="text-sm text-gray-600">Plastic removed from ocean</p>
@@ -232,21 +313,31 @@ const MarketplaceDashboard = () => {
             
             <div className="text-center">
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <Progress value={92} className="transform rotate-90 w-24 h-2" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-green-600">92%</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    {Math.min(100, (portfolio?.total_credits || 0) / 10)}%
+                  </span>
                 </div>
+                <Progress 
+                  value={Math.min(100, (portfolio?.total_credits || 0) / 10)} 
+                  className="transform rotate-90 w-24 h-2" 
+                />
               </div>
-              <h3 className="font-semibold text-green-800">Recycling Rate</h3>
-              <p className="text-sm text-gray-600">Credits properly recycled</p>
+              <h3 className="font-semibold text-green-800">Credit Generation</h3>
+              <p className="text-sm text-gray-600">Credits successfully earned</p>
             </div>
             
             <div className="text-center">
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <Progress value={78} className="transform rotate-90 w-24 h-2" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-purple-600">78%</span>
+                  <span className="text-2xl font-bold text-purple-600">
+                    {Math.min(100, (portfolio?.co2_offset || 0) * 10)}%
+                  </span>
                 </div>
+                <Progress 
+                  value={Math.min(100, (portfolio?.co2_offset || 0) * 10)} 
+                  className="transform rotate-90 w-24 h-2" 
+                />
               </div>
               <h3 className="font-semibold text-purple-800">CO₂ Offset</h3>
               <p className="text-sm text-gray-600">Carbon footprint reduced</p>
@@ -283,8 +374,8 @@ const MarketplaceDashboard = () => {
             
             <Button variant="outline" className="h-auto flex-col p-6 border-purple-200 hover:bg-purple-50">
               <Users className="h-8 w-8 mb-2 text-purple-600" />
-              <span className="font-medium">Join Community</span>
-              <span className="text-xs text-gray-600">Connect with other collectors</span>
+              <span className="font-medium">View Analytics</span>
+              <span className="text-xs text-gray-600">Track your impact over time</span>
             </Button>
           </div>
         </CardContent>

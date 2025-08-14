@@ -1973,6 +1973,295 @@ export type Database = {
         }
         Relationships: []
       }
+      plastic_collections: {
+        Row: {
+          collection_type: string
+          created_at: string | null
+          credits_earned: number | null
+          description: string | null
+          gps_coordinates: unknown | null
+          id: string
+          location: string
+          photos: Json | null
+          quantity: number
+          updated_at: string | null
+          user_id: string
+          verification_status: string | null
+          verified_at: string | null
+          verifier_id: string | null
+        }
+        Insert: {
+          collection_type: string
+          created_at?: string | null
+          credits_earned?: number | null
+          description?: string | null
+          gps_coordinates?: unknown | null
+          id?: string
+          location: string
+          photos?: Json | null
+          quantity: number
+          updated_at?: string | null
+          user_id: string
+          verification_status?: string | null
+          verified_at?: string | null
+          verifier_id?: string | null
+        }
+        Update: {
+          collection_type?: string
+          created_at?: string | null
+          credits_earned?: number | null
+          description?: string | null
+          gps_coordinates?: unknown | null
+          id?: string
+          location?: string
+          photos?: Json | null
+          quantity?: number
+          updated_at?: string | null
+          user_id?: string
+          verification_status?: string | null
+          verified_at?: string | null
+          verifier_id?: string | null
+        }
+        Relationships: []
+      }
+      plastic_credit_orders: {
+        Row: {
+          created_at: string | null
+          credit_type: string
+          expires_at: string | null
+          filled_quantity: number | null
+          id: string
+          order_type: string
+          price_per_credit: number
+          quantity: number
+          status: string | null
+          total_amount: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credit_type: string
+          expires_at?: string | null
+          filled_quantity?: number | null
+          id?: string
+          order_type: string
+          price_per_credit: number
+          quantity: number
+          status?: string | null
+          total_amount: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credit_type?: string
+          expires_at?: string | null
+          filled_quantity?: number | null
+          id?: string
+          order_type?: string
+          price_per_credit?: number
+          quantity?: number
+          status?: string | null
+          total_amount?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      plastic_credit_portfolios: {
+        Row: {
+          co2_offset: number | null
+          id: string
+          last_updated: string | null
+          total_collections: number | null
+          total_credits: number | null
+          total_trades: number | null
+          total_value: number | null
+          user_id: string
+        }
+        Insert: {
+          co2_offset?: number | null
+          id?: string
+          last_updated?: string | null
+          total_collections?: number | null
+          total_credits?: number | null
+          total_trades?: number | null
+          total_value?: number | null
+          user_id: string
+        }
+        Update: {
+          co2_offset?: number | null
+          id?: string
+          last_updated?: string | null
+          total_collections?: number | null
+          total_credits?: number | null
+          total_trades?: number | null
+          total_value?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      plastic_credit_trades: {
+        Row: {
+          buy_order_id: string
+          buyer_id: string
+          created_at: string | null
+          id: string
+          price_per_credit: number
+          quantity: number
+          sell_order_id: string
+          seller_id: string
+          settlement_date: string | null
+          total_amount: number
+          trade_date: string | null
+          trade_status: string | null
+        }
+        Insert: {
+          buy_order_id: string
+          buyer_id: string
+          created_at?: string | null
+          id?: string
+          price_per_credit: number
+          quantity: number
+          sell_order_id: string
+          seller_id: string
+          settlement_date?: string | null
+          total_amount: number
+          trade_date?: string | null
+          trade_status?: string | null
+        }
+        Update: {
+          buy_order_id?: string
+          buyer_id?: string
+          created_at?: string | null
+          id?: string
+          price_per_credit?: number
+          quantity?: number
+          sell_order_id?: string
+          seller_id?: string
+          settlement_date?: string | null
+          total_amount?: number
+          trade_date?: string | null
+          trade_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plastic_credit_trades_buy_order_id_fkey"
+            columns: ["buy_order_id"]
+            isOneToOne: false
+            referencedRelation: "plastic_credit_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plastic_credit_trades_sell_order_id_fkey"
+            columns: ["sell_order_id"]
+            isOneToOne: false
+            referencedRelation: "plastic_credit_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plastic_credits: {
+        Row: {
+          collection_id: string | null
+          created_at: string | null
+          credit_type: string
+          credits_amount: number
+          earned_date: string | null
+          expiry_date: string | null
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          collection_id?: string | null
+          created_at?: string | null
+          credit_type: string
+          credits_amount: number
+          earned_date?: string | null
+          expiry_date?: string | null
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          collection_id?: string | null
+          created_at?: string | null
+          credit_type?: string
+          credits_amount?: number
+          earned_date?: string | null
+          expiry_date?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plastic_credits_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "plastic_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plastic_verifications: {
+        Row: {
+          ai_verification_result: Json | null
+          collection_id: string
+          created_at: string | null
+          evidence_data: Json
+          human_verification_required: boolean | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          submission_type: string
+          updated_at: string | null
+          verification_notes: string | null
+          verification_score: number | null
+        }
+        Insert: {
+          ai_verification_result?: Json | null
+          collection_id: string
+          created_at?: string | null
+          evidence_data?: Json
+          human_verification_required?: boolean | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submission_type: string
+          updated_at?: string | null
+          verification_notes?: string | null
+          verification_score?: number | null
+        }
+        Update: {
+          ai_verification_result?: Json | null
+          collection_id?: string
+          created_at?: string | null
+          evidence_data?: Json
+          human_verification_required?: boolean | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submission_type?: string
+          updated_at?: string | null
+          verification_notes?: string | null
+          verification_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plastic_verifications_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "plastic_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       processor_connections: {
         Row: {
           created_at: string
