@@ -91,7 +91,7 @@ const WasteEntry = () => {
 
       if (error) throw error;
 
-      // Create activity log manually for immediate feedback
+      // Create activity log for immediate feedback
       await createActivity(
         'waste_logged',
         'Waste Data Recorded',
@@ -102,9 +102,24 @@ const WasteEntry = () => {
           unit: formData.unit,
           waste_type: formData.waste_type,
           co2_reduced: environmentalImpact.co2_reduction_kg,
-          cost_savings: environmentalImpact.co2_reduction_kg * 3800
+          cost_savings: environmentalImpact.co2_reduction_kg * 3800,
+          waste_log_id: Date.now() // Temporary ID for real-time updates
         }
       );
+
+      // Trigger real-time update by broadcasting to channels
+      const channel = supabase.channel('waste-updates');
+      channel.send({
+        type: 'broadcast',
+        event: 'waste_logged',
+        payload: {
+          user_id: user.id,
+          waste_logged_kg: quantity,
+          co2_reduced_kg: environmentalImpact.co2_reduction_kg,
+          cost_savings: environmentalImpact.co2_reduction_kg * 3800,
+          timestamp: new Date().toISOString()
+        }
+      });
 
       toast({
         title: "Waste Data Recorded",

@@ -42,6 +42,7 @@ import MunicipalityUsers from "./pages/MunicipalityUsers";
 import ResetPassword from "./pages/ResetPassword";
 import EnhancedGreenBonds from "./pages/EnhancedGreenBonds";
 import EnhancedMicroFinance from "./pages/EnhancedMicroFinance";
+import CorporateOffsetPrograms from "./pages/CorporateOffsetPrograms";
 import AIAssistant from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
@@ -170,6 +171,11 @@ const AppContent = () => {
           <Route path="/ai-assistant" element={
             <ProtectedRoute>
               <AIAssistant />
+            </ProtectedRoute>
+          } />
+          <Route path="/corporate-offset-programs" element={
+            <ProtectedRoute>
+              <CorporateOffsetPrograms />
             </ProtectedRoute>
           } />
           <Route path="*" element={<NotFound />} />

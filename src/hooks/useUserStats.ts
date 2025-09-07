@@ -90,7 +90,8 @@ export const useUserStats = () => {
   const setupRealtimeSubscription = () => {
     if (!user) return;
 
-    const channel = supabase
+    // Listen to multiple tables for real-time updates
+    const activitiesChannel = supabase
       .channel('user-activities-changes')
       .on(
         'postgres_changes',
@@ -100,15 +101,39 @@ export const useUserStats = () => {
           table: 'user_activities',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
-          // Refresh stats when activities change
-          fetchUserStats();
-        }
+        () => fetchUserStats()
       )
       .subscribe();
 
+    const wasteChannel = supabase
+      .channel('waste-data-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'waste_data_logs',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => fetchUserStats()
+      )
+      .subscribe();
+
+    // Listen for broadcast updates from waste entry
+    const broadcastChannel = supabase
+      .channel('waste-updates')
+      .on('broadcast', { event: 'waste_logged' }, (payload) => {
+        if (payload.payload.user_id === user.id) {
+          // Immediately update stats for real-time feedback
+          fetchUserStats();
+        }
+      })
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(activitiesChannel);
+      supabase.removeChannel(wasteChannel);
+      supabase.removeChannel(broadcastChannel);
     };
   };
 

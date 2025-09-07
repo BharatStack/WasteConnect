@@ -164,7 +164,7 @@ const Dashboard = () => {
       title: 'Corporate Offset Programs',
       description: 'B2B marketplace for corporate carbon offsetting and sustainability programs',
       icon: Building,
-      route: '/green-bonds',
+      route: '/corporate-offset-programs',
       buttonText: 'Corporate Solutions',
       color: 'text-gray-600'
     },
