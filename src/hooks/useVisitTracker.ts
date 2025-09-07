@@ -11,14 +11,18 @@ export const useVisitTracker = () => {
 
     const trackVisit = async () => {
       try {
-        // Call the track_user_visit function
-        const { error } = await supabase.rpc('track_user_visit', {
-          p_user_id: user.id
+        // Log visit as an activity instead
+        await supabase.from('user_activities').insert({
+          user_id: user.id,
+          activity_type: 'app_visit',
+          title: 'App Visit',
+          description: 'User visited the application',
+          status: 'completed',
+          metadata: {
+            timestamp: new Date().toISOString(),
+            visit_date: new Date().toISOString().split('T')[0]
+          }
         });
-
-        if (error) {
-          console.error('Error tracking visit:', error);
-        }
       } catch (error) {
         console.error('Error tracking visit:', error);
       }

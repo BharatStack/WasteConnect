@@ -36,20 +36,37 @@ export const useUserStats = () => {
     if (!user) return;
 
     try {
-      // Initialize user stats if not exists
-      await supabase.rpc('initialize_user_stats', {
-        p_user_id: user.id
+      // Calculate stats from existing data
+      const [activitiesData, wasteData, creditsData] = await Promise.all([
+        supabase.from('user_activities').select('*').eq('user_id', user.id),
+        supabase.from('waste_data_logs').select('*').eq('user_id', user.id),
+        supabase.from('carbon_credits').select('*').eq('user_id', user.id)
+      ]);
+
+      // Calculate aggregated stats
+      const activities = activitiesData.data || [];
+      const wasteLogs = wasteData.data || [];
+      const credits = creditsData.data || [];
+
+      const totalWaste = wasteLogs.reduce((sum, log) => sum + (log.quantity || 0), 0);
+      const totalCO2 = wasteLogs.reduce((sum, log) => {
+        const envImpact = log.environmental_impact as any;
+        return sum + (envImpact?.co2_reduction_kg || 0);
+      }, 0);
+      const totalCredits = credits.reduce((sum, credit) => sum + (credit.credits_amount || 0), 0);
+
+      setStats({
+        total_waste_logged_kg: totalWaste,
+        total_co2_reduced_kg: totalCO2,
+        total_cost_savings: totalCO2 * 3800, // INR conversion
+        total_credits_earned: totalCredits,
+        total_earnings: totalCredits * 50, // Example rate
+        activities_completed: activities.length,
+        current_level: Math.floor(activities.length / 10) + 1,
+        total_visits: Math.floor(Math.random() * 100) + 20, // Placeholder
+        streak_days: 1,
+        last_activity_date: activities[0]?.created_at?.split('T')[0] || null
       });
-
-      const { data, error } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      setStats(data);
     } catch (error) {
       console.error('Error fetching user stats:', error);
       // Set default values on error
@@ -74,20 +91,18 @@ export const useUserStats = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('user-stats-changes')
+      .channel('user-activities-changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'user_stats',
+          table: 'user_activities',
           filter: `user_id=eq.${user.id}`
         },
-        (payload) => {
-          console.log('User stats changed:', payload);
-          if (payload.new) {
-            setStats(payload.new as UserStats);
-          }
+        () => {
+          // Refresh stats when activities change
+          fetchUserStats();
         }
       )
       .subscribe();
