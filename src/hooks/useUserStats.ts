@@ -58,7 +58,7 @@ export const useUserStats = () => {
       setStats({
         total_waste_logged_kg: totalWaste,
         total_co2_reduced_kg: totalCO2,
-        total_cost_savings: totalCO2 * 3800, // INR conversion
+        total_cost_savings: totalCO2 * 0.455, // 455 INR per tonne CO2 reduced
         total_credits_earned: totalCredits,
         total_earnings: totalCredits * 50, // Example rate
         activities_completed: activities.length,
