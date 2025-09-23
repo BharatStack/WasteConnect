@@ -70,7 +70,7 @@ const RecentActivity = () => {
       <CardContent>
         <div className="space-y-4">
           {activities.length > 0 ? (
-            activities.map((activity) => (
+            activities.slice(0, 5).map((activity) => (
               <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gray-50/80 rounded-lg hover:bg-gray-100/80 transition-colors">
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-eco-green-100 text-eco-green-700 text-lg">

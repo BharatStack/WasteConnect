@@ -42,7 +42,7 @@ export const useUserActivities = () => {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(5);
 
       if (error) throw error;
 

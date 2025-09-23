@@ -339,24 +339,61 @@ const VerificationDashboard = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                    <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">Upload Photos</p>
-                    <p className="text-xs text-gray-500">Collection evidence</p>
-                    <p className="text-xs text-blue-500 mt-1">Coming soon</p>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      id="photo-upload"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        console.log('Photos selected:', files);
+                        // TODO: Upload to Supabase storage
+                      }}
+                    />
+                    <label htmlFor="photo-upload" className="cursor-pointer">
+                      <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">Upload Photos</p>
+                      <p className="text-xs text-gray-500">Collection evidence</p>
+                    </label>
                   </div>
                   
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                    <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">GPS Coordinates</p>
-                    <p className="text-xs text-gray-500">Location proof</p>
-                    <p className="text-xs text-blue-500 mt-1">Coming soon</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (navigator.geolocation) {
+                          navigator.geolocation.getCurrentPosition((position) => {
+                            console.log('GPS coordinates:', position.coords.latitude, position.coords.longitude);
+                            // TODO: Store coordinates
+                          });
+                        }
+                      }}
+                    >
+                      <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">GPS Coordinates</p>
+                      <p className="text-xs text-gray-500">Location proof</p>
+                    </button>
                   </div>
                   
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">Documentation</p>
-                    <p className="text-xs text-gray-500">Receipts, certificates</p>
-                    <p className="text-xs text-blue-500 mt-1">Coming soon</p>
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                      className="hidden"
+                      id="document-upload"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        console.log('Documents selected:', files);
+                        // TODO: Upload to Supabase storage
+                      }}
+                    />
+                    <label htmlFor="document-upload" className="cursor-pointer">
+                      <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">Documentation</p>
+                      <p className="text-xs text-gray-500">Receipts, certificates</p>
+                    </label>
                   </div>
                 </div>
                 

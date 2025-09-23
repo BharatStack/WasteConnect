@@ -171,8 +171,8 @@ const CorporateOffsetPrograms = () => {
       if (error) throw error;
 
       toast({
-        title: "Program Created",
-        description: "Your offset program has been created successfully.",
+        title: "🎉 Program Created Successfully!",
+        description: "Your corporate offset program is now active and ready for impact tracking.",
       });
 
       // Reset form and refresh data
@@ -190,8 +190,8 @@ const CorporateOffsetPrograms = () => {
     } catch (error: any) {
       console.error('Error creating program:', error);
       toast({
-        title: "Error",
-        description: "Failed to create offset program.",
+        title: "❌ Creation Failed",
+        description: "Unable to create offset program. Please check your information and try again.",
         variant: "destructive",
       });
     }
@@ -309,29 +309,35 @@ const CorporateOffsetPrograms = () => {
 
         {/* Create Program Form */}
         {showCreateForm && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Create New Offset Program</CardTitle>
-              <CardDescription>Set up a new sustainability program for your organization</CardDescription>
+          <Card className="mb-6 bg-gradient-to-br from-blue-50 via-teal-50 to-green-50 border-2 border-gradient-primary">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-3">
+                <Target className="h-6 w-6" />
+                Create New Offset Program
+              </CardTitle>
+              <CardDescription className="text-blue-100">
+                Set up a comprehensive sustainability program for your organization
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
+            <CardContent className="p-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Program Name</Label>
+                  <Label className="text-sm font-semibold text-gray-700">Program Name</Label>
                   <Input
                     value={programForm.program_name}
                     onChange={(e) => setProgramForm(prev => ({ ...prev, program_name: e.target.value }))}
                     placeholder="Enter program name"
+                    className="border-2 border-gray-200 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Program Type</Label>
+                  <Label className="text-sm font-semibold text-gray-700">Program Type</Label>
                   <Select
                     value={programForm.program_type}
                     onValueChange={(value) => setProgramForm(prev => ({ ...prev, program_type: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -345,39 +351,92 @@ const CorporateOffsetPrograms = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Target Credits</Label>
+                  <Label className="text-sm font-semibold text-gray-700">Target Credits</Label>
                   <Input
                     type="number"
                     value={programForm.target_credits}
                     onChange={(e) => setProgramForm(prev => ({ ...prev, target_credits: e.target.value }))}
                     placeholder="Enter target credits"
+                    className="border-2 border-gray-200 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Start Date</Label>
+                  <Label className="text-sm font-semibold text-gray-700">Start Date</Label>
                   <Input
                     type="date"
                     value={programForm.start_date}
                     onChange={(e) => setProgramForm(prev => ({ ...prev, start_date: e.target.value }))}
+                    className="border-2 border-gray-200 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>End Date</Label>
+                  <Label className="text-sm font-semibold text-gray-700">End Date</Label>
                   <Input
                     type="date"
                     value={programForm.end_date}
                     onChange={(e) => setProgramForm(prev => ({ ...prev, end_date: e.target.value }))}
+                    className="border-2 border-gray-200 focus:border-blue-500 transition-colors"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-gray-700">Asset Types</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {assetTypes.map(type => (
+                      <label key={type} className="flex items-center space-x-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={programForm.asset_types.includes(type)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setProgramForm(prev => ({ 
+                                ...prev, 
+                                asset_types: [...prev.asset_types, type] 
+                              }));
+                            } else {
+                              setProgramForm(prev => ({ 
+                                ...prev, 
+                                asset_types: prev.asset_types.filter(t => t !== type) 
+                              }));
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <span className="capitalize">{type.replace('_', ' ')}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-gray-700">Employee Participation</Label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={programForm.employee_participation}
+                      onChange={(e) => setProgramForm(prev => ({ ...prev, employee_participation: e.target.checked }))}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-sm text-gray-600">Include employee engagement program</span>
+                  </label>
                 </div>
               </div>
               
-              <div className="mt-4 flex gap-2">
-                <Button onClick={createProgram} className="bg-primary">
+              <div className="mt-6 flex gap-3">
+                <Button 
+                  onClick={createProgram} 
+                  className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
                   Create Program
                 </Button>
-                <Button variant="outline" onClick={() => setShowCreateForm(false)}>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCreateForm(false)}
+                  className="border-2 border-gray-300 hover:border-gray-400 px-6 py-2 rounded-lg font-semibold transition-all duration-200"
+                >
                   Cancel
                 </Button>
               </div>

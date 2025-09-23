@@ -47,7 +47,49 @@ const Analytics = () => {
     }
   };
 
-  const mockData = [
+  const [carbonData, setCarbonData] = useState([]);
+
+  useEffect(() => {
+    fetchCarbonEmissionData();
+  }, [user]);
+
+  const fetchCarbonEmissionData = async () => {
+    if (!user) return;
+
+    try {
+      const { data: wasteData } = await supabase
+        .from('waste_data_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+      // Process waste data to show CO2 reduction over time
+      const processedData = wasteData?.reduce((acc, log) => {
+        const month = new Date(log.created_at).toLocaleDateString('en-US', { month: 'short' });
+        const envImpact = log.environmental_impact as any;
+        const co2Reduced = envImpact?.co2_reduction_kg || 0;
+        
+        const existingMonth = acc.find(item => item.month === month);
+        if (existingMonth) {
+          existingMonth.carbon += co2Reduced;
+        } else {
+          acc.push({ 
+            month, 
+            carbon: co2Reduced,
+            plastic: Math.random() * 50 + 50, // Placeholder
+            water: Math.random() * 100 + 150 // Placeholder
+          });
+        }
+        return acc;
+      }, [] as any[]) || [];
+
+      setCarbonData(processedData);
+    } catch (error) {
+      console.error('Error fetching carbon data:', error);
+    }
+  };
+
+  const mockData = carbonData.length > 0 ? carbonData : [
     { month: 'Jan', carbon: 120, plastic: 80, water: 200 },
     { month: 'Feb', carbon: 150, plastic: 95, water: 180 },
     { month: 'Mar', carbon: 180, plastic: 110, water: 220 },

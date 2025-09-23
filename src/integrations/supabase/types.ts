@@ -1979,6 +1979,7 @@ export type Database = {
           created_at: string | null
           credits_earned: number | null
           description: string | null
+          documents: Json | null
           gps_coordinates: unknown | null
           id: string
           location: string
@@ -1995,6 +1996,7 @@ export type Database = {
           created_at?: string | null
           credits_earned?: number | null
           description?: string | null
+          documents?: Json | null
           gps_coordinates?: unknown | null
           id?: string
           location: string
@@ -2011,6 +2013,7 @@ export type Database = {
           created_at?: string | null
           credits_earned?: number | null
           description?: string | null
+          documents?: Json | null
           gps_coordinates?: unknown | null
           id?: string
           location?: string
