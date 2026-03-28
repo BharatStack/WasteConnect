@@ -18,7 +18,10 @@ import {
   Zap,
   Target,
   Award,
-  DollarSign
+  DollarSign,
+  Store,
+  Calculator,
+  Wallet
 } from 'lucide-react';
 import CarbonCreditOnboarding from '@/components/carbon/CarbonCreditOnboarding';
 import WasteActivityTracker from '@/components/carbon/WasteActivityTracker';
@@ -26,6 +29,9 @@ import CarbonCreditMarketplace from '@/components/carbon/CarbonCreditMarketplace
 import UserDashboard from '@/components/carbon/UserDashboard';
 import CommunityLeaderboard from '@/components/carbon/CommunityLeaderboard';
 import PaymentInterface from '@/components/carbon/PaymentInterface';
+import CarbonBridgeMarketplace from '@/components/carbon/CarbonBridgeMarketplace';
+import EmissionCalculator from '@/components/carbon/EmissionCalculator';
+import CreditPortfolio from '@/components/carbon/CreditPortfolio';
 
 const CarbonCreditTrading = () => {
   const { user } = useAuth();
@@ -164,9 +170,9 @@ const CarbonCreditTrading = () => {
             <div>
               <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
                 <Leaf className="h-8 w-8" />
-                Carbon Credit Trading
+                CarbonBridge India
               </h1>
-              <p className="text-eco-green-100">Transform waste into wealth while saving the planet</p>
+              <p className="text-eco-green-100">India's Carbon Credit Exchange — Trade, Offset, Comply</p>
             </div>
             <div className="flex items-center gap-6">
               <div className="text-center">
@@ -188,14 +194,26 @@ const CarbonCreditTrading = () => {
 
       <div className="max-w-7xl mx-auto py-6 px-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-6">
+          <TabsList className="grid w-full grid-cols-9 mb-6">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Dashboard
             </TabsTrigger>
+            <TabsTrigger value="carbonbridge" className="flex items-center gap-2">
+              <Store className="h-4 w-4" />
+              CarbonBridge
+            </TabsTrigger>
+            <TabsTrigger value="calculator" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Calculator
+            </TabsTrigger>
+            <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <Wallet className="h-4 w-4" />
+              Portfolio
+            </TabsTrigger>
             <TabsTrigger value="activities" className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
-              Track Activities
+              Activities
             </TabsTrigger>
             <TabsTrigger value="marketplace" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -217,6 +235,18 @@ const CarbonCreditTrading = () => {
 
           <TabsContent value="dashboard">
             <UserDashboard userStats={userStats} carbonProfile={carbonProfile} />
+          </TabsContent>
+
+          <TabsContent value="carbonbridge">
+            <CarbonBridgeMarketplace />
+          </TabsContent>
+
+          <TabsContent value="calculator">
+            <EmissionCalculator />
+          </TabsContent>
+
+          <TabsContent value="portfolio">
+            <CreditPortfolio />
           </TabsContent>
 
           <TabsContent value="activities">
