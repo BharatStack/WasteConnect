@@ -83,12 +83,12 @@ const EmissionCalculator = () => {
 
   const fetchSavedReports = async () => {
     try {
-      const { data, error } = await supabase
-        .from('cb_emission_reports')
+      const { data, error } = await (supabase
+        .from('cb_emission_reports' as any)
         .select('id, company_name, scope1_tco2e, scope2_tco2e, total_tco2e, credits_needed, estimated_budget, created_at')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(10) as any);
       if (error) throw error;
       setSavedReports((data as any[]) || []);
     } catch {
@@ -121,7 +121,7 @@ const EmissionCalculator = () => {
   const handleSave = async () => {
     if (!user || !calculated) return;
     try {
-      const { error } = await supabase.from('cb_emission_reports').insert({
+      const { error } = await (supabase.from('cb_emission_reports' as any).insert({
         user_id: user.id,
         company_name: companyName || null,
         diesel_litres: parseFloat(diesel) || 0,
@@ -136,7 +136,7 @@ const EmissionCalculator = () => {
         total_tco2e: total,
         credits_needed: creditsNeeded,
         estimated_budget: estimatedBudget,
-      } as any);
+      }) as any);
 
       if (error) throw error;
       toast({ title: "Report Saved!", description: "Your emission calculation has been saved." });

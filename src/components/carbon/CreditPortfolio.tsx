@@ -83,21 +83,21 @@ const CreditPortfolio = () => {
     setIsLoading(true);
     try {
       // Fetch portfolio
-      const { data: portfolioData, error: pError } = await supabase
-        .from('cb_portfolio')
+      const { data: portfolioData, error: pError } = await (supabase
+        .from('cb_portfolio' as any)
         .select('*')
         .eq('owner_id', user?.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (pError) throw pError;
       setPortfolio((portfolioData as any[]) || []);
 
       // Fetch transactions
-      const { data: txData, error: txError } = await supabase
+      const { data: txData, error: txError } = await (supabase
         .from('cb_transactions' as any)
         .select('*')
         .eq('buyer_id', user?.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (txError) throw txError;
       setTransactions((txData as any[]) || []);
@@ -125,10 +125,10 @@ const CreditPortfolio = () => {
 
   const handleRetire = async (item: PortfolioItem) => {
     try {
-      const { error } = await supabase
-        .from('cb_portfolio')
-        .update({ status: 'RETIRED', retired_at: new Date().toISOString() } as any)
-        .eq('id', item.id);
+      const { error } = await (supabase
+        .from('cb_portfolio' as any)
+        .update({ status: 'RETIRED', retired_at: new Date().toISOString() })
+        .eq('id', item.id) as any);
 
       if (error) throw error;
       toast({ title: "Credits Retired ✅", description: `${item.quantity} ${item.credit_type} credits have been permanently retired.` });

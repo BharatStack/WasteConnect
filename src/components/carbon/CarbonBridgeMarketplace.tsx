@@ -88,11 +88,11 @@ const CarbonBridgeMarketplace = () => {
 
   const fetchListings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('cb_listings')
+      const { data, error } = await (supabase
+        .from('cb_listings' as any)
         .select('*')
         .eq('status', 'LISTED')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (error) throw error;
       setListings((data as any[]) || []);
@@ -160,7 +160,7 @@ const CarbonBridgeMarketplace = () => {
     }
 
     try {
-      const { error } = await supabase.from('cb_listings').insert({
+      const { error } = await (supabase.from('cb_listings' as any).insert({
         seller_id: user.id,
         credit_type: newListing.credit_type,
         serial_number: newListing.serial_number,
@@ -173,7 +173,7 @@ const CarbonBridgeMarketplace = () => {
         description: newListing.description || null,
         status: 'LISTED',
         expiry_date: newListing.expiry_date,
-      } as any);
+      }) as any);
 
       if (error) throw error;
       toast({ title: "Listing Created!", description: "Your carbon credit listing is now live on the marketplace." });
@@ -200,7 +200,7 @@ const CarbonBridgeMarketplace = () => {
     const total = grossValue + commission + gst;
 
     try {
-      const { error } = await supabase.from('cb_transactions').insert({
+      const { error } = await (supabase.from('cb_transactions' as any).insert({
         listing_id: showBuyModal.id,
         buyer_id: user.id,
         seller_id: showBuyModal.seller_id,
@@ -211,15 +211,15 @@ const CarbonBridgeMarketplace = () => {
         gst_on_commission: gst,
         total_buyer_pays: total,
         status: 'COMPLETED',
-      } as any);
+      }) as any);
 
       if (error) throw error;
 
       // Update listing available quantity
-      await supabase.from('cb_listings').update({
+      await (supabase.from('cb_listings' as any).update({
         available_quantity: showBuyModal.available_quantity - qty,
         status: (showBuyModal.available_quantity - qty <= 0) ? 'SOLD' : 'LISTED',
-      } as any).eq('id', showBuyModal.id);
+      }).eq('id', showBuyModal.id) as any);
 
       toast({ title: "Purchase Successful! 🎉", description: `You purchased ${qty} ${showBuyModal.credit_type} credits for ₹${total.toFixed(2)}` });
       setShowBuyModal(null);
