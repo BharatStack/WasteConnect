@@ -29,10 +29,16 @@ A web-based waste management system designed to streamline pickup scheduling, di
 3. Commit and push changes.
 4. Submit a pull request detailing your enhancements.
 
-instructions to be followed to explore the application 
+Instructions to be followed to explore the application:
+
+
 1)Users can log in using their email and password.
+
 2)During sign-up, a verification email is sent. Users must verify their email before logging in.
+
 3)After verifying the email, users can return to the app and log in normally.
+
 4)The “Forgot Password” feature is currently not working due to a database issue.
+
 5)Some features — Equipment Financing, Green Insurance, Green Cryptocurrency, and Biodiversity Credits — are not available yet. Accessing them may lead to a 404 error, and the app may need to be restarted.
 
