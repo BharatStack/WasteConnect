@@ -44,50 +44,62 @@ serve(async (req) => {
       });
     }
 
-    const ollamaUrl = Deno.env.get('OLLAMA_API_URL') || 'http://localhost:11434';
-    const ollamaModel = Deno.env.get('OLLAMA_MODEL') || 'gemma4';
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    if (!geminiApiKey) {
+      console.error('GEMINI_API_KEY not configured');
+      return new Response(JSON.stringify({ error: 'AI API key not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const systemPrompt = buildSystemPrompt(context || {});
 
-    console.log(`ESG Copilot: Calling Ollama at ${ollamaUrl} with model ${ollamaModel}, ${messages.length} messages`);
+    // Convert messages to Gemini format
+    const geminiContents = messages.map((msg: any) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }));
 
-    const ollamaRes = await fetch(`${ollamaUrl}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: ollamaModel,
-        system: systemPrompt,
-        messages,
-        stream: true,
-      }),
-    });
+    console.log(`ESG Copilot: Calling Gemini API with ${messages.length} messages`);
 
-    if (!ollamaRes.ok) {
-      const errorText = await ollamaRes.text();
-      console.error('Ollama API error:', errorText);
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: geminiContents,
+          generationConfig: { temperature: 0.7 },
+        }),
+      }
+    );
+
+    if (!geminiRes.ok) {
+      const errorText = await geminiRes.text();
+      console.error('Gemini API error:', errorText);
       return new Response(JSON.stringify({
-        error: `AI service unavailable (${ollamaRes.status}). Please try again later.`,
+        error: `AI service unavailable (${geminiRes.status}). Please try again later.`,
       }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Stream the Ollama response directly back to the browser
-    return new Response(ollamaRes.body, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+    const aiData = await geminiRes.json();
+    const responseText = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    return new Response(JSON.stringify({
+      message: { content: responseText },
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('Error in esg-copilot:', error);
-
     return new Response(JSON.stringify({
-      error: 'An error occurred while processing your request. The AI service may be unavailable.',
+      error: 'An error occurred while processing your request.',
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

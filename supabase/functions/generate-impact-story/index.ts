@@ -22,10 +22,15 @@ serve(async (req) => {
       });
     }
 
-    const ollamaUrl = Deno.env.get('OLLAMA_API_URL') || 'http://localhost:11434';
-    const ollamaModel = Deno.env.get('OLLAMA_MODEL') || 'gemma4';
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    if (!geminiApiKey) {
+      console.error('GEMINI_API_KEY not configured');
+      return new Response(JSON.stringify({ error: 'AI API key not configured', story: '' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    // Build the AI prompt
     const prompt = `You are an environmental impact writer for WasteConnect, an Indian sustainability platform. A user just logged ${quantity} ${unit} of ${wasteType} waste.
 
 Write exactly 2 sentences that:
@@ -37,32 +42,34 @@ Write exactly 2 sentences that:
 
 Return ONLY the 2 sentences. No headings, no bullet points.`;
 
-    console.log(`Calling Ollama at ${ollamaUrl} with model ${ollamaModel}...`);
+    console.log('Calling Google Gemini API...');
 
-    const ollamaRes = await fetch(`${ollamaUrl}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: ollamaModel,
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-      }),
-    });
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 150, temperature: 0.7 },
+        }),
+      }
+    );
 
-    if (!ollamaRes.ok) {
-      const errorText = await ollamaRes.text();
-      console.error('Ollama API error:', errorText);
+    if (!geminiRes.ok) {
+      const errorText = await geminiRes.text();
+      console.error('Gemini API error:', errorText);
       return new Response(JSON.stringify({
-        error: `Ollama API error: ${ollamaRes.status}`,
-        story: '', // Return empty story so frontend can handle gracefully
+        error: `Gemini API error: ${geminiRes.status}`,
+        story: '',
       }), {
-        status: 200, // Still 200 so frontend doesn't crash
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const aiData = await ollamaRes.json();
-    const story = aiData.message?.content?.trim() || '';
+    const aiData = await geminiRes.json();
+    const story = aiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
     console.log('Impact story generated:', story.substring(0, 80) + '...');
 
@@ -88,12 +95,11 @@ Return ONLY the 2 sentences. No headings, no bullet points.`;
 
   } catch (error) {
     console.error('Error in generate-impact-story:', error);
-
     return new Response(JSON.stringify({
-      error: 'Failed to generate impact story. The AI service may be unavailable.',
+      error: 'Failed to generate impact story.',
       story: '',
     }), {
-      status: 200, // Return 200 with empty story for graceful degradation
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
