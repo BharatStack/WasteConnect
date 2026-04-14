@@ -19,8 +19,12 @@ import {
   FileText,
   Zap,
   Brain,
-  Settings
+  Settings,
+  Loader2
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { buildESGContext, type ESGContext } from '@/lib/esg-context';
 
 interface Message {
   id: string;
@@ -28,28 +32,31 @@ interface Message {
   content: string;
   timestamp: Date;
   suggestions?: string[];
-  charts?: any[];
   insights?: any[];
 }
 
 const ESGAICopilot = () => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'assistant',
-      content: "Hello! I'm your ESG AI Copilot. I can help you analyze your ESG performance, generate insights, and create reports. What would you like to know?",
+      content: "Hello! I'm your ESG AI Copilot powered by real-time data from your WasteConnect account. I can analyze your waste logs, water efficiency scores, and carbon credits to provide data-driven insights. What would you like to know?",
       timestamp: new Date(),
       suggestions: [
-        "Show me our water usage trends vs industry peers",
-        "Generate a sustainability report for Q3",
-        "What are our biggest ESG risks?",
-        "Compare our carbon footprint with competitors"
+        "What is my total waste logged this month?",
+        "Generate GRI 306 waste disclosure",
+        "How is my water efficiency trending?",
+        "Summarize my carbon credits portfolio"
       ]
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [streamingText, setStreamingText] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [esgContext, setEsgContext] = useState<ESGContext | null>(null);
+  const [contextLoading, setContextLoading] = useState(false);
   const [savedQueries, setSavedQueries] = useState([
     "Monthly ESG performance summary",
     "Supply chain risk analysis",
@@ -83,12 +90,23 @@ const ESGAICopilot = () => {
   ];
 
   const contextualSuggestions = [
-    "Analyze our ESG performance against SASB standards",
-    "Show climate risk exposure by region",
-    "Generate supplier sustainability scorecard",
-    "Create board presentation on ESG metrics",
+    "Analyze my ESG performance against SASB standards",
+    "Show waste diversion trends from my data",
+    "Generate a sustainability report for this quarter",
+    "What are my biggest ESG risks based on current data?",
     "Identify improvement opportunities in waste management"
   ];
+
+  // Load ESG context on mount when user is available
+  useEffect(() => {
+    if (user?.id) {
+      setContextLoading(true);
+      buildESGContext(user.id)
+        .then(ctx => setEsgContext(ctx))
+        .catch(err => console.error('Failed to load ESG context:', err))
+        .finally(() => setContextLoading(false));
+    }
+  }, [user?.id]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -96,7 +114,7 @@ const ESGAICopilot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, streamingText]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -108,44 +126,81 @@ const ESGAICopilot = () => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    const currentInput = inputMessage;
     setInputMessage('');
     setIsTyping(true);
+    setStreamingText('');
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
+    try {
+      // Build the messages array for Ollama (role + content only)
+      const ollamaMessages = updatedMessages.map(m => ({
+        role: m.type === 'user' ? 'user' : 'assistant',
+        content: m.content
+      }));
+
+      const { data: responseData, error } = await supabase.functions.invoke('esg-copilot', {
+        body: {
+          messages: ollamaMessages,
+          context: esgContext || {}
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to get AI response');
+      }
+
+      // The edge function returns a streaming response, but supabase.functions.invoke
+      // handles it as a single response. Parse the Ollama JSON lines.
+      let aiResponse = '';
+
+      if (typeof responseData === 'string') {
+        // Parse streaming JSON lines from Ollama
+        const lines = responseData.split('\n').filter(Boolean);
+        for (const line of lines) {
+          try {
+            const parsed = JSON.parse(line);
+            aiResponse += parsed.message?.content || '';
+          } catch {
+            // Skip unparseable lines
+          }
+        }
+      } else if (responseData?.message?.content) {
+        // Single response format
+        aiResponse = responseData.message.content;
+      } else if (responseData?.error) {
+        aiResponse = `⚠️ ${responseData.error}`;
+      } else {
+        aiResponse = "I received an unexpected response format. Please try again.";
+      }
+
+      setStreamingText('');
+      setIsTyping(false);
+
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: generateAIResponse(inputMessage),
-        timestamp: new Date(),
-        insights: [
-          { type: 'trend', text: 'Water usage decreased 8% vs last quarter' },
-          { type: 'benchmark', text: 'Performance 15% above industry average' }
-        ]
+        content: aiResponse || "I couldn't generate a response. Please try again.",
+        timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 2000);
-  };
+      setMessages(prev => [...prev, assistantMessage]);
 
-  const generateAIResponse = (query: string) => {
-    const lowerQuery = query.toLowerCase();
-    
-    if (lowerQuery.includes('water')) {
-      return "Your water usage trends show a positive trajectory. Over the past 6 months, you've reduced consumption by 12% compared to the same period last year. When benchmarked against industry peers, your water efficiency is 15% above average. Key insights: • Manufacturing sites in Asia-Pacific show the highest improvement • Recycling programs contributed to 40% of the reduction • Opportunity to implement smart water meters for real-time monitoring";
+    } catch (err: any) {
+      console.error('ESG Copilot error:', err);
+      setStreamingText('');
+      setIsTyping(false);
+
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: `⚠️ I'm unable to connect to the AI service right now. ${err.message || 'Please check that the Ollama service is running and try again.'}`,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, errorMessage]);
     }
-    
-    if (lowerQuery.includes('carbon') || lowerQuery.includes('emissions')) {
-      return "Your carbon footprint analysis reveals mixed results. While Scope 1 emissions decreased by 8%, Scope 2 emissions increased by 12% due to increased energy consumption. Scope 3 emissions remain the largest component at 65% of total footprint. Recommendations: • Accelerate renewable energy procurement • Engage suppliers on emission reduction • Implement carbon pricing in investment decisions";
-    }
-    
-    if (lowerQuery.includes('risk')) {
-      return "Your biggest ESG risks based on current data: 1. Climate Risk (65% probability) - Physical risks from extreme weather events 2. Regulatory Risk (45% probability) - Upcoming CSRD compliance requirements 3. Supply Chain Risk (55% probability) - Tier 2 supplier sustainability gaps 4. Reputational Risk (30% probability) - Social media sentiment analysis shows neutral trends";
-    }
-    
-    return "I understand you're interested in ESG insights. Could you be more specific about what aspect you'd like to explore? I can help with performance analysis, risk assessment, compliance reporting, or strategic recommendations.";
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -154,7 +209,6 @@ const ESGAICopilot = () => {
 
   const toggleListening = () => {
     setIsListening(!isListening);
-    // In a real app, this would start/stop speech recognition
   };
 
   const getPriorityColor = (priority: string) => {
@@ -193,6 +247,17 @@ const ESGAICopilot = () => {
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
                     ESG AI Assistant
+                    {contextLoading && (
+                      <Badge variant="secondary" className="ml-2 text-xs">
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        Loading data...
+                      </Badge>
+                    )}
+                    {esgContext && !contextLoading && (
+                      <Badge variant="secondary" className="ml-2 text-xs bg-green-50 text-green-700 border-green-200">
+                        Data connected
+                      </Badge>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
@@ -227,17 +292,22 @@ const ESGAICopilot = () => {
                       </div>
                     ))}
                     
+                    {/* Streaming response */}
                     {isTyping && (
                       <div className="flex justify-start">
-                        <div className="bg-gray-100 p-3 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="bg-gray-100 p-3 rounded-lg max-w-[70%]">
+                          {streamingText ? (
+                            <p className="whitespace-pre-wrap">{streamingText}</p>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <div className="flex space-x-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              </div>
+                              <span className="text-sm text-gray-500">AI is analyzing your data...</span>
                             </div>
-                            <span className="text-sm text-gray-500">AI is thinking...</span>
-                          </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -272,6 +342,7 @@ const ESGAICopilot = () => {
                       placeholder="Ask about ESG performance, risks, or generate reports..."
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       className="flex-1"
+                      disabled={isTyping}
                     />
                     <Button
                       onClick={toggleListening}
@@ -281,8 +352,8 @@ const ESGAICopilot = () => {
                     >
                       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                     </Button>
-                    <Button onClick={handleSendMessage} size="sm">
-                      <Send className="h-4 w-4" />
+                    <Button onClick={handleSendMessage} size="sm" disabled={isTyping || !inputMessage.trim()}>
+                      {isTyping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </Button>
                   </div>
                 </CardContent>

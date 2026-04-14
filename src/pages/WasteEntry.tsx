@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserActivities } from '@/hooks/useUserActivities';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Trash2, Home } from 'lucide-react';
+import { ArrowLeft, Trash2, Home, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const WasteEntry = () => {
@@ -19,6 +19,8 @@ const WasteEntry = () => {
   const { createActivity } = useUserActivities();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [impactStory, setImpactStory] = useState('');
+  const [isGeneratingStory, setIsGeneratingStory] = useState(false);
 
   const [formData, setFormData] = useState({
     waste_type: '',
@@ -28,6 +30,17 @@ const WasteEntry = () => {
     collection_date: '',
     notes: ''
   });
+
+  // Auto-dismiss impact story after 8 seconds and navigate to dashboard
+  useEffect(() => {
+    if (impactStory) {
+      const timer = setTimeout(() => {
+        setImpactStory('');
+        navigate('/dashboard');
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [impactStory, navigate]);
 
   const wasteTypes = [
     { value: 'organic', label: 'Organic' },
@@ -46,7 +59,6 @@ const WasteEntry = () => {
   ];
 
   const calculateEnvironmentalImpact = (wasteType: string, quantity: number) => {
-    // Simple calculations - in real app, these would be more sophisticated
     const factors = {
       organic: { co2_reduction: 0.5, methane_prevention: 0.8 },
       recyclable: { co2_reduction: 2.1, resource_saved: 1.5 },
@@ -60,6 +72,29 @@ const WasteEntry = () => {
       co2_reduction_kg: quantity * factor.co2_reduction,
       additional_impact: factor
     };
+  };
+
+  const generateImpactStory = async (wasteType: string, quantity: number, unit: string, entryId?: string) => {
+    setIsGeneratingStory(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-impact-story', {
+        body: { wasteType, quantity, unit, entryId },
+      });
+
+      if (error) {
+        console.error('Impact story generation error:', error);
+        return;
+      }
+
+      if (data?.story) {
+        setImpactStory(data.story);
+      }
+    } catch (err) {
+      console.error('Failed to generate impact story:', err);
+      // Silently fail — the form submission was already successful
+    } finally {
+      setIsGeneratingStory(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -76,7 +111,7 @@ const WasteEntry = () => {
       const quantity = parseFloat(formData.quantity);
       const environmentalImpact = calculateEnvironmentalImpact(formData.waste_type, quantity);
 
-      const { error } = await supabase
+      const { data: entry, error } = await supabase
         .from('waste_data_logs')
         .insert({
           user_id: user.id,
@@ -87,7 +122,9 @@ const WasteEntry = () => {
           collection_date: formData.collection_date || null,
           environmental_impact: environmentalImpact,
           notes: formData.notes || null
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
@@ -103,7 +140,7 @@ const WasteEntry = () => {
           waste_type: formData.waste_type,
           co2_reduced: environmentalImpact.co2_reduction_kg,
           cost_savings: environmentalImpact.co2_reduction_kg * 3800,
-          waste_log_id: Date.now() // Temporary ID for real-time updates
+          waste_log_id: entry?.id || Date.now()
         }
       );
 
@@ -126,6 +163,9 @@ const WasteEntry = () => {
         description: `Your waste data has been successfully logged. CO₂ reduced: ${environmentalImpact.co2_reduction_kg.toFixed(2)} kg`,
       });
 
+      // Fire AI impact story generation (non-blocking)
+      generateImpactStory(formData.waste_type, quantity, formData.unit, entry?.id);
+
       // Reset form
       setFormData({
         waste_type: '',
@@ -136,8 +176,6 @@ const WasteEntry = () => {
         notes: ''
       });
 
-      // Navigate back to dashboard after a short delay
-      setTimeout(() => navigate('/dashboard'), 1500);
     } catch (error: any) {
       console.error('Error recording waste data:', error);
       toast({
@@ -271,6 +309,28 @@ const WasteEntry = () => {
             </form>
           </CardContent>
         </Card>
+
+        {/* AI-generated Impact Story — Green Success Card */}
+        {isGeneratingStory && (
+          <div className="mt-6 p-5 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 animate-fade-in">
+            <Loader2 className="h-5 w-5 text-green-600 animate-spin" />
+            <p className="text-green-700 text-sm">Generating your environmental impact story...</p>
+          </div>
+        )}
+
+        {impactStory && (
+          <div className="mt-6 p-5 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3 animate-fade-in">
+            <span className="text-2xl">🌱</span>
+            <div>
+              <p className="font-semibold text-green-800 mb-1">
+                Your Environmental Impact
+              </p>
+              <p className="text-green-700 text-sm leading-relaxed">
+                {impactStory}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
