@@ -21,6 +21,8 @@ import About from "./pages/About";
 import CitizenReports from "./pages/CitizenReports";
 import CitizenReportDetails from "./pages/CitizenReportDetails";
 import NewCitizenReport from "./pages/NewCitizenReport";
+import WardDetails from "./pages/WardDetails";
+import ProfileSettings from "./pages/ProfileSettings";
 import WasteEntry from "./pages/WasteEntry";
 import Marketplace from "./pages/Marketplace";
 import RouteOptimization from "./pages/RouteOptimization";
@@ -81,14 +83,24 @@ const AppContent = () => {
               <CitizenReports />
             </ProtectedRoute>
           } />
+          <Route path="/citizen-reports/new" element={
+            <ProtectedRoute>
+              <NewCitizenReport />
+            </ProtectedRoute>
+          } />
           <Route path="/citizen-reports/:id" element={
             <ProtectedRoute>
               <CitizenReportDetails />
             </ProtectedRoute>
           } />
-          <Route path="/citizen-reports/new" element={
+          <Route path="/wards/:id" element={
             <ProtectedRoute>
-              <NewCitizenReport />
+              <WardDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfileSettings />
             </ProtectedRoute>
           } />
           <Route path="/waste-entry" element={

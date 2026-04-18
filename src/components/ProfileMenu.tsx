@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -16,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 const ProfileMenu = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
@@ -34,18 +36,12 @@ const ProfileMenu = () => {
     }
   };
 
-  const handleSettings = () => {
-    toast({
-      title: "Settings",
-      description: "Settings feature coming soon!"
-    });
+  const handleProfile = () => {
+    navigate('/profile');
   };
 
-  const handleProfile = () => {
-    toast({
-      title: "Profile",
-      description: "Profile management feature coming soon!"
-    });
+  const handleSettings = () => {
+    navigate('/profile');
   };
 
   if (!user) return null;

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,13 +29,33 @@ import RecentActivity from '@/components/dashboard/RecentActivity';
 import EnvironmentalImpactCard from '@/components/dashboard/EnvironmentalImpactCard';
 import VisitTracker from '@/components/dashboard/VisitTracker';
 import { useVisitTracker } from '@/hooks/useVisitTracker';
+import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState('');
   
   // Track user visit
   useVisitTracker();
+
+  // Fetch profile name
+  useEffect(() => {
+    const fetchName = async () => {
+      if (!user) return;
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        setDisplayName(data?.full_name || user.email?.split('@')[0] || 'User');
+      } catch {
+        setDisplayName(user.email?.split('@')[0] || 'User');
+      }
+    };
+    fetchName();
+  }, [user]);
 
   const handleNavigation = (route: string) => {
     navigate(route);
@@ -205,7 +225,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.email?.split('@')[0] || 'User'}!
+            Welcome back, {displayName}!
           </h1>
           <p className="text-gray-600">
             Manage your waste data, track environmental impact, and access green finance opportunities
