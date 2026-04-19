@@ -134,6 +134,9 @@ const NewCitizenReport: React.FC = () => {
       }
 
       // Insert report
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('You must be signed in to submit a report.');
+
       const { data, error } = await supabase
         .from('citizen_reports')
         .insert({
@@ -148,6 +151,7 @@ const NewCitizenReport: React.FC = () => {
           image_url: imageUrl,
           priority,
           status: 'pending',
+          user_id: user.id,
           last_activity_at: new Date().toISOString(),
         } as any)
         .select()
