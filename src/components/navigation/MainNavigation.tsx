@@ -36,14 +36,14 @@ const MainNavigation = () => {
 
   const navItems = [
     {
-      href: '/marketplace',
-      label: 'Marketplace',
-      icon: ShoppingCart
-    },
-    {
       href: '/dashboard',
       label: 'Dashboard',
       icon: BarChart3
+    },
+    {
+      href: '/marketplace',
+      label: 'Marketplace',
+      icon: ShoppingCart
     },
     {
       href: '/analytics',
