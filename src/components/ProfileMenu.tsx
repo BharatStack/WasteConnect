@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ProfileMenu = () => {
@@ -40,9 +40,7 @@ const ProfileMenu = () => {
     navigate('/profile');
   };
 
-  const handleSettings = () => {
-    navigate('/profile');
-  };
+
 
   if (!user) return null;
 
@@ -94,16 +92,7 @@ const ProfileMenu = () => {
           </div>
         </DropdownMenuItem>
 
-        <DropdownMenuItem 
-          onClick={handleSettings}
-          className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 cursor-pointer"
-        >
-          <Settings className="mr-3 h-4 w-4" />
-          <div>
-            <div className="text-sm font-medium">Settings</div>
-            <div className="text-xs text-gray-500">App preferences and configuration</div>
-          </div>
-        </DropdownMenuItem>
+
 
         <DropdownMenuSeparator className="bg-gray-200" />
 
