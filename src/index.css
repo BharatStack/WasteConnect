@@ -46,42 +46,42 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 220 20% 7%;
+    --foreground: 210 20% 95%;
 
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 220 18% 10%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 220 18% 10%;
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 220 14% 16%;
+    --secondary-foreground: 210 20% 95%;
 
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 220 14% 16%;
+    --muted-foreground: 215 14% 55%;
 
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 220 14% 16%;
+    --accent-foreground: 210 20% 95%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 142 76% 42%;
 
-    --sidebar-background: 0 0% 3.9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 9%;
-    --sidebar-accent: 0 0% 14.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 14.9%;
-    --sidebar-ring: 0 0% 83.1%;
+    --sidebar-background: 220 20% 7%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 142 76% 42%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 220 14% 16%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 220 14% 18%;
+    --sidebar-ring: 142 76% 42%;
   }
 }
 
@@ -92,8 +92,7 @@
 
   body {
     @apply bg-background text-foreground;
-    background-color: white;
-    color: black;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -109,20 +108,24 @@
   @apply bg-gradient-to-r from-eco-green-50 via-emerald-50 to-teal-50;
 }
 
+.dark .eco-gradient-subtle {
+  background: linear-gradient(to right, rgba(20, 83, 45, 0.2), rgba(6, 78, 59, 0.2), rgba(19, 78, 74, 0.2));
+}
+
 .eco-card {
-  @apply bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-eco-green-100/50;
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-eco-green-100/50 dark:border-gray-700/50;
 }
 
 .eco-card-enhanced {
-  @apply bg-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 backdrop-blur-lg border border-eco-green-200/50;
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 backdrop-blur-lg border border-eco-green-200/50 dark:border-gray-700/50;
 }
 
 .page-header {
-  @apply text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-eco-green-700 via-emerald-700 to-teal-700 bg-clip-text text-transparent;
+  @apply text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-eco-green-700 via-emerald-700 to-teal-700 dark:from-eco-green-400 dark:via-emerald-400 dark:to-teal-400 bg-clip-text text-transparent;
 }
 
 .section-header {
-  @apply text-xl md:text-2xl font-semibold mb-4 bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent;
+  @apply text-xl md:text-2xl font-semibold mb-4 bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 dark:from-eco-green-400 dark:via-emerald-400 dark:to-teal-400 bg-clip-text text-transparent;
 }
 
 .eco-button {
@@ -134,12 +137,16 @@
 }
 
 .glassmorphism {
-  @apply backdrop-blur-lg bg-white/80 border border-white/20 shadow-xl;
+  @apply backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 border border-white/20 dark:border-gray-700/30 shadow-xl;
 }
 
 .shimmer {
   background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
   animation: shimmer 2s infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
 }
 
 @keyframes shimmer {
@@ -148,7 +155,7 @@
 }
 
 .text-gradient {
-  @apply bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-eco-green-600 via-emerald-600 to-teal-600 dark:from-eco-green-400 dark:via-emerald-400 dark:to-teal-400 bg-clip-text text-transparent;
 }
 
 .border-gradient {
@@ -222,6 +229,10 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+.dark .report-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .vote-button {
@@ -256,6 +267,11 @@ html {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s infinite;
+}
+
+.dark .loading-shimmer {
+  background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
+  background-size: 200% 100%;
 }
 
 @keyframes loading-shimmer {

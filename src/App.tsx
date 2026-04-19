@@ -11,6 +11,7 @@ import AppOpeningAnimation from "@/components/AppOpeningAnimation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainNavigation from "@/components/navigation/MainNavigation";
 import PlasticCreditMarketplace from "@/pages/PlasticCreditMarketplace";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 // Import all pages
 import Home from "./pages/Home";
@@ -205,15 +206,17 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

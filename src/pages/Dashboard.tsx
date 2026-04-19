@@ -218,15 +218,15 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       
       <div className="max-w-7xl mx-auto py-6 px-4">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Welcome back, {displayName}!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Manage your waste data, track environmental impact, and access green finance opportunities
           </p>
         </div>
@@ -236,8 +236,8 @@ const Dashboard = () => {
 
         {/* Visit Tracking Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Engagement Insights</h2>
-          <p className="text-gray-600 mb-4">Track your app usage and build streaks to maximize your environmental impact!</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Engagement Insights</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Track your app usage and build streaks to maximize your environmental impact!</p>
           <VisitTracker />
         </div>
 
@@ -249,8 +249,8 @@ const Dashboard = () => {
 
         {/* Features Grid */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Available Features</h2>
-          <p className="text-gray-600 mb-6">Explore all the features available in your dashboard</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Available Features</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Explore all the features available in your dashboard</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featureCards.map((card) => {
