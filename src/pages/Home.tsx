@@ -6,7 +6,7 @@ import UserTypes from "@/components/UserTypes";
 import TestimonialSection from "@/components/TestimonialSection";
 import CallToAction from "@/components/CallToAction";
 import Footer from "@/components/Footer";
-import MainNavigation from "@/components/navigation/MainNavigation";
+
 import AppOpeningAnimation from "@/components/AppOpeningAnimation";
 import { useAppOpeningAnimation } from "@/hooks/useAppOpeningAnimation";
 import { useAuth } from "@/hooks/useAuth";
@@ -45,7 +45,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <MainNavigation />
+
       <Hero />
       <Features />
       <UserTypes />

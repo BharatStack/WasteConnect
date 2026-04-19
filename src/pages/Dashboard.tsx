@@ -23,7 +23,7 @@ import {
   ChartLine,
   Truck
 } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
+
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import EnvironmentalImpactCard from '@/components/dashboard/EnvironmentalImpactCard';
@@ -219,7 +219,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
       
       <div className="max-w-7xl mx-auto py-6 px-4">
         {/* Welcome Section */}

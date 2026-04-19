@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { CheckCircle2, ArrowRight, Mail, ArrowLeft, Home } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 const About = () => {
@@ -43,22 +42,6 @@ const About = () => {
     description: "Collaborating to create more efficient material recovery and recycling processes."
   }];
   return <div className="min-h-screen flex flex-col">
-      <Header />
-
-      {/* Navigation Buttons */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-2">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <Link to="/" className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
-            <Home className="h-4 w-4 mr-2" />
-            Home
-          </Link>
-          <Button variant="ghost" onClick={() => window.history.back()} className="inline-flex items-center text-eco-green-600 hover:text-eco-green-700">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-        </div>
-      </div>
-
       <main className="flex-1">
         <div className="bg-eco-green-50 dark:bg-eco-green-900/20 py-16 md:py-24">
           <div className="container mx-auto px-4">
